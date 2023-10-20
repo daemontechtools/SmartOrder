@@ -7,12 +7,16 @@
     @apply bg-gray-50;
 }
 
-
-::deep .quickgrid[theme=default] th:first-child {
+::deep .quickgrid[theme=default] thead th:not(:last-child) {
+    @apply text-left text-sm font-semibold text-gray-900;
+}
+::deep .quickgrid[theme=default] thead th:first-child {
     @apply py-3.5 pl-4 pr-3 sm:pl-6;
 }
-
-::deep .quickgrid[theme=default] th:not(:first-child):not(:last-child) {
+::deep .quickgrid[theme=default] thead th:last-child {
+    @apply relative py-3.5 pl-3 pr-4 sm:pr-6;
+}
+::deep .quickgrid[theme=default] thead th:not(:first-child):not(:last-child) {
     @apply px-3 py-3.5;
 }
 ::deep .quickgrid[theme=default] th:not(:last-child) {
@@ -26,7 +30,7 @@
 }
 
 
-::deep .quickgrid[theme=default] button.col-title {
+::deep .quickgrid[theme=default] thead button.col-title {
     @apply pl-0 hover:bg-inherit;
 }
 
@@ -39,15 +43,15 @@
     @apply hover:bg-sky-50 cursor-pointer duration-500;
 }
 
-::deep .quickgrid[theme=default] td {
+::deep .quickgrid[theme=default] tbody td {
     @apply whitespace-nowrap text-sm py-4;
 }
-::deep .quickgrid[theme=default] td:first-child {
+::deep .quickgrid[theme=default] tbody td:first-child {
     @apply pl-4 pr-3 font-medium text-gray-900 sm:pl-6;
 }
-::deep .quickgrid[theme=default] td:not(:first-child):not(:last-child) {
+::deep .quickgrid[theme=default] tbody td:not(:first-child):not(:last-child) {
     @apply text-gray-500 px-3;
 }
-::deep .quickgrid[theme=default] td:last-child {
+::deep .quickgrid[theme=default] tbody td:last-child {
     @apply relative pl-3 pr-4 text-right sm:pr-6;
 }
