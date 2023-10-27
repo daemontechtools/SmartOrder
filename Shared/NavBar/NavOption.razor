@@ -9,16 +9,20 @@
     class="
         group flex items-center
         px-2 py-2
-        text-sm font-medium
+        font-semibold
         rounded-md
         cursor-pointer select-none
-        text-stone-100 hover:text-stone-400
+        text-stone-200 hover:text-stone-400
         hover:bg-stone-700 hover:bg-opacity-75
         no-underline hover:no-underline
     "
     ActiveClass="bg-stone-900"
 >
-    <div class="mr-4 h-6 w-6 flex-shrink-0 opacity-60">
+    <div class="
+        mr-4 h-6 w-6 
+        flex-shrink-0 
+        text-stone-200 hover:text-stone-400
+    ">
         @if (Icon != null)
         { 
             @Icon

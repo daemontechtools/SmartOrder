@@ -15,7 +15,7 @@ public partial class QuoteList : ComponentBase, IDisposable
 
     [Inject]
 
-    ILoggerFactory? _loggerFactory { get; set; }
+    ILoggerFactory _loggerFactory { get; set; }
 
 
     private IQueryable<QuoteView> _quotes = new List<QuoteView>().AsQueryable();
@@ -83,14 +83,14 @@ public partial class QuoteList : ComponentBase, IDisposable
         await _quoteStore!.WritableStore.Create(newQuote);
     }
 
-    private async Task EditQuote()
+    private async Task EditQuote(int quoteId)
     {
-        Console.WriteLine("Edit Quote");
+        _logger.LogInformation("Navigate to Quote Details");
     }
 
-    private async Task DeleteQuote()
+    private async Task DeleteQuote(int quoteId)
     {
-        Console.WriteLine("Delete Quote");
+        ShowDeleteConfirmation(quoteId);
     }
 }
 

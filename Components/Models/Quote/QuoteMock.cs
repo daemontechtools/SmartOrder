@@ -108,7 +108,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                                 Name = "Product 2"
                             }
                         }
-                    }
+                    },
                 }
             },
             new Quote {
@@ -460,9 +460,9 @@ public struct QuoteMock : IModelMockData<Quote> {
             IsFreightForwarder = random.Next(0, 2) == 1,
             Status = (QuoteStatus)random.Next(0, 4),
             CatelogPdfUrl = "https://example.com/catalog.pdf",
-            Rooms = new List<Room>
+            Rooms = new List<RoomView>
             {
-                new Room
+                new RoomView
                 {
                     Id = random.Next(1, 1000),
                     CreatedAt = DateTime.Now.AddDays(-random.Next(1, 30)),

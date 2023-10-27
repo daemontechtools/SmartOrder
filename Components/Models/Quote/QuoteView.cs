@@ -27,5 +27,5 @@ public struct QuoteView : IDbModel {
     public bool IsFreightForwarder { get; set; }
     public string CatelogPdfUrl { get; set; }
 
-    public List<Room> Rooms { get; set; }
+    public List<RoomView> Rooms { get; set; }
 }
