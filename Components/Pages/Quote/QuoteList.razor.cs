@@ -15,7 +15,7 @@ public partial class QuoteList : ComponentBase, IDisposable
 
     [Inject]
 
-    ILoggerFactory _loggerFactory { get; set; }
+    ILoggerFactory? _loggerFactory { get; set; }
 
 
     private IQueryable<QuoteView> _quotes = new List<QuoteView>().AsQueryable();
