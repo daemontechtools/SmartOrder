@@ -29,9 +29,9 @@
           WorkingDirectory="$(MSBuildProjectDirectory)" />
   </Target>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="$(ProjectDir)tailwindwatch.sh" />
-  </Target>
+<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Release'">
+  <Exec Command="$(ProjectDir)tailwindbuild.sh" />
+</Target>
 
 
 </Project>
