@@ -102,10 +102,24 @@
                 />
                 <PropertyColumn 
                     TGridItem=RoomView 
-                    TProp=DateTime 
-                    Title="Last Updated"
-                    Property=@(q => q.UpdatedAt)
-                    Format="HH:mm tt MMMM d, yyyy"
+                    TProp=string 
+                    Title="Interior"
+                    Property=@(r => r.Interior.Name)
+                    Sortable=true 
+                />
+                <PropertyColumn 
+                    TGridItem=RoomView 
+                    TProp=string 
+                    Title="Drawer Hardware"
+                    Property=@(r => r.DrawerHardware.Name)
+                    Sortable=true 
+                />
+                <PropertyColumn 
+                    TGridItem=RoomView 
+                    TProp=float 
+                    Title="Drawer Hardware"
+                    Property=@(r => r.SubTotal)
+                    Format="C"
                     Sortable=true 
                 />
                 <TemplateColumn 
