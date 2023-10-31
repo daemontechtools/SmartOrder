@@ -159,6 +159,213 @@ public struct QuoteMock : IModelMockData<Quote> {
                             }
                         }
                     },
+                    new Room {
+                        Id = 3,
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now,
+                        Name = "Room 2",
+                        DoorStyle = new DoorStyle {
+                            Id = 4,
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now,
+                            Name = "Style 1",
+                            Price = 100.0f
+                        },
+                        Finish = new Finish {
+                            Id = 5,
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now,
+                            Name = "Finish 1",
+                            Price = 50.0f
+                        },
+                        Interior = new Interior {
+                            Id = 6,
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now,
+                            Name = "Interior 1",
+                            Price = 75.0f
+                        },
+                        DrawerHardware = new DrawerHardware {
+                            Id = 7,
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now,
+                            Name = "Hardware 1",
+                            Price = 25.0f
+                        },
+                        SubTotal = 250.0f,
+                        Products = new List<Product> {
+                            new Product {
+                                Id = 10,
+                                CreatedAt = DateTime.Now,
+                                UpdatedAt = DateTime.Now,
+                                Quantity = 3,
+                                Code = "P1",
+                                Width = 10.0f,
+                                Height = 20.0f,
+                                Depth = 5.0f,
+                                Left = true,
+                                Right = false,
+                                Comments = "",
+                                Price = 100.0f,
+                                EXT = "",
+                                Name = "Product 1"
+                            },
+                            new Product {
+                                Id = 11,
+                                CreatedAt = DateTime.Now,
+                                UpdatedAt = DateTime.Now,
+                                Quantity = 2,
+                                Code = "P2",
+                                Width = 15.0f,
+                                Height = 25.0f,
+                                Depth = 10.0f,
+                                Left = false,
+                                Right = true,
+                                Comments = "",
+                                Price = 150.0f,
+                                EXT = "",
+                                Name = "Product 2"
+                            }
+                        }
+                    },
+                    new Room {
+                        Id = 4,
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now,
+                        Name = "Room 3",
+                        DoorStyle = new DoorStyle {
+                            Id = 8,
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now,
+                            Name = "Style 1",
+                            Price = 100.0f
+                        },
+                        Finish = new Finish {
+                            Id = 9,
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now,
+                            Name = "Finish 1",
+                            Price = 50.0f
+                        },
+                        Interior = new Interior {
+                            Id = 10,
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now,
+                            Name = "Interior 1",
+                            Price = 75.0f
+                        },
+                        DrawerHardware = new DrawerHardware {
+                            Id = 11,
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now,
+                            Name = "Hardware 1",
+                            Price = 25.0f
+                        },
+                        SubTotal = 250.0f,
+                        Products = new List<Product> {
+                            new Product {
+                                Id = 12,
+                                CreatedAt = DateTime.Now,
+                                UpdatedAt = DateTime.Now,
+                                Quantity = 3,
+                                Code = "P1",
+                                Width = 10.0f,
+                                Height = 20.0f,
+                                Depth = 5.0f,
+                                Left = true,
+                                Right = false,
+                                Comments = "",
+                                Price = 100.0f,
+                                EXT = "",
+                                Name = "Product 1"
+                            },
+                            new Product {
+                                Id = 13,
+                                CreatedAt = DateTime.Now,
+                                UpdatedAt = DateTime.Now,
+                                Quantity = 2,
+                                Code = "P2",
+                                Width = 15.0f,
+                                Height = 25.0f,
+                                Depth = 10.0f,
+                                Left = false,
+                                Right = true,
+                                Comments = "",
+                                Price = 150.0f,
+                                EXT = "",
+                                Name = "Product 2"
+                            }
+                        }
+                    },
+                    new Room {
+                        Id = 4,
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now,
+                        Name = "Room 3",
+                        DoorStyle = new DoorStyle {
+                            Id = 8,
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now,
+                            Name = "Style 1",
+                            Price = 100.0f
+                        },
+                        Finish = new Finish {
+                            Id = 9,
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now,
+                            Name = "Finish 1",
+                            Price = 50.0f
+                        },
+                        Interior = new Interior {
+                            Id = 10,
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now,
+                            Name = "Interior 1",
+                            Price = 75.0f
+                        },
+                        DrawerHardware = new DrawerHardware {
+                            Id = 11,
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now,
+                            Name = "Hardware 1",
+                            Price = 25.0f
+                        },
+                        SubTotal = 250.0f,
+                        Products = new List<Product> {
+                            new Product {
+                                Id = 12,
+                                CreatedAt = DateTime.Now,
+                                UpdatedAt = DateTime.Now,
+                                Quantity = 3,
+                                Code = "P1",
+                                Width = 10.0f,
+                                Height = 20.0f,
+                                Depth = 5.0f,
+                                Left = true,
+                                Right = false,
+                                Comments = "",
+                                Price = 100.0f,
+                                EXT = "",
+                                Name = "Product 1"
+                            },
+                            new Product {
+                                Id = 13,
+                                CreatedAt = DateTime.Now,
+                                UpdatedAt = DateTime.Now,
+                                Quantity = 2,
+                                Code = "P2",
+                                Width = 15.0f,
+                                Height = 25.0f,
+                                Depth = 10.0f,
+                                Left = false,
+                                Right = true,
+                                Comments = "",
+                                Price = 150.0f,
+                                EXT = "",
+                                Name = "Product 2"
+                            }
+                        }
+                    }
                 }
             },
             new Quote {
