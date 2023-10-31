@@ -9,5 +9,6 @@ public class SmartEstimateMappingProfile : Profile
     {
         CreateMap<Quote, QuoteView>().ReverseMap();
         CreateMap<Room, RoomView>().ReverseMap();
+        CreateMap<Product, ProductView>().ReverseMap();
     }
 }

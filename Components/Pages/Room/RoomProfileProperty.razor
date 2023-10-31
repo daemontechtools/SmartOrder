@@ -1,0 +1,21 @@
+@using Daemon.Components
+
+@namespace SmartEstimate.Pages
+
+<div class="flex flex-col py-6 px-4">
+    <div class="flex justify-between items-center"> 
+        <label for="photo" class="block text-lg font-medium leading-6 text-gray-900">
+            @Title
+        </label>
+        <img src="/images/cherry.jpg?width=40&quality=80" class="w-14 rounded-full inline-block" />
+    </div>
+    <div class="flex mt-6">  
+        <SelectMenu />                            
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+}

@@ -15,5 +15,5 @@ public struct RoomView : IDbModel {
     public Interior Interior { get; set; }
     public DrawerHardware DrawerHardware { get; set; }
     public float SubTotal { get; set; }
-    public List<Product> Products { get; set; }
+    public List<ProductView> Products { get; set; }
 }

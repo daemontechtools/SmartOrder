@@ -81,6 +81,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                                 Id = 6,
                                 CreatedAt = DateTime.Now,
                                 UpdatedAt = DateTime.Now,
+                                Quantity = 3,
                                 Code = "P1",
                                 Width = 10.0f,
                                 Height = 20.0f,
@@ -96,6 +97,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                                 Id = 7,
                                 CreatedAt = DateTime.Now,
                                 UpdatedAt = DateTime.Now,
+                                Quantity = 2,
                                 Code = "P2",
                                 Width = 15.0f,
                                 Height = 25.0f,
@@ -106,6 +108,54 @@ public struct QuoteMock : IModelMockData<Quote> {
                                 Price = 150.0f,
                                 EXT = "",
                                 Name = "Product 2"
+                            },
+                            new Product {
+                                Id = 7,
+                                CreatedAt = DateTime.Now,
+                                UpdatedAt = DateTime.Now,
+                                Quantity = 2,
+                                Code = "P2",
+                                Width = 15.0f,
+                                Height = 25.0f,
+                                Depth = 6.0f,
+                                Left = false,
+                                Right = true,
+                                Comments = "",
+                                Price = 150.0f,
+                                EXT = "",
+                                Name = "Product 2"
+                            },
+                            new Product {
+                                Id = 8,
+                                CreatedAt = DateTime.Now,
+                                UpdatedAt = DateTime.Now,
+                                Quantity = 4,
+                                Code = "P3",
+                                Width = 20.0f,
+                                Height = 30.0f,
+                                Depth = 7.0f,
+                                Left = true,
+                                Right = false,
+                                Comments = "",
+                                Price = 200.0f,
+                                EXT = "",
+                                Name = "Product 3"
+                            },
+                            new Product {
+                                Id = 9,
+                                CreatedAt = DateTime.Now,
+                                UpdatedAt = DateTime.Now,
+                                Quantity = 5,
+                                Code = "P4",
+                                Width = 25.0f,
+                                Height = 35.0f,
+                                Depth = 8.0f,
+                                Left = false,
+                                Right = true,
+                                Comments = "",
+                                Price = 250.0f,
+                                EXT = "",
+                                Name = "Product 4"
                             }
                         }
                     },
@@ -171,6 +221,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                             new Product {
                                 Id = 9,
                                 Code = "P1",
+                                Quantity = 1,
                                 Width = 10.0f,
                                 Height = 20.0f,
                                 Depth = 5.0f,
@@ -184,6 +235,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                             new Product {
                                 Id = 10,
                                 Code = "P2",
+                                Quantity = 5,
                                 Width = 15.0f,
                                 Height = 25.0f,
                                 Depth = 10.0f,
@@ -224,6 +276,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                             new Product {
                                 Id = 16,
                                 Code = "P3",
+                                Quantity = 3,
                                 Width = 20.0f,
                                 Height = 30.0f,
                                 Depth = 15.0f,
@@ -237,6 +290,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                             new Product {
                                 Id = 17,
                                 Code = "P4",
+                                Quantity = 1,
                                 Width = 25.0f,
                                 Height = 35.0f,
                                 Depth = 20.0f,
@@ -324,6 +378,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                                 Id = 11,
                                 CreatedAt = DateTime.Now,
                                 UpdatedAt = DateTime.Now,
+                                Quantity = 7,
                                 Code = "P1",
                                 Width = 10.0f,
                                 Height = 20.0f,
@@ -339,6 +394,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                                 Id = 12,
                                 CreatedAt = DateTime.Now,
                                 UpdatedAt = DateTime.Now,
+                                Quantity = 2,
                                 Code = "P2",
                                 Width = 15.0f,
                                 Height = 25.0f,
@@ -391,6 +447,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                                 Id = 18,
                                 CreatedAt = DateTime.Now,
                                 UpdatedAt = DateTime.Now,
+                                Quantity = 4,
                                 Code = "P3",
                                 Width = 20.0f,
                                 Height = 30.0f,
@@ -406,6 +463,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                                 Id = 19,
                                 CreatedAt = DateTime.Now,
                                 UpdatedAt = DateTime.Now,
+                                Quantity = 1,
                                 Code = "P4",
                                 Width = 25.0f,
                                 Height = 35.0f,
@@ -501,13 +559,14 @@ public struct QuoteMock : IModelMockData<Quote> {
                         Price = (float)random.NextDouble() * 100
                     },
                     SubTotal = (float)random.NextDouble() * 1000,
-                    Products = new List<Product>
+                    Products = new List<ProductView>
                     {
-                        new Product
+                        new ProductView
                         {
                             Id = random.Next(1, 1000),
                             CreatedAt = DateTime.Now.AddDays(-random.Next(1, 30)),
                             UpdatedAt = DateTime.Now.AddDays(-random.Next(1, 30)),
+                            Quantity = random.Next(1, 10),
                             Code = $"P{random.Next(1, 10)}",
                             Width = (float)random.NextDouble() * 100,
                             Height = (float)random.NextDouble() * 100,
@@ -519,11 +578,12 @@ public struct QuoteMock : IModelMockData<Quote> {
                             EXT = "",
                             Name = $"Product {random.Next(1, 10)}"
                         },
-                        new Product
+                        new ProductView
                         {
                             Id = random.Next(1, 1000),
                             CreatedAt = DateTime.Now.AddDays(-random.Next(1, 30)),
                             UpdatedAt = DateTime.Now.AddDays(-random.Next(1, 30)),
+                            Quantity = random.Next(1, 10),
                             Code = $"P{random.Next(1, 10)}",
                             Width = (float)random.NextDouble() * 100,
                             Height = (float)random.NextDouble() * 100,
