@@ -1,7 +1,11 @@
+using Microsoft.AspNetCore.Components.Web;
+
 using AutoMapper;
-using SmartEstimate.Components;
+
+using Daemon.RazorUI.Modal; 
 using SmartEstimate.Models;
-using SmartEstimate.Modal;
+using SmartEstimate.Components;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +21,11 @@ IMapper mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 builder.Services.AddSingleton<ModalService>();
 builder.Services.AddScoped<QuoteStore>();
+
+builder.WebHost.UseWebRoot("wwwroot");
+builder.WebHost.UseStaticWebAssets();
+
+builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
