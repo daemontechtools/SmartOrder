@@ -1,11 +1,10 @@
-@using SmartEstimate.Animation
-@using Daemon.Components
+@namespace SmartEstimate.Pages
 
 @page "/quotes/{quoteId:int}/rooms/{roomId:int}"
+ 
 
 @inject QuoteStore _quoteStore
-
-@namespace SmartEstimate.Pages
+ 
 
 <div class="flex flex-col h-full">
   <QuoteDetailHeader QuoteId="@QuoteId" />

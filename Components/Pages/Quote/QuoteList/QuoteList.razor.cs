@@ -1,6 +1,11 @@
+using System;
+using System.IO;
+using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Components;
+
+using Daemon.RazorUI.Components;
+using Daemon.RazorUI.Modal;
 using SmartEstimate.Models;
-using SmartEstimate.Modal;
 
 namespace SmartEstimate.Pages;
 
@@ -16,6 +21,7 @@ public partial class QuoteList : ComponentBase, IDisposable
     [Inject]
 
     ILoggerFactory? _loggerFactory { get; set; }
+    ILogger<QuoteList>? _logger { get; set; }
 
 
     private IQueryable<QuoteView> _quotes = new List<QuoteView>().AsQueryable();
@@ -25,11 +31,14 @@ public partial class QuoteList : ComponentBase, IDisposable
     private RenderFragment? _deleteConfirmation;
     private int? _itemIdToDelete;
 
-    ILogger? _logger;
+
 
     protected override async Task OnInitializedAsync()
     {
-        _logger = _loggerFactory?.CreateLogger<QuoteList>();
+        if(_loggerFactory != null)
+        {
+            _logger = _loggerFactory.CreateLogger<QuoteList>();
+        }
         List<QuoteView> _viewList = await _quoteStore!.ReadableStore.GetAll();
         _quotes = _viewList.AsQueryable();
         //TODO: Can this be more specific?
@@ -83,12 +92,15 @@ public partial class QuoteList : ComponentBase, IDisposable
         await _quoteStore!.WritableStore.Create(newQuote);
     }
 
-    private async Task EditQuote(int quoteId)
+    private void EditQuote(int quoteId)
     {
-        _logger.LogInformation("Navigate to Quote Details");
+        if(_logger != null)
+        {
+            _logger.LogInformation($"Edit Quote {quoteId}");
+        }
     }
 
-    private async Task DeleteQuote(int quoteId)
+    private void DeleteQuote(int quoteId)
     {
         ShowDeleteConfirmation(quoteId);
     }

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Daemon.DataStore;
+using Daemon.DataAccess.DataStore;
 
 
 namespace SmartEstimate.Models;

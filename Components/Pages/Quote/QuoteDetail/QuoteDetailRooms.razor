@@ -1,6 +1,7 @@
-@using SmartEstimate.Animation
 
 @namespace SmartEstimate.Pages
+
+@using Microsoft.AspNetCore.Components.QuickGrid
 
 @inject QuoteStore _quoteStore
 
@@ -87,6 +88,8 @@
                 </TemplateColumn>
             </DataGrid>
         </DataGridWrapper>
+    } else {
+        <span>No Quotes Available</span>
     }
 
 

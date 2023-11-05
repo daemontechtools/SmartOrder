@@ -1,7 +1,6 @@
-@using SmartEstimate.Animation
-
 @namespace SmartEstimate.Pages
 
+@using Microsoft.AspNetCore.Components.QuickGrid
 
 <ContentViewHeader 
     Title="Products"
@@ -11,7 +10,7 @@
 <DataGridWrapper>
     <DataGrid Items=Products>
         <PropertyColumn 
-            TGridItem=ProductView
+            TGridItem=@ProductView
             TProp=int
             Title="ID"
             Property=@(p => p.Id)
@@ -110,5 +109,5 @@
 
 @code {
     [Parameter]
-    public IQueryable<ProductView> Products { get; set; }
+    public IQueryable<ProductView> Products { get; set; } = new List<ProductView>().AsQueryable();
 }
