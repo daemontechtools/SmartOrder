@@ -1,10 +1,7 @@
-using System;
-using System.IO;
-using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Components;
 
-using Daemon.RazorUI.Components;
 using Daemon.RazorUI.Modal;
+using Daemon.RazorUI.Icons;
 using SmartEstimate.Models;
 
 namespace SmartEstimate.Pages;
@@ -19,8 +16,6 @@ public partial class QuoteList : ComponentBase, IDisposable
     private QuoteStore? _quoteStore { get; set; }
 
     [Inject]
-
-    ILoggerFactory? _loggerFactory { get; set; }
     ILogger<QuoteList>? _logger { get; set; }
 
 
@@ -28,39 +23,46 @@ public partial class QuoteList : ComponentBase, IDisposable
 
     
     private bool IsLoading { get; set; } = true;
-    private RenderFragment? _deleteConfirmation;
+
+    private ModalContentInput _deleteConfirmationInput;
+    private ModalContentInput _createQuoteInput;
+    
     private int? _itemIdToDelete;
 
 
 
     protected override async Task OnInitializedAsync()
     {
-        if(_loggerFactory != null)
-        {
-            _logger = _loggerFactory.CreateLogger<QuoteList>();
-        }
         List<QuoteView> _viewList = await _quoteStore!.ReadableStore.GetAll();
         _quotes = _viewList.AsQueryable();
         //TODO: Can this be more specific?
         _quoteStore.Storage.OnStateChanged += OnStateChanged!;
-        InitDeleteConfirmation();
+
+        _deleteConfirmationInput = new ModalContentInput 
+        {
+            Color="red-600",
+            Title="Delete Category",
+            Description="Are you sure you want to deactivate your account? All of your data will be permanently removed from our servers forever. This action cannot be undone.",
+            IconType=typeof(ClipboardIcon),
+            OnConfirm=OnConfirm 
+        };
+
+        _createQuoteInput = new ModalContentInput 
+        {
+            Color="sky-500",
+            Title="Create New Quote",
+            IconType=typeof(ClipboardIcon),
+            //OnConfirm=@OnConfirm 
+        };
+
         IsLoading = false;
     }
 
-    private void InitDeleteConfirmation()
-    {
-        _deleteConfirmation = builder =>
-        {
-            builder.OpenComponent(0, typeof(DeleteConfirmation));
-            builder.AddAttribute(1, "OnConfirm", EventCallback.Factory.Create<bool>(this, OnConfirm));
-            builder.CloseComponent();
-        };
-    }
 
     private void ShowDeleteConfirmation(int id)
     {
         _itemIdToDelete = id;
-        _modalService!.Show(_deleteConfirmation!);
+        _modalService!.Show(_deleteConfirmationInput);
     }
 
     private async Task OnConfirm(bool confirmed)
