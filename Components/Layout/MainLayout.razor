@@ -1,5 +1,6 @@
 ﻿@using Daemon.RazorUI.Modal
 @using Daemon.RazorUI.Navigation
+@using Daemon.RazorUI.Icons
 
 
 @inherits LayoutComponentBase
@@ -8,14 +9,15 @@
 
 <div class="h-screen bg-gray-100">
     <SideNav>
-        @foreach (var option in @NavOptions)
-        {
-            <NavOption 
-                OptionPath=@option.OptionPath
-                Title=@option.Title
-                IconType=@option.IconType
-            />
-        }
+        <NavOption Path="/quotes" Title="Quotes">
+            <ClipboardIcon Class=@_iconClass />
+        </NavOption>
+        <NavOption Path="/contact" Title="Contact">
+            <UsersIcon Class=@_iconClass />
+        </NavOption>
+        <NavOption Path="/settings" Title="Settings">
+            <SettingsIcon Class=@_iconClass />
+        </NavOption>
     </SideNav>
     <ContentView>
         @Body
@@ -24,34 +26,5 @@
 </div>
 
 @code {
-    public struct IconType<T> where T : SvgIconBase { }
-
-    public struct NavOptionInput
-    {
-        public string OptionPath;
-        public string Title;
-        public Type IconType;
-    }
-
-    public NavOptionInput[] NavOptions = new NavOptionInput[]
-    {
-        new NavOptionInput()
-        {
-            OptionPath = "/quotes",
-            Title = "Quotes",
-            IconType = typeof(ClipboardIcon)
-        },
-        new NavOptionInput()
-        {
-            OptionPath = "/contact",
-            Title = "Contact",
-            IconType = typeof(UsersIcon)
-        },
-        new NavOptionInput()
-        {
-            OptionPath = "/settings",
-            Title = "Settings",
-            IconType = typeof(SettingsIcon)
-        },
-    };
+    private string _iconClass = "text-gray-500";
 }
