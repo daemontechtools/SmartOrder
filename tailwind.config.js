@@ -4,7 +4,6 @@ module.exports = {
     "./Components/**/*.{razor,html,cshtml}",
     "./Shared/**/*.{razor,html,cshtml}",
   ],
-  output: "./wwwroot/css/bundle.css",
   theme: {
     fontFamily: {
         'body': ['Nunito', 'system-ui', 'sans-serif']
