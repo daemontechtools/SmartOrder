@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 
 using Daemon.RazorUI.Modal;
 using Daemon.RazorUI.Icons;
+using Daemon.RazorUI.Color;
 using SmartEstimate.Models;
 
 namespace SmartEstimate.Pages;
@@ -24,8 +25,8 @@ public partial class QuoteList : ComponentBase, IDisposable
     
     private bool IsLoading { get; set; } = true;
 
-    private ModalContentInput _deleteConfirmationInput;
-    private ModalContentInput _createQuoteInput;
+    private ModalContentProps _deleteConfirmationInput;
+    private ModalContentProps _createQuoteInput;
     
     private int? _itemIdToDelete;
 
@@ -38,21 +39,20 @@ public partial class QuoteList : ComponentBase, IDisposable
         //TODO: Can this be more specific?
         _quoteStore.Storage.OnStateChanged += OnStateChanged!;
 
-        _deleteConfirmationInput = new ModalContentInput 
+        _deleteConfirmationInput = new ModalContentProps 
         {
-            Color="red-600",
-            Title="Delete Category",
-            Description="Are you sure you want to deactivate your account? All of your data will be permanently removed from our servers forever. This action cannot be undone.",
-            IconType=typeof(ClipboardIcon),
-            OnConfirm=OnConfirm 
+            Title = "Delete Category",
+            Description = "Are you sure you want to deactivate your account? All of your data will be permanently removed from our servers forever. This action cannot be undone.",
+            IconType = typeof(ClipboardIcon),
+            IconProps = new IconProps() { Color = new TailwindColor("rose") },
+            OnConfirm = OnConfirm 
         };
 
-        _createQuoteInput = new ModalContentInput 
+        _createQuoteInput = new ModalContentProps 
         {
-            Color="sky-500",
-            Title="Create New Quote",
-            IconType=typeof(ClipboardIcon),
-            //OnConfirm=@OnConfirm 
+            Title = "Create New Quote",
+            IconType = typeof(ClipboardIcon),
+            IconProps = new IconProps() { Color = new TailwindColor("sky") },
         };
 
         IsLoading = false;

@@ -10,13 +10,13 @@
 <div class="h-screen bg-gray-100">
     <SideNav>
         <NavOption Path="/quotes" Title="Quotes">
-            <ClipboardIcon Class=@_iconClass />
+            <ClipboardIcon Props=@_iconProps />
         </NavOption>
         <NavOption Path="/contact" Title="Contact">
-            <UsersIcon Class=@_iconClass />
+            <UsersIcon Props=@_iconProps  />
         </NavOption>
         <NavOption Path="/settings" Title="Settings">
-            <SettingsIcon Class=@_iconClass />
+            <SettingsIcon Props=@_iconProps  />
         </NavOption>
     </SideNav>
     <ContentView>
@@ -26,5 +26,8 @@
 </div>
 
 @code {
-    private string _iconClass = "stroke-stone-300";
+    private IconProps _iconProps = new IconProps() 
+    { 
+        Color = new TailwindColor("stone", 300) 
+    };
 }
