@@ -28,7 +28,7 @@
                     SortBy=@_sortByName
                     Sortable=true 
                 >
-                    <NavLink href=@($"/quotes/{context.Id}")>
+                    <NavLink href=@($"/quotes/{QuoteId}/rooms/{context.Id}")>
                         @context.Name
                     </NavLink>
                 </TemplateColumn>
