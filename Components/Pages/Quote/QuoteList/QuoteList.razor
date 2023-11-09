@@ -25,13 +25,16 @@
             />
             <DataGridWrapper>
                 <DataGrid Items=_quotes>
-                    <PropertyColumn 
-                        TGridItem=QuoteView
-                        TProp=string
+                     <TemplateColumn 
+                        TGridItem=QuoteView                
                         Title="Name"
-                        Property=@(q => q.Name)
-                        Sortable="true" 
-                    />
+                        SortBy=@_sortByName
+                        Sortable=true 
+                    >
+                        <NavLink href=@($"/quotes/{context.Id}")>
+                            @context.Name
+                        </NavLink>
+                    </TemplateColumn>
                     <PropertyColumn 
                         TGridItem=QuoteView 
                         TProp=QuoteStatus
@@ -62,7 +65,7 @@
                             <TrashIcon Props=@(new IconProps() 
                                 { 
                                     Color = new TailwindColor("gray", 400),
-                                    HoverColor = new TailwindColor("rose", 500),
+                                    HoverColor = new TailwindColor("red", 500),
                                     Transition = "transition ease-in duration-200"
                                 }) 
                             />
@@ -73,3 +76,8 @@
         }
    </div>
 </div>
+
+@code {
+    private GridSort<QuoteView> _sortByName = GridSort<QuoteView>
+        .ByAscending(q => q.Name);
+}
