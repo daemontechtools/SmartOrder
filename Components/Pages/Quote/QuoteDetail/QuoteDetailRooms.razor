@@ -6,18 +6,23 @@
 @inject QuoteStore _quoteStore
 
 
- @if(IsLoading) {
-        <Spinner Class="text-stone-400 dark:text-stone-400 fill-orange-600" />
-    } else if(!_roomsQueryable.Any()) {
-        <span>No Quotes Available</span>
-    } else {
+
+<div class="container flex flex-col flex-1 bg-gray-100 pt-6 pb-3 justify-between">
+    <div>
         <ContentViewHeader 
             Title="Rooms"
             Description="We heard you like rooms"
             ButtonLabel="Add Room"
+            Class="mb-6"
         />
-        <DataGridWrapper>
-            <QuickGrid Items=_roomsQueryable>
+
+        @if(IsLoading) {
+            <Spinner Class="text-stone-400 dark:text-stone-400 fill-orange-600" />
+        } else if(!_roomsQueryable.Any()) {
+            <span>No Quotes Available</span>
+        } else {
+
+            <QuickGrid Items=_roomsQueryable Pagination=@_pagination>
                 <TemplateColumn             
                     Title="Name"
                     SortBy=@_sortByName
@@ -30,24 +35,20 @@
                 <PropertyColumn 
                     Title="Door Style"
                     Property=@(r => r.DoorStyle.Name)
-                    Sortable=true
                 />
                 <PropertyColumn 
                     Title="Finish"
                     Property=@(r => r.Finish.Name)
-                    Sortable=true
                 />
                 <PropertyColumn 
                     Title="Interior"
                     Property=@(r => r.Interior.Name)
-                    Sortable=true 
                 />
                 <PropertyColumn 
                     TGridItem=RoomView 
                     TProp=string 
                     Title="Drawer Hardware"
                     Property=@(r => r.DrawerHardware.Name)
-                    Sortable=true 
                 />
                 <PropertyColumn 
                     Title="Drawer Hardware"
@@ -72,14 +73,16 @@
                     </button>         
                 </TemplateColumn>
             </QuickGrid>
-        </DataGridWrapper>
-    } else {
-        <span>No Quotes Available</span>
-    }
+        }
+    </div>
+    <Paginator State=@_pagination />
+</div>
+
 
 
 @code {
     private bool IsLoading { get; set; } = true;
+    private PaginationState _pagination = new PaginationState { ItemsPerPage = 10 };
 
     [Parameter]
     public int QuoteId { get; set; }
