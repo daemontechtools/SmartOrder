@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)'=='Release'">
-    <PackageReference Include="Daemon.RazorUI" Version="1.1.0-alpha.0.47" />
+    <PackageReference Include="Daemon.RazorUI" Version="1.1.0-alpha.0.58" />
     <PackageReference Include="Daemon.DataAccess" Version="1.1.0-alpha.0.43" />
   </ItemGroup>
 
