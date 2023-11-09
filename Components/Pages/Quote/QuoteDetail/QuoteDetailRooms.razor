@@ -17,31 +17,27 @@
             ButtonLabel="Add Room"
         />
         <DataGridWrapper>
-            <DataGrid Items=_roomsQueryable>
-                <PropertyColumn 
-                    TGridItem=RoomView
-                    TProp=string
+            <QuickGrid Items=_roomsQueryable>
+                <TemplateColumn             
                     Title="Name"
-                    Property=@(r => r.Name)
-                    Sortable="true" 
-                />
+                    SortBy=@_sortByName
+                    Sortable=true 
+                >
+                    <NavLink href=@($"/quotes/{context.Id}")>
+                        @context.Name
+                    </NavLink>
+                </TemplateColumn>
                 <PropertyColumn 
-                    TGridItem=RoomView 
-                    TProp=string
                     Title="Door Style"
                     Property=@(r => r.DoorStyle.Name)
                     Sortable=true
                 />
                 <PropertyColumn 
-                    TGridItem=RoomView 
-                    TProp=string 
                     Title="Finish"
                     Property=@(r => r.Finish.Name)
                     Sortable=true
                 />
                 <PropertyColumn 
-                    TGridItem=RoomView 
-                    TProp=string 
                     Title="Interior"
                     Property=@(r => r.Interior.Name)
                     Sortable=true 
@@ -54,39 +50,28 @@
                     Sortable=true 
                 />
                 <PropertyColumn 
-                    TGridItem=RoomView 
-                    TProp=float 
                     Title="Drawer Hardware"
                     Property=@(r => r.SubTotal)
                     Format="C"
                     Sortable=true 
                 />
                 <TemplateColumn 
-                    TGridItem=RoomView 
                     Class="flex gap-x-2 justify-end"
                 >
-                    <NavLink href=@($"quotes/{QuoteId}/rooms/{context.Id}")>
-                        <EditIcon Class="
-                            w-[22px]
-                            cursor-pointer 
-                            stroke-gray-400
-                            hover:stroke-sky-500 
-                            duration-300 
-                            ease-in-out" 
-                        />
-                    </NavLink>
                     <button>
-                        <TrashIcon Class="
-                            w-[22px]
-                            cursor-pointer 
-                            stroke-gray-400
-                            hover:stroke-rose-500 
-                            duration-300 
-                            ease-in-out" 
-                        />
+                        <TrashIcon Props=@(new IconProps() {
+                            Class=@"
+                                w-[22px]
+                                cursor-pointer 
+                                stroke-gray-400
+                                hover:stroke-rose-500 
+                                duration-300 
+                                ease-in-out
+                            " 
+                        }) />
                     </button>         
                 </TemplateColumn>
-            </DataGrid>
+            </QuickGrid>
         </DataGridWrapper>
     } else {
         <span>No Quotes Available</span>
@@ -101,6 +86,8 @@
 
     private QuoteView _quote = new();
     private IQueryable<RoomView> _roomsQueryable = new List<RoomView>().AsQueryable();
+    private GridSort<RoomView> _sortByName = GridSort<RoomView>
+        .ByAscending(r => r.Name);
 
     protected override async Task OnInitializedAsync()
     {

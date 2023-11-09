@@ -1,109 +1,106 @@
 @namespace SmartEstimate.Pages
 
-@using Microsoft.AspNetCore.Components.QuickGrid
 
 <ContentViewHeader 
     Title="Products"
     Description="What's a room without some products?"
     ButtonLabel="Add Product"
 />
-<DataGridWrapper>
-    <DataGrid Items=Products>
-        <PropertyColumn 
-            TGridItem=@ProductView
-            TProp=int
-            Title="ID"
-            Property=@(p => p.Id)
-            Sortable="true" 
-        />
-        <PropertyColumn 
-            TGridItem=ProductView 
-            TProp=string
-            Title="Code"
-            Property=@(p => p.Code)
-            Sortable=true
-        />
-        <PropertyColumn 
-            TGridItem=ProductView 
-            TProp=int 
-            Title="Qty"
-            Property=@(p => p.Quantity)
-            Sortable=true
-        />
-        <PropertyColumn 
-            TGridItem=ProductView 
-            TProp=float 
-            Title="Width"
-            Property=@(p => p.Width)
-            Sortable=true 
-        />
-        <PropertyColumn 
-            TGridItem=ProductView 
-            TProp=float 
-            Title="Height"
-            Property=@(p => p.Height)
-            Sortable=true 
-        />
-        <PropertyColumn 
-            TGridItem=ProductView 
-            TProp=float 
-            Title="Depth"
-            Property=@(p => p.Depth)
-            Sortable=true 
-        />
-        <PropertyColumn 
-            TGridItem=ProductView 
-            TProp=bool 
-            Title="Left"
-            Property=@(p => p.Left)
-            Sortable=true 
-        />
-        <PropertyColumn 
-            TGridItem=ProductView 
-            TProp=bool 
-            Title="Right"
-            Property=@(p => p.Right)
-            Sortable=true 
-        />
-        <PropertyColumn 
-            TGridItem=ProductView 
-            TProp=float 
-            Title="Price"
-            Property=@(p => p.Price)
-            Sortable=true 
-        />
-        <PropertyColumn 
-            TGridItem=ProductView 
-            TProp=string 
-            Title="EXT"
-            Property=@(p => p.EXT)
-            Sortable=true 
-        />
-        <TemplateColumn 
-            TGridItem=ProductView 
-            Class="flex gap-x-2 justify-end"
-        >
-                <EditIcon Class="
-                    w-[22px]
-                    cursor-pointer 
-                    stroke-gray-400
-                    hover:stroke-sky-500 
-                    duration-300 
-                    ease-in-out" 
-                />
-            <button>
-                <TrashIcon Class="
-                    w-[22px]
-                    cursor-pointer 
-                    stroke-gray-400
-                    hover:stroke-rose-500 
-                    duration-300 
-                    ease-in-out" 
-                />
-            </button>         
-        </TemplateColumn>
-    </DataGrid>
-</DataGridWrapper>
+<QuickGrid Items=Products>
+    <PropertyColumn 
+        TGridItem=@ProductView
+        TProp=int
+        Title="ID"
+        Property=@(p => p.Id)
+        Sortable="true" 
+    />
+    <PropertyColumn 
+        TGridItem=ProductView 
+        TProp=string
+        Title="Code"
+        Property=@(p => p.Code)
+        Sortable=true
+    />
+    <PropertyColumn 
+        TGridItem=ProductView 
+        TProp=int 
+        Title="Qty"
+        Property=@(p => p.Quantity)
+        Sortable=true
+    />
+    <PropertyColumn 
+        TGridItem=ProductView 
+        TProp=float 
+        Title="Width"
+        Property=@(p => p.Width)
+        Sortable=true 
+    />
+    <PropertyColumn 
+        TGridItem=ProductView 
+        TProp=float 
+        Title="Height"
+        Property=@(p => p.Height)
+        Sortable=true 
+    />
+    <PropertyColumn 
+        TGridItem=ProductView 
+        TProp=float 
+        Title="Depth"
+        Property=@(p => p.Depth)
+        Sortable=true 
+    />
+    <PropertyColumn 
+        TGridItem=ProductView 
+        TProp=bool 
+        Title="Left"
+        Property=@(p => p.Left)
+        Sortable=true 
+    />
+    <PropertyColumn 
+        TGridItem=ProductView 
+        TProp=bool 
+        Title="Right"
+        Property=@(p => p.Right)
+        Sortable=true 
+    />
+    <PropertyColumn 
+        TGridItem=ProductView 
+        TProp=float 
+        Title="Price"
+        Property=@(p => p.Price)
+        Sortable=true 
+    />
+    <PropertyColumn 
+        TGridItem=ProductView 
+        TProp=string 
+        Title="EXT"
+        Property=@(p => p.EXT)
+        Sortable=true 
+    />
+    <TemplateColumn 
+        TGridItem=ProductView 
+        Class="flex gap-x-2 justify-end"
+    >
+            <EditIcon Class="
+                w-[22px]
+                cursor-pointer 
+                stroke-gray-400
+                hover:stroke-sky-500 
+                duration-300 
+                ease-in-out" 
+            />
+        <button>
+            <TrashIcon Class="
+                w-[22px]
+                cursor-pointer 
+                stroke-gray-400
+                hover:stroke-rose-500 
+                duration-300 
+                ease-in-out" 
+            />
+        </button>         
+    </TemplateColumn>
+</QuickGrid>
     
 
 

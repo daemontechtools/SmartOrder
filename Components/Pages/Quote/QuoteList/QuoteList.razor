@@ -11,22 +11,23 @@
 
 <div class="flex flex-col h-full">
     <Search />
-    <div class="container flex flex-col flex-1 bg-gray-100 h-full py-10">
-        @if(IsLoading) {
-            <Spinner Class="text-stone-400 dark:text-stone-400 fill-orange-600" />
-        } else if(!_quotes.Any()) {
-            <span>No Quotes Available</span>
-        } else {
+    <div class="container flex flex-col flex-1 justify-between bg-gray-100 h-full py-10">
+        <div class="flex flex-col">
             <ContentViewHeader 
                 Title="Quotes"
                 Description="A list of all your quotes including their name, sales associate and created and last updated dates"
                 ButtonLabel="Add Quote"
                 OnClick=AddQuote
+                Class="mb-6"
             />
-            <DataGridWrapper>
-                <DataGrid Items=_quotes>
-                     <TemplateColumn 
-                        TGridItem=QuoteView                
+
+            @if(IsLoading) {
+                <Spinner Class="text-stone-400 dark:text-stone-400 fill-orange-600" />
+            } else if(!_quotes.Any()) {
+                <span>No Quotes Available</span>
+            } else {  
+                <QuickGrid Items=_quotes Pagination=@_pagination>
+                    <TemplateColumn               
                         Title="Name"
                         SortBy=@_sortByName
                         Sortable=true 
@@ -36,8 +37,6 @@
                         </NavLink>
                     </TemplateColumn>
                     <PropertyColumn 
-                        TGridItem=QuoteView 
-                        TProp=QuoteStatus
                         Title="Status"
                         Property=@(q => q.Status)
                         Sortable=true
@@ -50,15 +49,12 @@
                         Sortable=true
                     />
                     <PropertyColumn 
-                        TGridItem=QuoteView 
-                        TProp=DateTime 
                         Title="Last Updated"
                         Property=@(q => q.UpdatedAt)
                         Format="HH:mm tt MMMM d, yyyy"
                         Sortable=true 
                     />
                     <TemplateColumn 
-                        TGridItem=QuoteView 
                         Class="flex gap-x-2 justify-end"
                     >
                         <button class="w-[22px] cursor-pointer" onclick=@(() => DeleteQuote(context.Id))>
@@ -73,13 +69,16 @@
                             />
                         </button>         
                     </TemplateColumn>
-                </DataGrid>
-            </DataGridWrapper>
-        }
+                </QuickGrid>
+            }
+        </div>
+                
+        <Paginator State=@_pagination />
    </div>
 </div>
 
 @code {
+    private PaginationState _pagination = new PaginationState { ItemsPerPage = 10 };
     private GridSort<QuoteView> _sortByName = GridSort<QuoteView>
         .ByAscending(q => q.Name);
 }
