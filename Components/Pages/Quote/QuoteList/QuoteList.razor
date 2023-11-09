@@ -64,9 +64,11 @@
                         <button class="w-[22px] cursor-pointer" onclick=@(() => DeleteQuote(context.Id))>
                             <TrashIcon Props=@(new IconProps() 
                                 { 
-                                    Color = new TailwindColor("gray", 400),
-                                    HoverColor = new TailwindColor("red", 500),
-                                    Transition = "transition ease-in duration-200"
+                                    Class = $@"
+                                        stroke-gray-400 
+                                        hover:stroke-red-500 
+                                        transition ease-in duration-200
+                                    "
                                 }) 
                             />
                         </button>         

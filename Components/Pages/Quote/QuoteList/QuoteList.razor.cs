@@ -26,7 +26,7 @@ public partial class QuoteList : ComponentBase, IDisposable
     private bool IsLoading { get; set; } = true;
 
     private ModalContentProps _deleteConfirmationInput;
-    private ModalContentProps _createQuoteInput;
+    //private ModalContentProps _createQuoteInput;
     
     private int? _itemIdToDelete;
 
@@ -44,16 +44,18 @@ public partial class QuoteList : ComponentBase, IDisposable
             Title = "Delete Category",
             Description = "Are you sure you want to deactivate your account? All of your data will be permanently removed from our servers forever. This action cannot be undone.",
             IconType = typeof(ClipboardIcon),
-            IconProps = new IconProps() { Color = new TailwindColor("rose") },
+            IconProps = new IconProps() { Class = "stroke-red-500" },
+            IconBackgroundClass = "bg-red-100",
+            ButtonClass = "bg-red-500 hover:bg-red-400",
             OnConfirm = OnConfirm 
         };
 
-        _createQuoteInput = new ModalContentProps 
-        {
-            Title = "Create New Quote",
-            IconType = typeof(ClipboardIcon),
-            IconProps = new IconProps() { Color = new TailwindColor("sky") },
-        };
+        // _createQuoteInput = new ModalContentProps 
+        // {
+        //     Title = "Create New Quote",
+        //     IconType = typeof(ClipboardIcon),
+        //     IconProps = new IconProps() { Class = new TailwindColor("sky") },
+        // };
 
         IsLoading = false;
     }
