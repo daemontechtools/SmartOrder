@@ -22,7 +22,7 @@ jobs:
       - name: Setup dotnet
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.100-rc.2.23502.2'
+          dotnet-version: '8.x'
       - uses: actions/cache@v3
         with:
           path: ~/.nuget/packages
@@ -31,7 +31,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget
       - name: Install dependencies
-        run: dotnet add package Microsoft.AspNetCore.Components.QuickGrid --version 8.0.0-rc.2.23480.2
+        run: dotnet add package Microsoft.AspNetCore.Components.QuickGrid
 
       - name: Download Tailwind CSS CLI
         run: |
@@ -68,7 +68,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'smart-estimate'
+          app-name: 'muskoka-estimate'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_19EF24863746467FAF2070A9A7139BF7 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           package: .
