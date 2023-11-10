@@ -1,7 +1,6 @@
 @using static Microsoft.AspNetCore.Components.Web.RenderMode
 @rendermode InteractiveServer
- 
-@using Microsoft.AspNetCore.Components.QuickGrid
+
 
 @namespace SmartEstimate.Pages
 
@@ -10,7 +9,7 @@
   
 
 <div class="flex flex-col h-full">
-    <Search />
+    <Search OnInput=OnSearchInput />
     <div class="container flex flex-col flex-1 justify-between bg-gray-100 h-full pt-8 pb-3">
         <div class="flex flex-col">
             <ContentViewHeader 
@@ -23,10 +22,10 @@
 
             @if(IsLoading) {
                 <Spinner Class="text-stone-400 dark:text-stone-400 fill-orange-600" />
-            } else if(!_quotes.Any()) {
+            } else if(!_visibleQuotes.Any()) {
                 <span>No Quotes Available</span>
             } else {  
-                <QuickGrid Items=_quotes Pagination=@_pagination>
+                <QuickGrid Items=_visibleQuotes Pagination=@_pagination>
                     <TemplateColumn               
                         Title="Name"
                         SortBy=@_sortByName
@@ -76,9 +75,3 @@
         <Paginator State=@_pagination />
    </div>
 </div>
-
-@code {
-    private PaginationState _pagination = new PaginationState { ItemsPerPage = 10 };
-    private GridSort<QuoteView> _sortByName = GridSort<QuoteView>
-        .ByAscending(q => q.Name);
-}

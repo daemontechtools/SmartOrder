@@ -1,15 +1,14 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.QuickGrid;
 
 using Daemon.RazorUI.Modal;
 using Daemon.RazorUI.Icons;
-using Daemon.RazorUI.Color;
 using SmartEstimate.Models;
 
 namespace SmartEstimate.Pages;
 
 public partial class QuoteList : ComponentBase, IDisposable
 {
-
     [Inject]
     private ModalService? _modalService { get; set; }
 
@@ -21,6 +20,7 @@ public partial class QuoteList : ComponentBase, IDisposable
 
 
     private IQueryable<QuoteView> _quotes = new List<QuoteView>().AsQueryable();
+    private IQueryable<QuoteView> _visibleQuotes = new List<QuoteView>().AsQueryable();
 
     
     private bool IsLoading { get; set; } = true;
@@ -29,6 +29,11 @@ public partial class QuoteList : ComponentBase, IDisposable
     //private ModalContentProps _createQuoteInput;
     
     private int? _itemIdToDelete;
+    private string? _searchQuery;
+
+    private PaginationState _pagination = new PaginationState { ItemsPerPage = 10 };
+    private GridSort<QuoteView> _sortByName = GridSort<QuoteView>
+        .ByAscending(q => q.Name);
 
 
 
@@ -36,6 +41,7 @@ public partial class QuoteList : ComponentBase, IDisposable
     {
         List<QuoteView> _viewList = await _quoteStore!.ReadableStore.GetAll();
         _quotes = _viewList.AsQueryable();
+        _visibleQuotes = _quotes;
         //TODO: Can this be more specific?
         _quoteStore.Storage.OnStateChanged += OnStateChanged!;
 
@@ -47,7 +53,7 @@ public partial class QuoteList : ComponentBase, IDisposable
             IconProps = new IconProps() { Class = "stroke-red-500" },
             IconBackgroundClass = "bg-red-100",
             ButtonClass = "bg-red-500 hover:bg-red-400",
-            OnConfirm = OnConfirm 
+            OnConfirm = OnDeleteConfirm 
         };
 
         // _createQuoteInput = new ModalContentProps 
@@ -67,12 +73,13 @@ public partial class QuoteList : ComponentBase, IDisposable
         _modalService!.Show(_deleteConfirmationInput);
     }
 
-    private async Task OnConfirm(bool confirmed)
+    private async Task OnDeleteConfirm(bool confirmed)
     {
        if (confirmed && _itemIdToDelete != null)
         {
             await _quoteStore!.WritableStore.Delete(_itemIdToDelete.Value);
             _itemIdToDelete = null;
+            _visibleQuotes = SearchQuotes(_searchQuery);
         }
         _modalService!.Hide();
     }
@@ -94,19 +101,34 @@ public partial class QuoteList : ComponentBase, IDisposable
     {
         QuoteView newQuote = QuoteMock.GenerateRandomQuoteView();
         await _quoteStore!.WritableStore.Create(newQuote);
-    }
+        _visibleQuotes = SearchQuotes(_searchQuery);
 
-    private void EditQuote(int quoteId)
-    {
-        if(_logger != null)
-        {
-            _logger.LogInformation($"Edit Quote {quoteId}");
-        }
     }
 
     private void DeleteQuote(int quoteId)
     {
         ShowDeleteConfirmation(quoteId);
+    }
+
+
+    // TODO: Abstract this out?
+    private void OnSearchInput(string input) {
+        _searchQuery = input;
+        if(string.IsNullOrEmpty(input)) {
+            _visibleQuotes = _quotes;
+        } else {
+            _visibleQuotes = SearchQuotes(input);
+        }   
+    }
+
+    private IQueryable<QuoteView> SearchQuotes(string? query) {
+        if(string.IsNullOrWhiteSpace(query)) {
+            return _quotes;
+        }
+        return _quotes
+            .Where(q => 
+                q.Name.Contains(query, StringComparison.OrdinalIgnoreCase)
+            );
     }
 }
 
