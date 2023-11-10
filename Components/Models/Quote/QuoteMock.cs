@@ -88,7 +88,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                                 Depth = 5.0f,
                                 Left = true,
                                 Right = false,
-                                Comments = "",
+                                Comments = "asdeasdfsadfasdfasdfas",
                                 Price = 100.0f,
                                 EXT = "",
                                 Name = "Product 1"
@@ -104,7 +104,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                                 Depth = 10.0f,
                                 Left = false,
                                 Right = true,
-                                Comments = "",
+                                Comments = "asdeasdfsadfasdfasdfa",
                                 Price = 150.0f,
                                 EXT = "",
                                 Name = "Product 2"
@@ -120,7 +120,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                                 Depth = 6.0f,
                                 Left = false,
                                 Right = true,
-                                Comments = "",
+                                Comments = "asdeasdfsadfasdfasdfas",
                                 Price = 150.0f,
                                 EXT = "",
                                 Name = "Product 2"
@@ -136,7 +136,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                                 Depth = 7.0f,
                                 Left = true,
                                 Right = false,
-                                Comments = "",
+                                Comments = "asdeasdfsadfasdfasdfas",
                                 Price = 200.0f,
                                 EXT = "",
                                 Name = "Product 3"
@@ -152,7 +152,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                                 Depth = 8.0f,
                                 Left = false,
                                 Right = true,
-                                Comments = "",
+                                Comments = "asdeasdfsadfasdfasdfas",
                                 Price = 250.0f,
                                 EXT = "",
                                 Name = "Product 4"
@@ -205,7 +205,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                                 Depth = 5.0f,
                                 Left = true,
                                 Right = false,
-                                Comments = "",
+                                Comments = "asdeasdfsadfasdfasdfasdfasdfasdfasdfasdfsfsfsdfasdfasdfasf",
                                 Price = 100.0f,
                                 EXT = "",
                                 Name = "Product 1"
