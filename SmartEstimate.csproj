@@ -22,8 +22,8 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)'=='Release'">
-    <PackageReference Include="Daemon.RazorUI" Version="1.1.0-alpha.0.58" />
-    <PackageReference Include="Daemon.DataAccess" Version="1.1.0-alpha.0.43" />
+    <PackageReference Include="Daemon.RazorUI" Version="*" />
+    <PackageReference Include="Daemon.DataAccess" Version="*" />
   </ItemGroup>
 
   <!-- Only do this when we actually have scoped css to process
