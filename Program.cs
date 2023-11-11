@@ -23,7 +23,7 @@ builder.Services.AddSingleton<ModalService>();
 builder.Services.AddScoped<QuoteStore>();
 
 builder.WebHost.UseWebRoot("wwwroot");
-//builder.WebHost.UseStaticWebAssets();
+builder.WebHost.UseStaticWebAssets();
 
 builder.Services.AddRazorPages();
 
