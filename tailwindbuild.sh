@@ -2,7 +2,7 @@
 
 
 appStylesPathIn="./Styles/styles.css"
-appStylesPathOut="./wwwroot/css/styles.css"
+appStylesPathOut="./wwwroot/css/site.css"
 
 if [[ $1 == "--watch" ]]; then
   echo "Building Tailwind CSS in watch mode..."
