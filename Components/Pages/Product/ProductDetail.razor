@@ -1,0 +1,35 @@
+@page "/quotes/{quoteId:int}/rooms/{roomId:int}/products/{productId:int}"
+@page "/quotes/{quoteId:int}/rooms/{roomId:int}/products"
+
+
+<div class="container">
+    <ContentViewHeader
+        Title="New Product"
+    />
+    <h3>Quote Id: @QuoteId</h3>
+    <h3>Room Id: @RoomId</h3>
+    <h3>Product Id: @ProductId</h3>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public int QuoteId { get; set; }
+
+    [Parameter]
+    public int RoomId { get; set; }
+
+    [Parameter]
+    public int? ProductId { get; set; }
+
+    private bool _isNew = true;
+
+    protected override void OnInitialized()
+    {
+        if(ProductId != null) _isNew = false;
+        Console.WriteLine($"QuoteId: {QuoteId}");
+        Console.WriteLine($"RoomId: {RoomId}");
+        Console.WriteLine($"ProductId: {ProductId}");
+    }
+}

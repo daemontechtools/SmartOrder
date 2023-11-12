@@ -1,21 +1,35 @@
 @namespace SmartEstimate.Pages
 
+@inject NavigationManager NavigationManager
+@inject ILogger<RoomDetailProducts> Logger
+
 
 <ContentViewHeader 
     Title="Products"
     Description="What's a room without some products?"
     ButtonLabel="Add Product"
+    OnClick=@OnClick
     Class="mb-6"
 />
 <QuickGrid Items=Products>
-    <PropertyColumn 
+    <TemplateColumn               
         Title="ID"
-        Property=@(p => p.Id)
-    />
-    <PropertyColumn 
+        SortBy=@_sortByName
+        Sortable=true 
+    >
+        <NavLink href=@($"/quotes/{QuoteId}/rooms/{RoomId}/products/{context.Id}")>
+            @context.Id
+        </NavLink>
+    </TemplateColumn>
+    <TemplateColumn               
         Title="Code"
-        Property=@(p => p.Code)
-    />
+        SortBy=@_sortByName
+        Sortable=true 
+    >
+        <NavLink href=@($"/quotes/{QuoteId}/rooms/{RoomId}/products/{context.Id}")>
+            @context.Code
+        </NavLink>
+    </TemplateColumn>
     <PropertyColumn 
         Title="Qty"
         Property=@(p => p.Quantity)
@@ -74,5 +88,20 @@
 
 @code {
     [Parameter]
+    public int QuoteId { get; set; }
+
+    [Parameter]
+    public int RoomId { get; set; }
+
+    [Parameter]
     public IQueryable<ProductView> Products { get; set; } = new List<ProductView>().AsQueryable();
+
+    private GridSort<ProductView> _sortByName = GridSort<ProductView>
+        .ByAscending(p => p.Name);
+
+
+    private void OnClick()
+    {
+        NavigationManager.NavigateTo($"/quotes/{QuoteId}/rooms/{RoomId}/products");
+    }
 }

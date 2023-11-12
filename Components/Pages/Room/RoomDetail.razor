@@ -1,3 +1,6 @@
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@rendermode InteractiveServer
+
 @namespace SmartEstimate.Pages
 
 @page "/quotes/{quoteId:int}/rooms/{roomId:int}"
@@ -42,7 +45,11 @@
                 </ul>
             </form>
 
-            <RoomDetailProducts Products=@_products />
+            <RoomDetailProducts 
+                Products=@_products 
+                QuoteId=@QuoteId
+                RoomId=@RoomId
+            />
         </div>
     }
 </div>
