@@ -1,6 +1,10 @@
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@rendermode InteractiveServer
+
 @namespace SmartEstimate.Pages
 
 @inject NavigationManager NavigationManager
+@inject ModalService ModalService
 @inject ILogger<RoomDetailProducts> Logger
 
 
@@ -69,7 +73,7 @@
     <TemplateColumn 
         Class="flex gap-x-2 justify-end"
     >
-        <button>
+        <button @onclick=@(() => DeleteProduct(context.Id))>
             <TrashIcon Props=@(new IconProps() {
                 Class=@"
                     w-[22px]
@@ -99,9 +103,35 @@
     private GridSort<ProductView> _sortByName = GridSort<ProductView>
         .ByAscending(p => p.Name);
 
+    private ModalContentProps _deleteConfirmationInput;
+    private int? _itemIdToDelete;
+
+    protected override void OnInitialized() {
+        _deleteConfirmationInput = new ModalContentProps {
+            Title = "Delete Product",
+            Description = "Are you sure you want to delete this product?",
+            IconType = typeof(TrashIcon),
+            IconProps = new IconProps() { Class = "stroke-red-500" },
+            IconBackgroundClass = "bg-red-100",
+            ButtonClass = "bg-red-500 hover:bg-red-400",
+            OnConfirm = OnDeleteConfirm 
+        };
+    }
+
 
     private void OnClick()
     {
         NavigationManager.NavigateTo($"/quotes/{QuoteId}/rooms/{RoomId}/products");
+    }
+
+    private void DeleteProduct(int productId)
+    {
+        _itemIdToDelete = productId;
+        ModalService!.Show(_deleteConfirmationInput);
+    }
+
+    private async Task OnDeleteConfirm(bool confirmed)
+    {
+        ModalService!.Hide();
     }
 }

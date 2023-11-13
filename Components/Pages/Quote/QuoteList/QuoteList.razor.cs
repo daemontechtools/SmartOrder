@@ -49,7 +49,7 @@ public partial class QuoteList : ComponentBase, IDisposable
         {
             Title = "Delete Quote",
             Description = "Are you sure you want to delete this quote?",
-            IconType = typeof(ClipboardIcon),
+            IconType = typeof(TrashIcon),
             IconProps = new IconProps() { Class = "stroke-red-500" },
             IconBackgroundClass = "bg-red-100",
             ButtonClass = "bg-red-500 hover:bg-red-400",
