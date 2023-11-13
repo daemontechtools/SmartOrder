@@ -47,8 +47,8 @@ public partial class QuoteList : ComponentBase, IDisposable
 
         _deleteConfirmationInput = new ModalContentProps 
         {
-            Title = "Delete Category",
-            Description = "Are you sure you want to deactivate your account? All of your data will be permanently removed from our servers forever. This action cannot be undone.",
+            Title = "Delete Quote",
+            Description = "Are you sure you want to delete this quote?",
             IconType = typeof(ClipboardIcon),
             IconProps = new IconProps() { Class = "stroke-red-500" },
             IconBackgroundClass = "bg-red-100",
