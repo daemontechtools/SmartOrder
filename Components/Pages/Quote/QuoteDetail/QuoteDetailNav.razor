@@ -1,29 +1,48 @@
 @namespace SmartEstimate.Pages
 
-<nav class="flex overflow-x-auto border-b border-white/10 py-4">
-    <ul role="list" class="flex min-w-full flex-none gap-x-6 px-4 text-sm font-semibold leading-6 text-stone-700 sm:px-6 lg:px-8">
-        <li>
-            <NavLink 
-                href=@($"/quotes/{QuoteId}")
-                ActiveClass="text-sky-500"
-                Match=NavLinkMatch.All
-            >
-                Overview
-            </NavLink>
-        </li>
-        <li>
-            <NavLink 
-                href=@($"/quotes/{QuoteId}/shipping")
-                ActiveClass="text-sky-500"
-                Match=NavLinkMatch.All
-            >
-                Shipping
-            </NavLink>
-        </li>
-    </ul>
+
+<nav class="
+    flex 
+    py-2.5 
+    px-4 sm:px-6 lg:px-8
+    w-full 
+    gap-x-6
+    text-sm font-semibold text-stone-700
+    bg-stone-300
+">
+    @foreach (var option in MenuOptions)
+    {
+        <NavLink 
+            href=@(option.Item2)
+            class="px-3 py-1.5"
+            ActiveClass="
+                text-sky-500
+                rounded-md
+                bg-sky-100
+            "
+            Match=NavLinkMatch.All
+        >
+            @option.Item1
+        </NavLink>
+    }
 </nav>
 
-@code {
+@code { 
+    public struct QuoteDetailNavProps {
+        public int QuoteId { get; set; }
+        public int QuoteDocumentCount { get; set; }
+    } 
+
     [Parameter] 
-    public int? QuoteId { get; set; }
+    public QuoteDetailNavProps? Props { get; set; }
+
+    private (string, string)[] MenuOptions { get; set; } = new (string, string)[]{};
+
+    protected override void OnInitialized() {
+        MenuOptions = new (string, string)[] {
+            ("Overview", $"/quotes/{Props?.QuoteId}"),
+            ("Shipping", $"/quotes/{Props?.QuoteId}/shipping"),
+            ($"Documents ({Props?.QuoteDocumentCount})", $"/quotes/{Props?.QuoteId}/documents"),
+        };
+    }
 }
