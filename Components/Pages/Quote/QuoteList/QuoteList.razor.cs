@@ -66,13 +66,6 @@ public partial class QuoteList : ComponentBase, IDisposable
         IsLoading = false;
     }
 
-
-    private void ShowDeleteConfirmation(int id)
-    {
-        _itemIdToDelete = id;
-        _modalService!.Show(_deleteConfirmationInput);
-    }
-
     private async Task OnDeleteConfirm(bool confirmed)
     {
        if (confirmed && _itemIdToDelete != null)
@@ -107,7 +100,8 @@ public partial class QuoteList : ComponentBase, IDisposable
 
     private void DeleteQuote(int quoteId)
     {
-        ShowDeleteConfirmation(quoteId);
+        _itemIdToDelete = quoteId;
+        _modalService!.Show(_deleteConfirmationInput);
     }
 
 

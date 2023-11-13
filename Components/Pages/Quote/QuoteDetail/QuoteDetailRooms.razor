@@ -1,9 +1,12 @@
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@rendermode InteractiveServer
 
 @namespace SmartEstimate.Pages
 
 @using Microsoft.AspNetCore.Components.QuickGrid
 
 @inject QuoteStore _quoteStore
+@inject ModalService _modalService
 
 
 
@@ -59,7 +62,7 @@
                 <TemplateColumn 
                     Class="flex gap-x-2 justify-end"
                 >
-                    <button>
+                    <button @onclick=@(() => DeleteQuote(context.Id))>
                         <TrashIcon Props=@(new IconProps() {
                             Class=@"
                                 w-[22px]
@@ -91,11 +94,37 @@
     private IQueryable<RoomView> _roomsQueryable = new List<RoomView>().AsQueryable();
     private GridSort<RoomView> _sortByName = GridSort<RoomView>
         .ByAscending(r => r.Name);
+    private ModalContentProps _deleteConfirmationInput;
+    private int? _itemIdToDelete;
+    
 
     protected override async Task OnInitializedAsync()
     {
         _quote = await _quoteStore.ReadableStore.GetById(QuoteId);
         _roomsQueryable = _quote.Rooms.AsQueryable();
+
+        _deleteConfirmationInput = new ModalContentProps 
+        {
+            Title = "Delete Room",
+            Description = "Are you sure you want to delete this room?",
+            IconType = typeof(ClipboardIcon),
+            IconProps = new IconProps() { Class = "stroke-red-500" },
+            IconBackgroundClass = "bg-red-100",
+            ButtonClass = "bg-red-500 hover:bg-red-400",
+            OnConfirm = OnDeleteConfirm 
+        };
+
         IsLoading = false;
+    }
+
+    private void DeleteQuote(int quoteId)
+    {
+        _itemIdToDelete = quoteId;
+        _modalService!.Show(_deleteConfirmationInput);
+    }
+
+    private async Task OnDeleteConfirm(bool confirmed)
+    {
+        _modalService!.Hide();
     }
 }
