@@ -1,0 +1,26 @@
+@page "/quotes{quoteId:int}/add"
+
+@namespace SmartEstimate.Pages
+
+@inject QuoteStore QuoteStore
+
+<RoomDetailNav 
+    Options=@(new List<NavOptionProps> {
+        new NavOptionProps { Path = "/quotes" },
+        new NavOptionProps { Path = $"/quotes/add", Label = "New Quote" },
+    }) 
+/>
+
+
+@code {
+    [Parameter]
+    public int QuoteId { get; set; }
+
+    private QuoteView? _quote;
+
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _quote = await QuoteStore.ReadableStore.GetById(QuoteId);
+    }
+}

@@ -19,7 +19,7 @@ public partial class QuoteDetailNav : ComponentBase {
         MenuOptions = new (string, string)[] {
             ("Rooms", $"/quotes/{Props?.QuoteId}"),
             ("Shipping", $"/quotes/{Props?.QuoteId}/shipping"),
-            ($"Documents ({Props?.QuoteDocumentCount})", $"/quotes/{Props?.QuoteId}/documents"),
+            ($"Documents (2)", $"/quotes/{Props?.QuoteId}/documents"),
         };
     }
 }

@@ -1,0 +1,12 @@
+@page "/quotes/new"
+
+@namespace SmartEstimate.Pages
+
+
+<SEBreadcrumbNav
+    Options=@(new List<NavOptionProps> {
+        new NavOptionProps { Path = "/quotes" },
+        new NavOptionProps { Path = $"/quotes/add", Label = "New Quote" },
+    }) 
+/>
+

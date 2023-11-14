@@ -9,7 +9,7 @@
 @inject QuoteStore _quoteStore
  
 
-<RoomDetailNav 
+<SEBreadcrumbNav 
     Options=@(new List<NavOptionProps> {
         new NavOptionProps { Path = "/quotes", Label = "What?" },
         new NavOptionProps { Path = $"/quotes/{QuoteId}", Label = _quote.Name },

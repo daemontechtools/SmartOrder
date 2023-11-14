@@ -18,6 +18,9 @@ public partial class QuoteList : ComponentBase, IDisposable
     [Inject]
     ILogger<QuoteList>? _logger { get; set; }
 
+    [Inject]
+    NavigationManager? _navigationManager { get; set; }
+
 
     private IQueryable<QuoteView> _quotes = new List<QuoteView>().AsQueryable();
     private IQueryable<QuoteView> _visibleQuotes = new List<QuoteView>().AsQueryable();
@@ -26,7 +29,6 @@ public partial class QuoteList : ComponentBase, IDisposable
     private bool IsLoading { get; set; } = true;
 
     private ModalContentProps _deleteConfirmationInput;
-    //private ModalContentProps _createQuoteInput;
     
     private int? _itemIdToDelete;
     private string? _searchQuery;
@@ -55,14 +57,7 @@ public partial class QuoteList : ComponentBase, IDisposable
             ButtonClass = "bg-red-500 hover:bg-red-400",
             OnConfirm = OnDeleteConfirm 
         };
-
-        // _createQuoteInput = new ModalContentProps 
-        // {
-        //     Title = "Create New Quote",
-        //     IconType = typeof(ClipboardIcon),
-        //     IconProps = new IconProps() { Class = new TailwindColor("sky") },
-        // };
-
+    
         IsLoading = false;
     }
 
@@ -92,10 +87,8 @@ public partial class QuoteList : ComponentBase, IDisposable
 
     private async Task AddQuote()
     {
-        QuoteView newQuote = QuoteMock.GenerateRandomQuoteView();
-        await _quoteStore!.WritableStore.Create(newQuote);
-        _visibleQuotes = SearchQuotes(_searchQuery);
-
+        _logger.LogInformation("AddQuote");
+        _navigationManager?.NavigateTo("/quotes/new");
     }
 
     private void DeleteQuote(int quoteId)
