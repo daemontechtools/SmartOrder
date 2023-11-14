@@ -1,0 +1,15 @@
+@namespace SmartEstimate.Pages
+
+@inherits BreadcrumbNav
+
+<BreadcrumbNav 
+  Class="bg-stone-600 border-stone-800 h-12"
+  OptionClass="text-stone-300 hover:text-stone-100"
+  Options=@Options
+>
+  <HomeIcon>
+    <ClipboardIcon Props=@(new IconProps { 
+      Class = "w-6 stroke-stone-300 hover:stroke-stone-100 transition-hover" 
+    }) />
+  </HomeIcon>
+</BreadcrumbNav>
