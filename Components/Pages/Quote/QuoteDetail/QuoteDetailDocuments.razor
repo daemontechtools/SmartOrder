@@ -23,7 +23,26 @@
         ">
             <TableTemplate ListItems=@ListItems Context="item">
                 <Actions>
-                    <span>Do things</span>
+                    <div class="flex gap-x-2">
+                        <DownloadIcon Props=@(new IconProps() {
+                            Class=@"
+                                w-7
+                                stroke-gray-300
+                                transition-hover
+                                cursor-pointer
+                                hover:stroke-sky-500
+                            "
+                        }) />
+                        <TrashIcon Props=@(new IconProps() {
+                            Class=@"
+                                w-7
+                                stroke-gray-300
+                                transition-hover
+                                cursor-pointer
+                                hover:stroke-red-500
+                            "
+                        }) />
+                    </div>
                 </Actions> 
             </TableTemplate>
         </div>
