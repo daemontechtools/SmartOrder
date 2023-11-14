@@ -9,8 +9,14 @@
 @inject QuoteStore _quoteStore
  
 
-<div class="flex flex-col h-full">
-  <QuoteDetailNav QuoteId="@QuoteId" />
+<RoomDetailNav 
+    Options=@(new List<NavOptionProps> {
+        new NavOptionProps { Path = "/quotes", Label = "What?" },
+        new NavOptionProps { Path = $"/quotes/{QuoteId}", Label = _quote.Name },
+        new NavOptionProps { Path = $"/quotes/{QuoteId}/rooms/{RoomId}", Label = _room.Name }
+    }) 
+/>
+<div class="flex flex-1 flex-col">
   <div class="border-t border-gray-300"></div>
    
    @if(IsLoading) {

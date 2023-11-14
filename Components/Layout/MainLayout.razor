@@ -9,15 +9,24 @@
 
 <div class="h-screen bg-gray-100">
     <SideNav>
-        <NavOption Path="/quotes" Title="Quotes">
+        <SideNavOption Props=@(new NavOptionProps() {
+            Label = "Quotes",
+            Path = "/quotes"
+        })>
             <ClipboardIcon Props=@_iconProps />
-        </NavOption>
-        <NavOption Path="/contact" Title="Contact">
-            <UsersIcon Props=@_iconProps  />
-        </NavOption>
-        <NavOption Path="/settings" Title="Settings">
-            <SettingsIcon Props=@_iconProps  />
-        </NavOption>
+        </SideNavOption>
+        <SideNavOption Props=@(new NavOptionProps() {
+            Label = "Contact",
+            Path = "/contact"
+        }) >
+            <UsersIcon Props=@_iconProps />
+        </SideNavOption>
+        <SideNavOption Props=@(new NavOptionProps() {
+            Label = "Settings",
+            Path = "/settings"
+        }) >
+            <SettingsIcon Props=@_iconProps />
+        </SideNavOption>
     </SideNav>
     <ContentView>
         @Body
