@@ -21,34 +21,10 @@
   <QuoteDetailShippingOptions />
   <div class="border-t border-gray-300 mb-4"></div>
 
-  <h2 class="text-base font-semibold leading-7 text-gray-900">Shipping Address</h2>
-  <p class="mt-1 text-sm leading-6 text-gray-600">Please enter the customer's address</p>
-
-    <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
-      <div class="sm:col-span-3">
-        <TextInput Label="Dealer Name" />
-      </div>
-
-      <div class="sm:col-span-3">
-        <TextInput Label="Email Address" />
-      </div>
-
-      <div class="col-span-full">
-        <TextInput Label="Street Address" />
-      </div>
-
-      <div class="sm:col-span-2 sm:col-start-1">
-        <TextInput Label="Dealer Name" />
-      </div>
-
-      <div class="sm:col-span-2">
-        <TextInput Label="Province" />
-      </div>
-
-      <div class="sm:col-span-2">
-        <TextInput Label="Postal Code" />
-    </div>
-  </div>
+  <AddressInputGroup 
+    Title="Shipping Address"
+    Subtitle="Please enter the customer's address"
+  />
 </div>  
 
 
