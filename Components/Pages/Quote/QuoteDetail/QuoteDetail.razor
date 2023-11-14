@@ -1,12 +1,14 @@
-﻿@namespace SmartEstimate.Pages
+﻿@page "/quotes/{quoteId:int}"
 
-@page "/quotes/{quoteId:int}"
+@namespace SmartEstimate.Pages
 
+@inject QuoteStore QuoteStore
 
 <div class="flex flex-col h-full">
-  <QuoteDetailNav QuoteId=QuoteId/>
-  <QuoteDetailHeader />
-  <QuoteDetailRooms QuoteId=@QuoteId />
+   <QuoteDetailHeader Quote=@_quote/>
+    <div class="flex flex-1">
+        <QuoteDetailRooms Quote=@_quote /> 
+    </div> 
 </div>
 
 
@@ -15,4 +17,19 @@
 @code {
     [Parameter]
     public int QuoteId { get; set; }
+
+    private QuoteView _quote;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        _quote = await QuoteStore!.ReadableStore.GetById(QuoteId);
+        QuoteStore.Storage.OnStateChanged += OnStateChanged!;
+    }
+
+    private async void OnStateChanged(object sender, EventArgs e)
+    {
+        _quote = await QuoteStore!.ReadableStore.GetById(QuoteId);
+        await InvokeAsync(StateHasChanged);
+    }
 }

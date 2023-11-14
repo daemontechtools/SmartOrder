@@ -2,9 +2,9 @@
 
 
 <nav class="
+    container-wide
     flex 
     py-2.5 
-    px-4 sm:px-6 lg:px-8
     w-full 
     gap-x-6
     text-sm font-semibold text-stone-700
@@ -26,23 +26,3 @@
         </NavLink>
     }
 </nav>
-
-@code { 
-    public struct QuoteDetailNavProps {
-        public int QuoteId { get; set; }
-        public int QuoteDocumentCount { get; set; }
-    } 
-
-    [Parameter] 
-    public QuoteDetailNavProps? Props { get; set; }
-
-    private (string, string)[] MenuOptions { get; set; } = new (string, string)[]{};
-
-    protected override void OnInitialized() {
-        MenuOptions = new (string, string)[] {
-            ("Overview", $"/quotes/{Props?.QuoteId}"),
-            ("Shipping", $"/quotes/{Props?.QuoteId}/shipping"),
-            ($"Documents ({Props?.QuoteDocumentCount})", $"/quotes/{Props?.QuoteId}/documents"),
-        };
-    }
-}
