@@ -1,0 +1,20 @@
+@page "/quotes/{quoteId:int}/documents"
+
+@inject QuoteStore QuoteStore
+
+<QuoteDetailHeader Quote=@_quote />
+
+Big Special
+
+@code {
+    [Parameter]
+    public int QuoteId { get; set; }
+
+    private QuoteView _quote;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        _quote = await QuoteStore.ReadableStore.GetById(QuoteId);
+    }
+}
