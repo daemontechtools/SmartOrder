@@ -10,7 +10,7 @@
 
 
 
-<div class="container flex flex-col flex-1 bg-gray-100 pt-6 pb-3 justify-between">
+<div class="container flex flex-col flex-1 bg-stone-100 pt-6 pb-3 justify-between">
     <div>
         <ContentViewHeader 
             Title="Rooms"
@@ -31,7 +31,10 @@
                     SortBy=@_sortByName
                     Sortable=true 
                 >
-                    <NavLink href=@($"/quotes/{QuoteId}/rooms/{context.Id}")>
+                    <NavLink 
+                        href=@($"/quotes/{Quote.Id}/rooms/{context.Id}")
+                        class="font-medium"
+                    >
                         @context.Name
                     </NavLink>
                 </TemplateColumn>
@@ -88,9 +91,8 @@
     private PaginationState _pagination = new PaginationState { ItemsPerPage = 10 };
 
     [Parameter]
-    public int QuoteId { get; set; }
+    public QuoteView Quote { get; set; } = new();
 
-    private QuoteView _quote = new();
     private IQueryable<RoomView> _roomsQueryable = new List<RoomView>().AsQueryable();
     private GridSort<RoomView> _sortByName = GridSort<RoomView>
         .ByAscending(r => r.Name);
@@ -100,8 +102,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _quote = await _quoteStore.ReadableStore.GetById(QuoteId);
-        _roomsQueryable = _quote.Rooms.AsQueryable();
+        _roomsQueryable = Quote.Rooms.AsQueryable();
 
         _deleteConfirmationInput = new ModalContentProps 
         {
