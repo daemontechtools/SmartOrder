@@ -31,6 +31,7 @@ public struct Quote : IDbModel
     public bool IsMultiLevel { get; set; }
     public bool IsFreightForwarder { get; set; }
     public string CatelogPdfUrl { get; set; }
+    public FileDocument[] Files { get; set; }
 
     public List<Room> Rooms { get; set; }
 }
