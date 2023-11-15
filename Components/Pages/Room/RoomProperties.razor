@@ -1,0 +1,17 @@
+@namespace SmartEstimate.Pages
+
+<form class="border-none mb-8">
+    <ul role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
+            @foreach (var prop in Props)
+        {
+            <li class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center shadow">
+                <RoomProfileProperty Title=@prop.Title />
+            </li>
+        }
+    </ul>
+</form>
+
+@code {
+    [Parameter]
+    public List<RoomProfileProps> Props { get; set; } = new List<RoomProfileProps>();
+}

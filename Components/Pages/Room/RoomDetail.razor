@@ -1,12 +1,9 @@
+@page "/quotes/{quoteId:int}/rooms/{roomId:int}"
+
 @using static Microsoft.AspNetCore.Components.Web.RenderMode
 @rendermode InteractiveServer
 
 @namespace SmartEstimate.Pages
-
-@page "/quotes/{quoteId:int}/rooms/{roomId:int}"
- 
-
-@inject QuoteStore _quoteStore
  
 
 <SEBreadcrumbNav 
@@ -40,16 +37,9 @@
                 </div>
             </div>
 
-            <form class="border-none mb-8">
-                <ul role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
-                        @foreach (var prop in @_roomProfileProps)
-                    {
-                        <li class="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-white text-center shadow">
-                            <RoomProfileProperty Title=@prop.Title />
-                        </li>
-                    }
-                </ul>
-            </form>
+            <RoomProperties 
+                Props=@_roomProfileProps
+            />
 
             <RoomDetailProducts 
                 Products=@_products 
@@ -59,37 +49,3 @@
         </div>
     }
 </div>
-
-
-@code {
-    [Parameter]
-    public int QuoteId { get; set; }
-
-    [Parameter]
-    public int RoomId { get; set; }
-
-    private QuoteView _quote = new();
-    private RoomView _room = new();
-    private IQueryable<ProductView> _products = new List<ProductView>().AsQueryable();
-    private bool IsLoading = true;
-
-    private List<RoomProfileProps> _roomProfileProps = new List<RoomProfileProps>();
-
-    protected override async Task OnInitializedAsync()
-    {
-        _quote = await _quoteStore.ReadableStore.GetById(QuoteId);
-        _room = _quote.Rooms.FirstOrDefault(r => r.Id == RoomId);
-        _products = _room.Products.AsQueryable();
-        IsLoading = false;
-
-        _roomProfileProps.Add(new RoomProfileProps { Title = "Door Style" });
-        _roomProfileProps.Add(new RoomProfileProps { Title = "Finish" });
-        _roomProfileProps.Add(new RoomProfileProps { Title = "Interior Finish" });
-        _roomProfileProps.Add(new RoomProfileProps { Title = "Drawer Hardware" });
-    }
-
-    private struct RoomProfileProps
-    {
-        public string Title { get; set; }
-    }
-}
