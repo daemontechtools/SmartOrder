@@ -5,6 +5,7 @@
 
 @using Microsoft.AspNetCore.Components.QuickGrid
 
+@inject NavigationManager _navigationManager
 @inject QuoteStore _quoteStore
 @inject ModalService _modalService
 
@@ -16,6 +17,7 @@
             Title="Rooms"
             Subtitle="We heard you like rooms"
             SubmitButtonText="Add Room"
+            OnSubmitClick=AddRoom
             Class="mb-6"
         />
 
@@ -116,6 +118,11 @@
         };
 
         IsLoading = false;
+    }
+
+    private void AddRoom()
+    {
+        _navigationManager.NavigateTo($"/quotes/{Quote.Id}/rooms/new");
     }
 
     private void DeleteRoom(int roomId)

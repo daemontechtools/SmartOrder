@@ -1,15 +1,44 @@
-@page "/quotes{quoteId:int}/add"
+@page "/quotes/{quoteId:int}/rooms/new"
 
 @namespace SmartEstimate.Pages
 
 @inject QuoteStore QuoteStore
 
-<RoomDetailNav 
-    Options=@(new List<NavOptionProps> {
-        new NavOptionProps { Path = "/quotes" },
-        new NavOptionProps { Path = $"/quotes/add", Label = "New Quote" },
-    }) 
-/>
+
+
+
+<div class="flex flex-col h-full"
+    <SEBreadcrumbNav 
+        Options=@(new List<NavOptionProps> {
+            new NavOptionProps { Path = "/quotes" },
+            new NavOptionProps { Path = $"/quotes/{QuoteId}", Label = @_quote?.Name },
+            new NavOptionProps { Path = $"/quotes/{QuoteId}/rooms/new", Label = "New Room" },
+        }) 
+    />
+
+    <div class="flex flex-1 flex-col container mt-6">
+        <ContentViewHeader 
+            Title="Create Room"
+            TitleClass="!text-3xl"
+            Subtitle="Show me how much you love rooms!"
+            SubmitButtonText="Save"
+            CancelButtonText="Clear"
+        />
+        <div 
+            class="
+                w-full 
+                border-b 
+                border-stone-300
+                mt-2 mb-6
+            "
+        />
+
+        <RoomProperties 
+            Props=@_roomProfileProps
+        />
+
+    </div>
+</div>
 
 
 @code {
@@ -17,10 +46,15 @@
     public int QuoteId { get; set; }
 
     private QuoteView? _quote;
-
+    private List<RoomProfileProps> _roomProfileProps = new List<RoomProfileProps>();
     
     protected override async Task OnInitializedAsync()
     {
         _quote = await QuoteStore.ReadableStore.GetById(QuoteId);
+
+        _roomProfileProps.Add(new RoomProfileProps { Title = "Door Style" });
+        _roomProfileProps.Add(new RoomProfileProps { Title = "Finish" });
+        _roomProfileProps.Add(new RoomProfileProps { Title = "Interior Finish" });
+        _roomProfileProps.Add(new RoomProfileProps { Title = "Drawer Hardware" });
     }
 }
