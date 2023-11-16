@@ -1,16 +1,34 @@
 @page "/quotes/{quoteId:int}/rooms/{roomId:int}/products/{productId:int}"
 @page "/quotes/{quoteId:int}/rooms/{roomId:int}/products"
 
+@namespace SmartEstimate.Pages
 
-<div class="container">
-    <ContentViewHeader
-        Title="New Product"
+@inject QuoteStore QuoteStore
+
+<div class="flex flex-col h-full"
+    <SEBreadcrumbNav
+        Options=@(new List<NavOptionProps> {
+            new NavOptionProps { Path = "/quotes" },
+            new NavOptionProps { Path = $"/quotes/{QuoteId}", Label = _quote?.Name },
+            new NavOptionProps { Path = $"/quotes/{QuoteId}/rooms/{RoomId}", Label = _room?.Name },
+            new NavOptionProps { Path = $"/quotes/{QuoteId}/rooms/{RoomId}/products/new", Label = "New Product" },
+        }) 
     />
-    <h3>Quote Id: @QuoteId</h3>
-    <h3>Room Id: @RoomId</h3>
-    <h3>Product Id: @ProductId</h3>
-</div>
 
+    <div class="flex flex-1 flex-col container mt-6">
+        <ContentViewHeader 
+            Title="Create Product"
+            TitleClass="!text-3xl"
+            Subtitle="So many products, so little time"
+            SubmitButtonText="Save"
+            CancelButtonText="Clear"
+        />
+        <ProductDetailHeader
+            Product=@_product
+        />
+
+    </div>
+</div>
 
 
 @code {
@@ -25,11 +43,25 @@
 
     private bool _isNew = true;
 
-    protected override void OnInitialized()
+    private QuoteView? _quote;
+    private RoomView? _room;
+    private ProductView? _product;
+
+    
+    protected override async Task OnInitializedAsync()
     {
-        if(ProductId != null) _isNew = false;
-        Console.WriteLine($"QuoteId: {QuoteId}");
-        Console.WriteLine($"RoomId: {RoomId}");
-        Console.WriteLine($"ProductId: {ProductId}");
+        _quote = await QuoteStore.ReadableStore.GetById(QuoteId);
+        _room = _quote?.Rooms.FirstOrDefault(r => r.Id == RoomId);
+        if (ProductId.HasValue)
+        {
+            _product = _room?.Products.FirstOrDefault(p => p.Id == ProductId);
+            _isNew = false;
+        }
     }
 }
+
+
+
+
+
+
