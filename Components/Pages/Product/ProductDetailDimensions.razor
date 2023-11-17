@@ -1,12 +1,16 @@
 @namespace SmartEstimate.Pages
 
-<div class="flex w-full">
-    @foreach(string dimension in _dimensions) {
-        <Label>
-            @dimension
-            <InputText @bind-Value="@DimensionValues[dimension]" />
-        </Label>   
-    }
+
+<div class="flex flex-col">
+    <h3 class="text-lg font-semibold mb-2">Dimensions</h3>
+    <div class="grid grid-cols-3 gap-4">
+        @foreach(string dimension in _dimensions) {
+                <DmnInputText 
+                    Label="@dimension"
+                    @bind-Value="@DimensionValues[dimension]" 
+                />
+        }
+    </div>
 </div>
 
 

@@ -28,15 +28,20 @@
             "
         />
 
-        <TextInput 
+        <DmnInputText 
             Label="Customer Name" 
             LabelClass="!text-base font-semibold mb-1"
+            @bind-Value=@_customerName
         />
         <div class="m-3"></div>
-        <AddressInputGroup
+        <DmnInputAddress
             Title="Customer Address"
             Subtitle="Enter the customer's address"
         />
     </div>
 </div>
 
+@code {
+    private string _customerName;
+}
+```
