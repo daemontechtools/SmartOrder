@@ -27,7 +27,7 @@
             SubmitButtonText="Save"
             CancelButtonText="Clear"
         /> 
-        <div class="grid grid-cols-5 gap-4">
+        <div class="grid grid-cols-5 gap-8">
             <div class="col-span-3">
                 <div class="h-full flex items-center w-2/3">
                     <div class="center-self w-full">
@@ -45,11 +45,12 @@
             @if(SelectedProductType is not null) {
                  <div class="col-span-3">
                     <ProductDetailDimensions />
+                    <div class="mt-6" />
                     <ProductDetailAddOns ProductType=@SelectedProductType />
                 </div>
 
                 <div class="col-span-2">
-                    <FileUpload 
+                    <DmnFileDropzone 
                         Class="w-full"
                         IconClass="w-24 stroke-sky-500" 
                     />
