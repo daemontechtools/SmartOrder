@@ -3,14 +3,16 @@
 
 @namespace SmartEstimate.Pages
 
-@if(ProductType.HasValue) {
-    @foreach(ProductAddOn addOn in _addOns) {
-        <ComboBox Label=@addOn.Name />
-    }
+@if(_addOns.Any()) {
+    <div class="flex flex-col">
+            <h3 class="text-lg font-semibold mb-2">Add Ons</h3>
+            <div class="grid grid-cols-2 gap-4">
+                @foreach(ProductAddOn addOn in _addOns) {
+                    <DmnComboBox Label=@addOn.Name />
+                }
+            </div>
+    </div>
 }
-else {
-    <h3>Product Type: None</h3>
-}  
 
 
 
