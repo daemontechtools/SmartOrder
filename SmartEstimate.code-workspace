@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "../daemon-dotnet"
+		},
+		{
+			"path": "../SMARTOnlineOrderClient"
 		}
 	],
 	"settings": {
