@@ -1,0 +1,30 @@
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@rendermode InteractiveServer
+
+@namespace SmartEstimate.Pages
+
+@if(ProductType.HasValue) {
+    @foreach(ProductAddOn addOn in _addOns) {
+        <ComboBox Label=@addOn.Name />
+    }
+}
+else {
+    <h3>Product Type: None</h3>
+}  
+
+
+
+@code {
+    [Parameter]
+    public ProductType? ProductType { get; set; }
+
+    public Dictionary<ProductType, List<ProductAddOn>> TypeAddOns = new ProductTypeAddOns().TypeAddOns;
+    private List<ProductAddOn> _addOns = new List<ProductAddOn>();
+
+    protected override void OnParametersSet() {
+        if (ProductType.HasValue)
+        {
+            _addOns = TypeAddOns.GetValueOrDefault(ProductType.Value);
+        }
+    }
+}

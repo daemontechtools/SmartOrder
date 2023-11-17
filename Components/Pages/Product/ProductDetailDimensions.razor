@@ -1,0 +1,27 @@
+@namespace SmartEstimate.Pages
+
+<div class="flex w-full">
+    @foreach(string dimension in _dimensions) {
+        <Label>
+            @dimension
+            <InputText @bind-Value="@DimensionValues[dimension]" />
+        </Label>   
+    }
+</div>
+
+
+@code {
+    private List<string> _dimensions { get; set; } = new List<string> { 
+        "Width",
+        "Height",
+        "Depth"
+    };
+
+    private Dictionary<string, string> DimensionValues { get; set; } = new Dictionary<string, string>();
+
+    protected override void OnInitialized()
+    {
+        DimensionValues = _dimensions.ToDictionary(dimension => dimension, dimension => "0");
+    }
+
+}

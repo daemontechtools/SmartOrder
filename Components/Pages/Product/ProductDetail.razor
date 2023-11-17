@@ -1,9 +1,13 @@
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@rendermode InteractiveServer
+
 @page "/quotes/{quoteId:int}/rooms/{roomId:int}/products/{productId:int}"
 @page "/quotes/{quoteId:int}/rooms/{roomId:int}/products"
 
 @namespace SmartEstimate.Pages
 
 @inject QuoteStore QuoteStore
+@inject ILogger<ProductDetail> Logger
 
 <div class="flex flex-col h-full"
     <SEBreadcrumbNav
@@ -22,11 +26,40 @@
             Subtitle="So many products, so little time"
             SubmitButtonText="Save"
             CancelButtonText="Clear"
-        />
-        <ProductDetailHeader
-            Product=@_product
-        />
+        /> 
+        <div class="grid grid-cols-5 gap-4">
+            <div class="col-span-3">
+                <div class="h-full flex items-center w-2/3">
+                    <div class="center-self w-full">
+                        <ProductDetailTypeSelect 
+                            SelectedProductType=@SelectedProductType
+                            OnProductTypeChanged="OnProductTypeChanged"
+                        />
+                    </div>
+                </div>
+            </div>
+            <div class="col-span-2">
+               <ProductDetailPriceSummary />
+            </div>
 
+            @if(SelectedProductType is not null) {
+                 <div class="col-span-3">
+                    <ProductDetailDimensions />
+                    <ProductDetailAddOns ProductType=@SelectedProductType />
+                </div>
+
+                <div class="col-span-2">
+                    <FileUpload 
+                        Class="w-full"
+                        IconClass="w-24 stroke-sky-500" 
+                    />
+                </div>
+
+                <div class="col-span-5">
+                    <ProductDetailComments />
+                </div>
+            }
+        </div>
     </div>
 </div>
 
@@ -47,7 +80,21 @@
     private RoomView? _room;
     private ProductView? _product;
 
-    
+    private ProductType? _selectedProductType;
+
+    public ProductType? SelectedProductType
+    {
+        get => _selectedProductType;
+        set
+        {
+            if (_selectedProductType != value)
+            {
+                _selectedProductType = value;
+                StateHasChanged(); // This will cause the component to rerender
+            }
+        }
+    }
+
     protected override async Task OnInitializedAsync()
     {
         _quote = await QuoteStore.ReadableStore.GetById(QuoteId);
@@ -57,6 +104,11 @@
             _product = _room?.Products.FirstOrDefault(p => p.Id == ProductId);
             _isNew = false;
         }
+    }
+
+    private void OnProductTypeChanged(ProductType? productType)
+    {
+        SelectedProductType = productType;
     }
 }
 
