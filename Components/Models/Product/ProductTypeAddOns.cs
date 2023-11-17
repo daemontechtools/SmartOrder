@@ -18,8 +18,8 @@ public struct ProductTypeAddOns {
             new ProductAddOn { Name = "Hinging", Options = new List<string> { "Option1", "Option2" } },
             new ProductAddOn { Name = "Left End", Options = new List<string> { "Option1", "Option2" } },
             new ProductAddOn { Name = "Right End", Options = new List<string> { "Option1", "Option2" } },
-            new ProductAddOn { Name = "Interior Drw Top", Options = new List<string> { "Option1", "Option2" } },
-            new ProductAddOn { Name = "Interior Drw Btm", Options = new List<string> { "Option1", "Option2" } }
+            new ProductAddOn { Name = "Interior Drawer Top", Options = new List<string> { "Option1", "Option2" } },
+            new ProductAddOn { Name = "Interior Drawer Bottom", Options = new List<string> { "Option1", "Option2" } }
         });
 
         TypeAddOns.Add(ProductType.Tall, new List<ProductAddOn>
@@ -27,8 +27,8 @@ public struct ProductTypeAddOns {
             new ProductAddOn { Name = "Hinging", Options = new List<string> { "Option1", "Option2" } },
             new ProductAddOn { Name = "Left End", Options = new List<string> { "Option1", "Option2" } },
             new ProductAddOn { Name = "Right End", Options = new List<string> { "Option1", "Option2" } },
-            new ProductAddOn { Name = "Interior Drw Top", Options = new List<string> { "Option1", "Option2" } },
-            new ProductAddOn { Name = "Interior Drw Btm", Options = new List<string> { "Option1", "Option2" } }
+            new ProductAddOn { Name = "Interior Drawer Top", Options = new List<string> { "Option1", "Option2" } },
+            new ProductAddOn { Name = "Interior Drawer Bottom", Options = new List<string> { "Option1", "Option2" } }
         });
 
         TypeAddOns.Add(ProductType.Vanity, new List<ProductAddOn>

@@ -17,7 +17,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                 Name = "Quote 1",
                 SalesAssociate = "John Doe",
                 ContactInfo = "johndoe@example.com",
-                DealerAddress = new ShippingAddress {
+                DealerAddress = new Address {
                     Name = "Dealer 1",
                     Line1 = "123 Main St",
                     Line2 = "",
@@ -25,7 +25,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                     Ontario = "ON",
                     PostalCode = "M1M 1M1"
                 },
-                CustomerAddress = new ShippingAddress {
+                CustomerAddress = new Address {
                     Name = "Customer 1",
                     Line1 = "456 Elm St",
                     Line2 = "",
@@ -375,7 +375,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                 Name = "Quote 2",
                 SalesAssociate = "Jane Smith",
                 ContactInfo = "janesmith@example.com",
-                DealerAddress = new ShippingAddress {
+                DealerAddress = new Address {
                     Name = "Dealer 2",
                     Line1 = "789 Oak St",
                     Line2 = "",
@@ -383,7 +383,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                     Ontario = "BC",
                     PostalCode = "V6H 1K2"
                 },
-                CustomerAddress = new ShippingAddress {
+                CustomerAddress = new Address {
                     Name = "Customer 2",
                     Line1 = "321 Pine St",
                     Line2 = "",
@@ -519,7 +519,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                 Name = "Quote 3",
                 SalesAssociate = "Bob Johnson",
                 ContactInfo = "bobjohnson@example.com",
-                DealerAddress = new ShippingAddress {
+                DealerAddress = new Address {
                     Id = 4,
                     Name = "Dealer 3",
                     Line1 = "456 Main St",
@@ -528,7 +528,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                     Ontario = "BC",
                     PostalCode = "V6H 1K2"
                 },
-                CustomerAddress = new ShippingAddress {
+                CustomerAddress = new Address {
                     Id = 5,
                     Name = "Customer 3",
                     Line1 = "789 Pine St",
@@ -699,7 +699,7 @@ public struct QuoteMock : IModelMockData<Quote> {
             Name = $"Quote {random.Next(1, 100)}",
             SalesAssociate = $"Sales Associate {random.Next(1, 10)}",
             ContactInfo = $"salesassociate{random.Next(1, 10)}@example.com",
-            DealerAddress = new ShippingAddress
+            DealerAddress = new Address
             {
                 Name = $"Dealer {random.Next(1, 10)}",
                 Line1 = $"{random.Next(1, 100)} Main St",
@@ -708,7 +708,7 @@ public struct QuoteMock : IModelMockData<Quote> {
                 Ontario = "ON",
                 PostalCode = $"M{random.Next(1, 9)}{random.Next(1, 9)}{random.Next(1, 9)} {random.Next(1, 9)}{random.Next(1, 9)}{random.Next(1, 9)}"
             },
-            CustomerAddress = new ShippingAddress
+            CustomerAddress = new Address
             {
                 Name = $"Customer {random.Next(1, 10)}",
                 Line1 = $"{random.Next(1, 1000)} Elm St",
