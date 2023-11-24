@@ -19,7 +19,7 @@ var mapperConfig = new MapperConfiguration(cfg =>
 });
 IMapper mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
-builder.Services.AddSingleton<ModalService>();
+builder.Services.AddScoped<ModalService>();
 builder.Services.AddScoped<QuoteStore>();
 
 builder.WebHost.UseWebRoot("wwwroot");
