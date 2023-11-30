@@ -1,3 +1,5 @@
+@using SMART.Common.ProjectManagement
+
 @namespace SmartEstimate.Pages
 
 
@@ -16,10 +18,10 @@
                 <div class="h-2 w-2 rounded-full bg-current"></div>
             </div>
             <h1 class="flex gap-x-3 text-base leading-7">
-                <span class="font-semibold text-xl text-gray-200">@Quote.Name</span>
+                <span class="font-semibold text-xl text-gray-200">@Project!.Name</span>
             </h1>
         </div>
-        <p class="mt-2 leading-6 text-gray-300">@Quote.SalesAssociate</p>
+        <p class="mt-2 leading-6 text-gray-300">Sales Associate Name</p>
     </div>
     <div class="
         order-first flex-none 
@@ -64,13 +66,16 @@
     </div>
 </div>
 
-<QuoteDetailNav Props=@(new QuoteDetailNavProps { 
-    QuoteId = Quote.Id,
-    QuoteDocumentCount = Quote.Files.Length
+<ProjectDetailNav Props=@(new ProjectDetailNavProps { 
+    ProjectId = Project!.LinkID,
+    ProjectDocumentCount = DocumentCount
 }) />
 
 
 @code {
     [Parameter]
-    public QuoteView Quote { get; set; }
+    public ProjectView? Project { get; set; }
+
+    [Parameter]
+    public int DocumentCount { get; set; }
 }

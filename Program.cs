@@ -1,7 +1,5 @@
-using Microsoft.AspNetCore.Components.Web;
-
 using AutoMapper;
-
+using SMART.Web.OrderApi;
 using Daemon.RazorUI.Modal; 
 using SmartEstimate.Models;
 using SmartEstimate.Components;
@@ -20,7 +18,9 @@ var mapperConfig = new MapperConfiguration(cfg =>
 IMapper mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 builder.Services.AddScoped<ModalService>();
-builder.Services.AddScoped<QuoteStore>();
+// TODO: This should work as Scoped
+builder.Services.AddSingleton<OrderApi>();
+builder.Services.AddSingleton<SMARTStore>();
 
 builder.WebHost.UseWebRoot("wwwroot");
 builder.WebHost.UseStaticWebAssets();

@@ -1,14 +1,18 @@
-@using static Microsoft.AspNetCore.Components.Web.RenderMode
 @rendermode InteractiveServer
+
+@using SMART.Common.ProjectManagement
 
 @namespace SmartEstimate.Pages
 
 @using Microsoft.AspNetCore.Components.QuickGrid
 
 @inject NavigationManager _navigationManager
-@inject QuoteStore _quoteStore
+@inject PersistentComponentState? _applicationState
 @inject ModalService _modalService
+@inject SMARTStore _smartStore
+@inject ILogger<ProjectDetailGroups> _logger 
 
+@implements IDisposable
 
 
 <div class="container flex flex-col flex-1 bg-stone-100 pt-6 pb-3 justify-between">
@@ -21,20 +25,15 @@
             Class="mb-6"
         />
 
-        @if(IsLoading) {
-            <Spinner Class="text-stone-400 dark:text-stone-400 fill-orange-600" />
-        } else if(!_roomsQueryable.Any()) {
-            <span>No Quotes Available</span>
+        @if(_projectGroups is null || !_projectGroups.Any()) {
+            <span>No Rooms Available</span>
         } else {
-
-            <QuickGrid Items=_roomsQueryable Pagination=@_pagination>
+            <QuickGrid Items=@_projectGroups Pagination=@_pagination>
                 <TemplateColumn             
                     Title="Name"
-                    SortBy=@_sortByName
-                    Sortable=true 
                 >
                     <NavLink 
-                        href=@($"/quotes/{Quote.Id}/rooms/{context.Id}")
+                        href=@($"/quotes/{Project!.LinkID}/rooms/{context.LinkID}")
                         class="font-medium"
                     >
                         @context.Name
@@ -42,32 +41,30 @@
                 </TemplateColumn>
                 <PropertyColumn 
                     Title="Door Style"
-                    Property=@(r => r.DoorStyle.Name)
+                    Property=@(r => r.ProductDoorStyle)
                 />
                 <PropertyColumn 
                     Title="Finish"
-                    Property=@(r => r.Finish.Name)
+                    Property=@(r => r.ProductFinishExterior)
                 />
                 <PropertyColumn 
                     Title="Interior"
-                    Property=@(r => r.Interior.Name)
-                />
-                <PropertyColumn 
-                    TGridItem=RoomView 
-                    TProp=string 
-                    Title="Drawer Hardware"
-                    Property=@(r => r.DrawerHardware.Name)
+                    Property=@(r => r.ProductFinishInterior)
                 />
                 <PropertyColumn 
                     Title="Drawer Hardware"
-                    Property=@(r => r.SubTotal)
+                    Property=@(r => r.ProductHinge)
+                />
+                <PropertyColumn 
+                    Title="Drawer Hardware"
+                    Property=@(r => r.PriceSubTotal)
                     Format="C"
                     Sortable=true 
                 />
                 <TemplateColumn 
                     Class="flex gap-x-2 justify-end"
                 >
-                    <button @onclick=@(() => DeleteRoom(context.Id))>
+                    <button @onclick=@(() => DeleteRoom(context.LinkID))>
                         <TrashIcon Props=@(new IconProps() {
                             Class=@"
                                 w-[22px]
@@ -81,7 +78,7 @@
                     </button>         
                 </TemplateColumn>
             </QuickGrid>
-        }
+        } 
     </div>
     <Paginator State=@_pagination />
 </div>
@@ -89,23 +86,35 @@
 
 
 @code {
-    private bool IsLoading { get; set; } = true;
-    private PaginationState _pagination = new PaginationState { ItemsPerPage = 10 };
+    private PersistingComponentStateSubscription? _stateSubscription;
 
     [Parameter]
-    public QuoteView Quote { get; set; } = new();
+    public ProjectView? Project { get; set; }
 
-    private IQueryable<RoomView> _roomsQueryable = new List<RoomView>().AsQueryable();
-    private GridSort<RoomView> _sortByName = GridSort<RoomView>
+
+    //private bool IsLoading { get; set; } = true;
+    private PaginationState _pagination = new PaginationState { ItemsPerPage = 10 };
+
+
+    private IQueryable<ProjectGroupView>? _projectGroups { get; set; }
+    private GridSort<ProjectGroupView> _sortByName = GridSort<ProjectGroupView>
         .ByAscending(r => r.Name);
     private ModalContentProps _deleteConfirmationInput;
-    private int? _itemIdToDelete;
+    private string? _itemIdToDelete;
     
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        _roomsQueryable = Quote.Rooms.AsQueryable();
-
+        _stateSubscription = _applicationState!.RegisterOnPersisting(PersistProjectGroups);
+        if(!_applicationState!.TryTakeFromJson(
+            "projectGroups", 
+            out List<ProjectGroupView>? restoredProjectGroups
+        )) {
+            _projectGroups = Project?.ProjectGroups.AsQueryable();
+        } else {
+            _logger.LogInformation("Restored project groups from state");
+            _projectGroups = restoredProjectGroups?.AsQueryable();
+        }
         _deleteConfirmationInput = new ModalContentProps 
         {
             Title = "Delete Room",
@@ -117,15 +126,21 @@
             OnConfirm = OnDeleteConfirm 
         };
 
-        IsLoading = false;
+        //IsLoading = false;
+    }
+
+    private Task PersistProjectGroups()
+    {
+        _applicationState?.PersistAsJson("projectGroups", _projectGroups);
+        return Task.CompletedTask;
     }
 
     private void AddRoom()
     {
-        _navigationManager.NavigateTo($"/quotes/{Quote.Id}/rooms/new");
+        _navigationManager.NavigateTo($"/quotes/{Project!.LinkID}/rooms/new");
     }
 
-    private void DeleteRoom(int roomId)
+    private void DeleteRoom(string roomId)
     {
         _itemIdToDelete = roomId;
         _modalService!.Show(_deleteConfirmationInput);
@@ -134,5 +149,10 @@
     private async Task OnDeleteConfirm(bool confirmed)
     {
         _modalService!.Hide();
+    }
+
+    public void Dispose()
+    {
+        _stateSubscription?.Dispose();
     }
 }

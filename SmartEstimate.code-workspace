@@ -7,7 +7,7 @@
 			"path": "../daemon-dotnet"
 		},
 		{
-			"path": "../SMARTOnlineOrderClient"
+			"path": "../SMARTWebOrderApi"
 		}
 	],
 	"settings": {

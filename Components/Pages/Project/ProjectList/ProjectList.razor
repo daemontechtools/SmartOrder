@@ -1,5 +1,6 @@
-@using static Microsoft.AspNetCore.Components.Web.RenderMode
 @rendermode InteractiveServer
+
+@using SMART.Web.OrderApi
 
 
 @namespace SmartEstimate.Pages
@@ -22,41 +23,28 @@
 
             @if(IsLoading) {
                 <Spinner Class="text-stone-400 dark:text-stone-400 fill-orange-600" />
-            } else if(!_visibleQuotes.Any()) {
+            } else if(!_projects.Any()) {
                 <span>No Quotes Available</span>
             } else {  
-                <QuickGrid Items=_visibleQuotes Pagination=@_pagination>
+                <QuickGrid Items=@_projects Pagination=@_pagination>
+                    <TemplateColumn               
+                        Title="ID"
+                    >
+                        <NavLink href=@($"/quotes/{context.LinkID}") class="font-medium">
+                            @context.LinkID
+                        </NavLink>
+                    </TemplateColumn>
                     <TemplateColumn               
                         Title="Name"
-                        SortBy=@_sortByName
-                        Sortable=true 
                     >
-                        <NavLink href=@($"/quotes/{context.Id}") class="font-medium">
+                        <NavLink href=@($"/quotes/{context.LinkID}") class="font-medium">
                             @context.Name
                         </NavLink>
                     </TemplateColumn>
-                    <PropertyColumn 
-                        Title="Status"
-                        Property=@(q => q.Status)
-                        Sortable=true
-                    />
-                    <PropertyColumn 
-                        TGridItem=QuoteView 
-                        TProp=string 
-                        Title="Sales Associate"
-                        Property=@(q => q.SalesAssociate)
-                        Sortable=true
-                    />
-                    <PropertyColumn 
-                        Title="Last Updated"
-                        Property=@(q => q.UpdatedAt)
-                        Format="HH:mm tt MMMM d, yyyy"
-                        Sortable=true 
-                    />
                     <TemplateColumn 
                         Class="flex gap-x-2 justify-end"
                     >
-                        <button class="w-[22px] cursor-pointer" onclick=@(() => DeleteQuote(context.Id))>
+                        <button class="w-[22px] cursor-pointer" onclick=@(() => DeleteQuote(context.LinkID))>
                             <TrashIcon Props=@(new IconProps() 
                                 { 
                                     Class = $@"

@@ -1,0 +1,51 @@
+﻿@using SMART.Common.ProjectManagement
+
+@page "/quotes/{projectLinkId}"
+
+@namespace SmartEstimate.Pages
+
+@inject ILogger<ProjectDetail> _logger
+@inject SMARTStore _smartStore
+
+
+<div class="flex flex-col h-full">
+    @if(_isLoading) {
+    <span>Loading</span>
+    } else if(_project is null) {
+        <span>Project not found</span>
+    } else {
+        <ProjectDetailHeader Project=@_project/>
+        <div class="flex flex-1">
+            <ProjectDetailGroups Project=@_project />
+        </div> 
+    }
+</div>
+
+
+@code {
+    [Parameter]
+    public string? ProjectLinkId { get; set; }
+
+    private ProjectView? _project;
+    private bool _isLoading = true;
+
+    protected override void OnInitialized()
+    {
+        _logger.LogInformation("INITIALIZING ProjectDetail");
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        _logger.LogInformation("Load Project: {ProjectLinkId}", ProjectLinkId ?? "NULL");
+        _project = await _smartStore.GetProjectById(ProjectLinkId!);
+        _smartStore.OnStateChanged += OnStateChanged!;
+        _isLoading = false;
+    }
+
+    private async void OnStateChanged(object sender, EventArgs e)
+    {
+        _project = await _smartStore.GetProjectById(ProjectLinkId);
+        await InvokeAsync(StateHasChanged);
+    }
+}

@@ -1,9 +1,14 @@
 ﻿@using Daemon.RazorUI.Modal
 @using Daemon.RazorUI.Navigation
 @using Daemon.RazorUI.Icons
+@using SMART.Web.OrderApi
 
 
 @namespace SmartEstimate.Layouts
+
+@inject OrderApi OrderApi
+@inject SMARTStore SMARTStore
+
 
 @inherits LayoutComponentBase
 
@@ -35,6 +40,7 @@
     </ContentView>
     <Modal />
 </div>
+
 
 @code {
     private IconProps _iconProps = new IconProps() 
