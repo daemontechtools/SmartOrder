@@ -1,7 +1,11 @@
+using SMART.Common.Base;
+
 namespace SmartEstimate.Models;
 
-public class ProjectGroupView {
-    public string LinkID { get; set; }
+public class ProjectGroupView : SMARTBaseClass {
+
+    public ProjectGroupView(string LinkID) : base(LinkID) { }
+
     public string Name { get; set; }
     public string ProductDoorStyle { get; set; }
     public string ProductFinishExterior { get; set; }

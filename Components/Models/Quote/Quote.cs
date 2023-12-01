@@ -10,7 +10,7 @@ public enum QuoteStatus
     Approved,
 }
 
-public struct Quote : IDbModel
+public struct Quote
 {
     public int Id { get; set; }
     public DateTime CreatedAt { get; set; }

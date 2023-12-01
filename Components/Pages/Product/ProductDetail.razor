@@ -1,21 +1,21 @@
 @using static Microsoft.AspNetCore.Components.Web.RenderMode
 @rendermode InteractiveServer
 
-@page "/quotes/{quoteId:int}/rooms/{roomId:int}/products/{productId:int}"
-@page "/quotes/{quoteId:int}/rooms/{roomId:int}/products"
+@page "/quotes/{projectLinkId}/rooms/{projectGroupLinkId}/products/{libraryProductLinkId}"
+@page "/quotes/{projectLinkId}/rooms/{projectGroupLinkId}/products"
 
 @namespace SmartEstimate.Pages
 
-@inject QuoteStore QuoteStore
+@inject ProjectStore ProjectStore
 @inject ILogger<ProductDetail> Logger
 
 <div class="flex flex-col h-full"
     <SEBreadcrumbNav
         Options=@(new List<NavOptionProps> {
             new NavOptionProps { Path = "/quotes" },
-            new NavOptionProps { Path = $"/quotes/{QuoteId}", Label = _quote?.Name },
-            new NavOptionProps { Path = $"/quotes/{QuoteId}/rooms/{RoomId}", Label = _room?.Name },
-            new NavOptionProps { Path = $"/quotes/{QuoteId}/rooms/{RoomId}/products/new", Label = "New Product" },
+            new NavOptionProps { Path = $"/quotes/{ProjectLinkId}", Label = _project?.Name },
+            new NavOptionProps { Path = $"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}", Label = _projectGroup?.Name },
+            new NavOptionProps { Path = $"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}/products/new", Label = "New Product" },
         }) 
     />
 
@@ -67,19 +67,19 @@
 
 @code {
     [Parameter]
-    public int QuoteId { get; set; }
+    public string? ProjectLinkId { get; set; }
 
     [Parameter]
-    public int RoomId { get; set; }
+    public string? ProjectGroupLinkId { get; set; }
 
     [Parameter]
-    public int? ProductId { get; set; }
+    public string? LibraryProductLinkId { get; set; }
 
     private bool _isNew = true;
 
-    private QuoteView? _quote;
-    private RoomView? _room;
-    private ProductView? _product;
+    private ProjectView? _project;
+    private ProjectGroupView? _projectGroup;
+    private LibraryProductView? _product;
 
     private ProductType? _selectedProductType;
 
@@ -98,12 +98,14 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _quote = await QuoteStore.ReadableStore.GetById(QuoteId);
-        _room = _quote?.Rooms.FirstOrDefault(r => r.Id == RoomId);
-        if (ProductId.HasValue)
+        _project = await ProjectStore.ReadableStore
+            .GetById(ProjectLinkId!);
+        _projectGroup = _project.ProjectGroups
+            .FirstOrDefault(g => g.LinkID == ProjectGroupLinkId);
+        if (LibraryProductLinkId is not null)
         {
-            _product = _room?.Products.FirstOrDefault(p => p.Id == ProductId);
-            _isNew = false;
+            //_product = _room?.Products.FirstOrDefault(p => p.Id == ProductId);
+            //_isNew = false;
         }
     }
 

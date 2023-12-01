@@ -3,8 +3,7 @@ using Daemon.DataAccess.DataStore;
 
 namespace SmartEstimate.Models;
 
-public struct QuoteMock : IModelMockData<Quote> {
-
+public struct QuoteMock {
     public QuoteMock() {}
 
     public List<Quote> MockModels { get; set; }

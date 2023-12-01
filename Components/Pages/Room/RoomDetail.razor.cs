@@ -12,26 +12,29 @@ public struct RoomProfileProps
 public partial class RoomDetail : ComponentBase
 {
     [Inject]
-    private QuoteStore? QuoteStore { get; set; }
+    private ProjectStore? _projectStore { get; set; }
 
     [Parameter]
-    public int QuoteId { get; set; }
+    public string? ProjectLinkId { get; set; }
 
     [Parameter]
-    public int RoomId { get; set; }
+    public string? ProjectGroupLinkId { get; set; }
 
-    private QuoteView _quote = new();
-    private RoomView _room = new();
-    private IQueryable<ProductView> _products = new List<ProductView>().AsQueryable();
+    private ProjectView? _project;
+    private ProjectGroupView? _projectGroup;
+    //private IQueryable<ProductView> _products = new List<ProductView>().AsQueryable();
     private bool IsLoading = true;
 
     private List<RoomProfileProps> _roomProfileProps = new List<RoomProfileProps>();
 
     protected override async Task OnInitializedAsync()
     {
-        _quote = await QuoteStore?.ReadableStore.GetById(QuoteId);
-        _room = _quote.Rooms.FirstOrDefault(r => r.Id == RoomId);
-        _products = _room.Products.AsQueryable();
+        _project = await _projectStore!
+            .ReadableStore
+            .GetById(ProjectLinkId!);
+        _projectGroup = _project.ProjectGroups
+            .FirstOrDefault(g => g.LinkID == ProjectGroupLinkId);
+        //_products = _room.Products.AsQueryable();
         IsLoading = false;
 
         _roomProfileProps.Add(new RoomProfileProps { Title = "Door Style" });

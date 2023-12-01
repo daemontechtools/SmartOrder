@@ -3,7 +3,7 @@ using Daemon.DataAccess.DataStore;
 
 namespace SmartEstimate.Models;
 
-public struct DrawerHardware : IDbModel
+public struct DrawerHardware
 {
     public int Id { get; set; }
     public DateTime CreatedAt { get; set; }

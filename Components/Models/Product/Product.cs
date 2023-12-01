@@ -1,5 +1,4 @@
-﻿using Daemon.DataAccess.DataStore;
-
+﻿
 
 namespace SmartEstimate.Models;
 
@@ -20,7 +19,7 @@ public struct ProductAddOn {
     public List<string> Options { get; set; }
 }
 
-public struct Product : IDbModel
+public struct Product
 {
     public int Id { get; set; }
     public DateTime CreatedAt { get; set; }

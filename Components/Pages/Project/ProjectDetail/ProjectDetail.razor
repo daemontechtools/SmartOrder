@@ -5,7 +5,7 @@
 @namespace SmartEstimate.Pages
 
 @inject ILogger<ProjectDetail> _logger
-@inject SMARTStore _smartStore
+@inject ProjectStore _projectStore
 
 
 <div class="flex flex-col h-full">
@@ -38,14 +38,14 @@
     protected override async Task OnInitializedAsync()
     {
         _logger.LogInformation("Load Project: {ProjectLinkId}", ProjectLinkId ?? "NULL");
-        _project = await _smartStore.GetProjectById(ProjectLinkId!);
-        _smartStore.OnStateChanged += OnStateChanged!;
+        _project = await _projectStore!.ReadableStore.GetById(ProjectLinkId!);
+        _projectStore!.Storage.OnStateChanged += OnStateChanged!;
         _isLoading = false;
     }
 
     private async void OnStateChanged(object sender, EventArgs e)
     {
-        _project = await _smartStore.GetProjectById(ProjectLinkId);
+        _project = await _projectStore!.ReadableStore.GetById(ProjectLinkId!);
         await InvokeAsync(StateHasChanged);
     }
 }

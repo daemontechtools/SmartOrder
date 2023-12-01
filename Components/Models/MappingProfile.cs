@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using SMART.Common.LibraryManagement;
 using SMART.Common.ProjectManagement;
 
 
@@ -9,40 +10,28 @@ public class SmartEstimateMappingProfile : Profile
     public SmartEstimateMappingProfile()
     {
         
-        CreateMap<Project, ProjectView>().ReverseMap();
-        CreateMap<Projects, IQueryable<ProjectView>>()
+        CreateMap<Project, ProjectView>();
+        CreateMap<ICollection<Project>, IQueryable<ProjectView>>()
             .ConvertUsing<CollectionToQueryableConverter<Project, ProjectView>>();
 
-        CreateMap<ProjectGroup, ProjectGroupView>().ReverseMap();
+        CreateMap<ProjectGroup, ProjectGroupView>();
         CreateMap<ProjectGroups, IQueryable<ProjectGroupView>>()
             .ConvertUsing<CollectionToQueryableConverter<ProjectGroup, ProjectGroupView>>();
-        
-        // OLD Models
-        CreateMap<Quote, QuoteView>().ReverseMap();
-        CreateMap<Room, RoomView>().ReverseMap();
-        CreateMap<Product, ProductView>().ReverseMap();
+
+        CreateMap<LibraryProduct, LibraryProductView>();
+        CreateMap<LibraryProducts, IQueryable<LibraryProductView>>()
+            .ConvertUsing<CollectionToQueryableConverter<LibraryProduct, LibraryProductView>>();
     }
 }
 
-// public class ProjectGroupConverter: ITypeConverter<ProjectGroups, IQueryable<ProjectGroupView>>
-// {
-//     public IQueryable<ProjectGroupView> Convert(
-//         ProjectGroups source, 
-//         ResolutionContext context)
-//     {
-//         List<ProjectGroupView> views = context.Mapper.Map<List<ProjectGroupView>>(source);
-//         return views.AsQueryable();
-//     }
-// }
-
-public class CollectionToQueryableConverter<T, V>: ITypeConverter<ICollection<T>, IQueryable<V>>
+public class CollectionToQueryableConverter<C, Q>: ITypeConverter<ICollection<C>, IQueryable<Q>>
 {
-    public IQueryable<V> Convert(
-        ICollection<T> source, 
-        IQueryable<V> destination,
+    public IQueryable<Q> Convert(
+        ICollection<C> source, 
+        IQueryable<Q> destination,
         ResolutionContext context)
     {
-        List<V> views = context.Mapper.Map<List<V>>(source);
+        List<Q> views = context.Mapper.Map<List<Q>>(source);
         return views.AsQueryable();
     }
 }

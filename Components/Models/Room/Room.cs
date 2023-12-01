@@ -3,7 +3,7 @@
 
 namespace SmartEstimate.Models;
 
-public struct Room : IDbModel
+public struct Room
 {
     public int Id { get; set; }
     public DateTime CreatedAt { get; set; }

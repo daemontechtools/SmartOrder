@@ -9,7 +9,6 @@
 @inject NavigationManager _navigationManager
 @inject PersistentComponentState? _applicationState
 @inject ModalService _modalService
-@inject SMARTStore _smartStore
 @inject ILogger<ProjectDetailGroups> _logger 
 
 @implements IDisposable
@@ -125,8 +124,6 @@
             ButtonClass = "bg-red-500 hover:bg-red-400",
             OnConfirm = OnDeleteConfirm 
         };
-
-        //IsLoading = false;
     }
 
     private Task PersistProjectGroups()

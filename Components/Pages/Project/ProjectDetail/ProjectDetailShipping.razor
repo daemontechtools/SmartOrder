@@ -1,11 +1,11 @@
-@page "/quotes/{quoteId:int}/shipping"
+@page "/quotes/{projectLinkId}/shipping"
  
 @namespace SmartEstimate.Pages
 
-@inject QuoteStore QuoteStore
+@inject ProjectStore ProjectStore
 
 
-<ProjectDetailHeader Quote=@_quote/>
+<ProjectDetailHeader Project=@_project/>
 
 <div class="
   container
@@ -33,14 +33,14 @@
     private bool IsLoading = true;
 
     [Parameter]
-    public int QuoteId { get; set; }
+    public string? ProjectLinkId { get; set; }
 
 
-    private QuoteView _quote;
+    private ProjectView? _project;
 
     protected override async Task OnInitializedAsync()
     {
-        _quote = await QuoteStore.ReadableStore.GetById(QuoteId);
+        _project = await ProjectStore!.ReadableStore.GetById(ProjectLinkId!);
         IsLoading = false;
     }
 }

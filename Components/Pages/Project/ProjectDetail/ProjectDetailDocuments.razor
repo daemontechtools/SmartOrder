@@ -1,9 +1,9 @@
-@page "/quotes/{quoteId:int}/documents"
+@page "/quotes/{projectLinkId}/documents"
 
-@inject QuoteStore QuoteStore
+@inject ProjectStore ProjectStore
 
 <div class="flex flex-col h-full">
-   <ProjectDetailHeader Quote=@_quote />
+   <ProjectDetailHeader Project=@_project />
 
     <div class="
         container 
@@ -52,15 +52,15 @@
 
 @code {
     [Parameter]
-    public int QuoteId { get; set; }
+    public string? ProjectLinkId { get; set; }
 
-    private QuoteView _quote;
+    private ProjectView _project;
 
     private List<RowTemplateProps> ListItems { get; set; } = new List<RowTemplateProps>();
 
     protected override async Task OnInitializedAsync()
     {
-        _quote = await QuoteStore.ReadableStore.GetById(QuoteId);
+        _project = await ProjectStore.ReadableStore.GetById(ProjectLinkId!);
         ListItems = new List<RowTemplateProps>() {
             new RowTemplateProps() {
                 Title = "secret_plans.pdf",

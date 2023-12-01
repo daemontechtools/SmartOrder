@@ -1,4 +1,4 @@
-@page "/quotes/{quoteId:int}/rooms/{roomId:int}"
+@page "/quotes/{projectLinkId}/rooms/{projectGroupLinkId}"
 
 @using static Microsoft.AspNetCore.Components.Web.RenderMode
 @rendermode InteractiveServer
@@ -8,9 +8,17 @@
 
 <SEBreadcrumbNav 
     Options=@(new List<NavOptionProps> {
-        new NavOptionProps { Path = "/quotes", Label = "What?" },
-        new NavOptionProps { Path = $"/quotes/{QuoteId}", Label = _quote.Name },
-        new NavOptionProps { Path = $"/quotes/{QuoteId}/rooms/{RoomId}", Label = _room.Name }
+        new NavOptionProps { 
+            Path = "/quotes", Label = "What?" 
+        },
+        new NavOptionProps { 
+            Path = $"/quotes/{ProjectLinkId}", 
+            Label = _project!.Name 
+        },
+        new NavOptionProps { 
+            Path = $"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}", 
+            Label = _projectGroup!.Name 
+        }
     }) 
 />
 <div class="flex flex-1 flex-col">
@@ -29,7 +37,7 @@
                         sm:truncate sm:text-3xl 
                         sm:tracking-tight
                     ">
-                        @_room.Name
+                        @_projectGroup.Name
                     </h2>
                 </div>
                 <div class="mt-4 flex md:ml-4 md:mt-0">
@@ -37,7 +45,7 @@
                 </div>
             </div>
 
-            <RoomProperties 
+            @* <RoomProperties 
                 Props=@_roomProfileProps
             />
 
@@ -45,7 +53,7 @@
                 Products=@_products 
                 QuoteId=@QuoteId
                 RoomId=@RoomId
-            />
+            /> *@
         </div>
     }
 </div>

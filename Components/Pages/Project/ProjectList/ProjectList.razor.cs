@@ -11,13 +11,12 @@ using SmartEstimate.Models;
 
 namespace SmartEstimate.Pages;
 
-public partial class ProjectList : ComponentBase, IDisposable
-{
+public partial class ProjectList : ComponentBase, IDisposable {
     [Inject]
     private ModalService? _modalService { get; set; }
 
     [Inject]
-    private SMARTStore? _smartStore { get; set; }
+    private ProjectStore? _projectStore { get; set; }
 
     [Inject]
     private ILogger<ProjectList>? _logger { get; set; }
@@ -29,15 +28,14 @@ public partial class ProjectList : ComponentBase, IDisposable
     private PersistentComponentState? _applicationState { get; set; }
     private PersistingComponentStateSubscription? _stateSubscription;
 
-    //private IQueryable<QuoteView> _quotes = new List<QuoteView>().AsQueryable();
-    //private IQueryable<QuoteView> _visibleQuotes = new List<QuoteView>().AsQueryable();
 
-    private IQueryable<ProjectView> _projects = new List<ProjectView>().AsQueryable();
+    private IQueryable<ProjectView>? _projects;
+    private IQueryable<ProjectView>? _visibleProjects;
     private bool IsLoading { get; set; } = true;
 
     private ModalContentProps _deleteConfirmationInput;
     
-    private int? _itemIdToDelete;
+    private string? _itemIdToDelete;
     private string? _searchQuery;
 
     private PaginationState _pagination = new PaginationState { ItemsPerPage = 10 };
@@ -49,18 +47,15 @@ public partial class ProjectList : ComponentBase, IDisposable
     {
         _stateSubscription = _applicationState?.RegisterOnPersisting(PersistProjects);
         if(!_applicationState!.TryTakeFromJson("projects", out List<ProjectView>? restoredProjects)) {
-            _projects = await _smartStore!.GetProjects();
+            _projects = await _projectStore!.ReadableStore.Get();
         } else {
             _logger?.LogInformation("Restored project groups from state");
             _projects = restoredProjects!.AsQueryable();
         }
         _logger!.LogInformation("OnInitializedAsync ProjectList");
-
-        //List<QuoteView> _viewList = await _quoteStore!.ReadableStore.GetAll();
-        //_quotes = _viewList.AsQueryable();
-        //_visibleQuotes = _quotes;
+        _visibleProjects = _projects;
         //TODO: Can this be more specific?
-        //_quoteStore.Storage.OnStateChanged += OnStateChanged!;
+        _projectStore!.Storage.OnStateChanged += OnStateChanged!;
 
         _deleteConfirmationInput = new ModalContentProps 
         {
@@ -87,36 +82,35 @@ public partial class ProjectList : ComponentBase, IDisposable
     {
        if (confirmed && _itemIdToDelete != null)
         {
-            //await _quoteStore!.WritableStore.Delete(_itemIdToDelete.Value);
+            //await _projectstore!.WritableStore.Delete(_itemIdToDelete.Value);
             _itemIdToDelete = null;
-            //_visibleQuotes = SearchQuotes(_searchQuery);
+            _visibleProjects = SearchProducts(_searchQuery);
         }
         _modalService!.Hide();
     }
 
     private async void OnStateChanged(object sender, EventArgs e)
     {
-        //List<QuoteView> _newQuotes = await _quoteStore!.ReadableStore.GetAll();
-        //_quotes = _newQuotes.AsQueryable();
+        _projects = await _projectStore!.ReadableStore.Get();
         await InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()
     {
-        //_quoteStore!.Storage.OnStateChanged -= OnStateChanged!;
+        //_projectstore!.Storage.OnStateChanged -= OnStateChanged!;
         _stateSubscription?.Dispose();
     }
 
 
     private async Task AddQuote()
     {
-        _logger.LogInformation("AddQuote");
+        _logger?.LogInformation("AddQuote");
         _navigationManager?.NavigateTo("/quotes/new");
     }
 
     private void DeleteQuote(string quoteId)
     {
-        //_itemIdToDelete = quoteId;
+        _itemIdToDelete = quoteId;
         _modalService!.Show(_deleteConfirmationInput);
     }
 
@@ -125,21 +119,20 @@ public partial class ProjectList : ComponentBase, IDisposable
     private void OnSearchInput(string input) {
         _searchQuery = input;
         if(string.IsNullOrEmpty(input)) {
-            //_visibleQuotes = _quotes;
+            _visibleProjects = _projects;
         } else {
-            //_visibleQuotes = SearchQuotes(input);
+            _visibleProjects = SearchProducts(input);
         }   
     }
 
-    //private IQueryable<QuoteView> SearchQuotes(string? query) {
-    private void SearchQuotes(string? query) {
+    private IQueryable<ProjectView> SearchProducts(string? query) {
         if(string.IsNullOrWhiteSpace(query)) {
-            //return _quotes;
+            return _projects!;
         }
-        // return _quotes
-        //     .Where(q => 
-        //         q.Name.Contains(query, StringComparison.OrdinalIgnoreCase)
-        //     );
+        return _projects!
+            .Where(q => 
+                q.Name.Contains(query, StringComparison.OrdinalIgnoreCase)
+            );
     }
 }
 
