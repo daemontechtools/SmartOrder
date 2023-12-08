@@ -41,10 +41,14 @@
                             @context.Name
                         </NavLink>
                     </TemplateColumn>
+                    <PropertyColumn 
+                        Title="Sales Associate"
+                        Property=@(p => p.LinkIDEmployeeSoldBy)
+                    />
                     <TemplateColumn 
                         Class="flex gap-x-2 justify-end"
                     >
-                        <button class="w-[22px] cursor-pointer" onclick=@(() => DeleteQuote(context.LinkID))>
+                        <button class="w-[22px] cursor-pointer" onclick=@(() => DeleteQuote(context))>
                             <TrashIcon Props=@(new IconProps() 
                                 { 
                                     Class = $@"

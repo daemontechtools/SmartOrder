@@ -1,0 +1,28 @@
+@namespace SmartEstimate.Shared.Components
+
+<div class="flex flex-col">
+    <span class=" 
+        font-medium 
+        text-gray-900
+    ">
+        @Label!
+    </span>
+ 
+    <span class="
+        mt-2
+        py-1.5 
+        leading-6
+        text-gray-900 
+        sm:text-sm sm:leading-6
+    ">
+        @Value!
+    </span>
+</div>
+
+@code {
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public string? Value { get; set; }
+}

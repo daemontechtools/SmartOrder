@@ -14,6 +14,15 @@ public class ProjectWriteableModelStore : BaseWriteableModelStore<Project, Proje
     ) : base(mapper, storage, api) { }
 
     public override async Task<ProjectView> Create(ProjectView view) {
-        return await base.Create(view);
+        Project newProject = await _api.Create(view.Name);
+        ProjectView newView = _mapper.Map<ProjectView>(newProject);
+        await base.Create(newView);
+        return newView;
+    }
+
+    public override async Task Delete(ProjectView view) {
+        Project removedProject = _mapper.Map<Project>(view);
+        await _api.Delete(removedProject);
+        await base.Delete(view);
     }
 }

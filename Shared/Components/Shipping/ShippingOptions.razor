@@ -1,0 +1,36 @@
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@rendermode InteractiveServer
+
+@using Microsoft.AspNetCore.Components.Forms
+@using SmartEstimate.Models
+
+@namespace SmartEstimate.Shared.Components
+@inject ILogger<ShippingOptions> Logger
+
+
+<h2 class="text-base font-semibold leading-7 text-gray-900">Shipping Options</h2>
+
+<InputRadioGroup @bind-Value=@_project!.IsShipped>
+    <div class="flex items-center">
+        <InputRadio Value=false class="dmn-input-radio" />Pickup
+        <div class="w-4" />
+        <InputRadio Value=true class="dmn-input-radio" />Delivery
+    </div>
+</InputRadioGroup>
+
+
+@code {
+
+    private ProjectView? _project { get; set; }
+
+    [CascadingParameter]
+    public EditContext? EditContext { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _project = EditContext!.Model as ProjectView;
+    }
+}
+
+
+ 

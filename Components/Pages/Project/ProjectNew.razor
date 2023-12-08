@@ -1,6 +1,12 @@
 @page "/quotes/new"
+@rendermode InteractiveServer
+@using SmartEstimate.Models
 
 @namespace SmartEstimate.Pages
+
+@inject NavigationManager NavigationManager
+@inject ProjectStore ProjectStore
+@inject ILogger<ProjectNew> Logger
 
 
 <div class="flex flex-col h-full"
@@ -12,36 +18,71 @@
     />
 
     <div class="flex flex-1 flex-col container mt-6">
-        <ContentViewHeader 
-            Title="Create Quote"
-            TitleClass="!text-3xl"
-            Subtitle="Let's do some business"
-            SubmitButtonText="Save"
-            CancelButtonText="Clear"
-        />
-        <div 
-            class="
-                w-full 
-                border-b 
-                border-stone-300
-                mt-2 mb-6
-            "
-        />
-
-        <DmnInputText 
-            Label="Customer Name" 
-            LabelClass="!text-base font-semibold mb-1"
-            @bind-Value=@_customerName
-        />
-        <div class="m-3"></div>
-        <DmnInputAddress
-            Title="Customer Address"
-            Subtitle="Enter the customer's address"
-        />
+        <EditForm 
+            @ref=@_editForm
+            Model=@_newProject     
+            FormName="add-quote"
+            OnValidSubmit=@AddQuote
+        >
+            <DataAnnotationsValidator />
+            <ContentViewHeader 
+                Title="Create Quote"
+                TitleClass="!text-3xl"
+                Subtitle="Let's do some business"
+                SubmitButtonText="Save"
+                CancelButtonText="Clear"
+                IsLoading=@_isSubmitting
+                OnSubmitClick=@OnSubmitClick
+            />
+            <div 
+                class="
+                    w-full 
+                    border-b 
+                    border-stone-300
+                    mt-2 mb-6
+                "
+            />
+            <DmnInputText 
+                Label="Customer Name" 
+                LabelClass="!text-base font-semibold" 
+                @bind-Value=@_newProject!.Name
+            />
+            <div class="m-3"></div>
+            <SEShippingInput />
+        </EditForm>
     </div>
 </div>
 
 @code {
-    private string _customerName;
+
+    [SupplyParameterFromForm]
+    private ProjectView? _newProject { get; set; }
+
+    private EditForm _editForm = default!;
+    private bool _isSubmitting = false;
+
+    protected override void OnInitialized()
+    {
+        _newProject ??= new("");
+    }
+
+    private async Task OnSubmitClick()
+    {
+        if (_editForm!.EditContext!.Validate()) {
+            await AddQuote();
+        }
+    }
+
+    private async Task AddQuote()
+    {
+        _isSubmitting = true;
+        Logger.LogInformation($"Creating new project: {_newProject!.Name}");
+        ProjectView newProject = await ProjectStore!
+            .WritableStore
+            .Create(_newProject);
+
+        Logger.LogInformation($"Created new project: {newProject.Name}");
+        NavigationManager.NavigateTo("/quotes");
+        _isSubmitting = false;
+    }
 }
-```

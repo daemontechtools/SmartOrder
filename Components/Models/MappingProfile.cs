@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using SMART.Common.CompanyManagement;
 using SMART.Common.LibraryManagement;
 using SMART.Common.ProjectManagement;
+using SMART.Common.Utility;
 
 
 namespace SmartEstimate.Models;
@@ -9,29 +11,33 @@ public class SmartEstimateMappingProfile : Profile
 {
     public SmartEstimateMappingProfile()
     {
-        
-        CreateMap<Project, ProjectView>();
-        CreateMap<ICollection<Project>, IQueryable<ProjectView>>()
+        // IList<Project> projects = new Projects();
+        // IList<Project> projectList = new Projects();
+        // projectList.As
+        // List<Project> projects1 = new Projects();
+
+        CreateMap<Project, ProjectView>().ReverseMap();
+        CreateMap<IList<Project>, IQueryable<ProjectView>>()
             .ConvertUsing<CollectionToQueryableConverter<Project, ProjectView>>();
 
-        CreateMap<ProjectGroup, ProjectGroupView>();
+        CreateMap<ProjectGroup, ProjectGroupView>().ReverseMap();
         CreateMap<ProjectGroups, IQueryable<ProjectGroupView>>()
             .ConvertUsing<CollectionToQueryableConverter<ProjectGroup, ProjectGroupView>>();
 
-        CreateMap<LibraryProduct, LibraryProductView>();
+        CreateMap<LibraryProduct, LibraryProductView>().ReverseMap();
         CreateMap<LibraryProducts, IQueryable<LibraryProductView>>()
             .ConvertUsing<CollectionToQueryableConverter<LibraryProduct, LibraryProductView>>();
     }
 }
 
-public class CollectionToQueryableConverter<C, Q>: ITypeConverter<ICollection<C>, IQueryable<Q>>
+public class CollectionToQueryableConverter<C, Q>: ITypeConverter<IList<C>, IQueryable<Q>>
 {
     public IQueryable<Q> Convert(
-        ICollection<C> source, 
+        IList<C> source, 
         IQueryable<Q> destination,
         ResolutionContext context)
     {
-        List<Q> views = context.Mapper.Map<List<Q>>(source);
+        IList<Q> views = context.Mapper.Map<IList<Q>>(source);
         return views.AsQueryable();
     }
 }

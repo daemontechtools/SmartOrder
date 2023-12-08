@@ -1,8 +1,6 @@
 using Daemon.DataAccess.DataStore;
 using SMART.Common.ProjectManagement;
 using SMART.Web.OrderApi;
-using SMART.Common.Base;
-using SMART.Common;
 
 
 public class ProjectApi : IModelApi<Project> {
@@ -26,9 +24,11 @@ public class ProjectApi : IModelApi<Project> {
         try {
             _logger.LogInformation("Connecting to SMART");
             await _orderApi.Connect(new ApiCreds {
-                FactoryLinkId = "0818M26D1TT4",
-                DealerName = "Bathrooms First",
-                UserName = "Bathrooms First Agent"
+                //FactoryLinkId = "0818M26D1TT4",
+                //DealerName = "Bathrooms First",
+                FactoryLinkId = "078DP04B0284",
+                DealerName = "Tamarack",
+                UserName = "Tamarack Agent"
             });
             await _orderApi.LoadLibrary();
         } catch(Exception e) {
@@ -37,7 +37,7 @@ public class ProjectApi : IModelApi<Project> {
         }
     }
 
-    public async Task<ICollection<Project>> Get() {
+    public async Task<IList<Project>> Get() {
         await Connect();
         return await _orderApi.GetProjects();
     }
@@ -45,12 +45,23 @@ public class ProjectApi : IModelApi<Project> {
     public async Task<Project> Create(string name) {
         await Connect();
         await _orderApi.AddQuote(name);
-        ICollection<Project> projects = await _orderApi.GetProjects();
+        IList<Project> projects = await _orderApi.GetProjects();
         IQueryable<Project> queryable = projects.AsQueryable();
         Project? newModel = queryable.Where(p => p.Name == name).FirstOrDefault();
         if(newModel is null) {
             throw new Exception("Failed to create project");
         }
         return newModel;
+    }
+
+    public async Task Delete(Project project) {
+        await Connect();
+        await _orderApi.DeleteProject(project);
+    }
+
+    public Task<Project> Update(Project project) {
+        //await Connect();
+        //await _orderApi.UpdateProject(project);
+        return Task.FromResult(project);
     }
 }

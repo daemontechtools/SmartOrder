@@ -32,6 +32,7 @@ public partial class RoomDetail : ComponentBase
         _project = await _projectStore!
             .ReadableStore
             .GetById(ProjectLinkId!);
+        //_projectGroup.ProjectGroup
         _projectGroup = _project.ProjectGroups
             .FirstOrDefault(g => g.LinkID == ProjectGroupLinkId);
         //_products = _room.Products.AsQueryable();
