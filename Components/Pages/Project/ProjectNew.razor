@@ -33,6 +33,7 @@
                 CancelButtonText="Clear"
                 IsLoading=@_isSubmitting
                 OnSubmitClick=@OnSubmitClick
+                OnCancelClick=@OnCancelClick
             />
             <div 
                 class="
@@ -71,6 +72,12 @@
         if (_editForm!.EditContext!.Validate()) {
             await AddQuote();
         }
+    }
+
+    private void OnCancelClick()
+    {
+        _newProject = new("");
+        StateHasChanged();
     }
 
     private async Task AddQuote()
