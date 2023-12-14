@@ -24,11 +24,12 @@ public class ProjectApi : IModelApi<Project> {
         try {
             _logger.LogInformation("Connecting to SMART");
             await _orderApi.Connect(new ApiCreds {
-                //FactoryLinkId = "0818M26D1TT4",
-                //DealerName = "Bathrooms First",
-                FactoryLinkId = "078DP04B0284",
-                DealerName = "Tamarack",
-                UserName = "Tamarack Agent"
+                FactoryLinkId = "0818M26D1TT4",
+                DealerName = "Bathrooms First",
+                UserName = "Bathrooms First Agent"
+                //FactoryLinkId = "078DP04B0284",
+                // DealerName = "Tamarack",
+                // UserName = "Tamarack Agent"
             });
             await _orderApi.LoadLibrary();
         } catch(Exception e) {
@@ -42,12 +43,12 @@ public class ProjectApi : IModelApi<Project> {
         return await _orderApi.GetProjects();
     }
 
-    public async Task<Project> Create(string name) {
+    public async Task<Project> Create(Project project) {
         await Connect();
-        await _orderApi.AddQuote(name);
+        await _orderApi.AddQuote(project);
         IList<Project> projects = await _orderApi.GetProjects();
         IQueryable<Project> queryable = projects.AsQueryable();
-        Project? newModel = queryable.Where(p => p.Name == name).FirstOrDefault();
+        Project? newModel = queryable.Where(p => p.LinkID == project.LinkID).FirstOrDefault();
         if(newModel is null) {
             throw new Exception("Failed to create project");
         }
