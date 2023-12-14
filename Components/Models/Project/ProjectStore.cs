@@ -25,7 +25,7 @@ public class ProjectStore {
             Storage,
             Api
         );
-        WritableStore = new ProjectWriteableModelStore(
+        WritableStore = new BaseWriteableModelStore<Project, ProjectView>(
             mapper,
             Storage,
             Api
