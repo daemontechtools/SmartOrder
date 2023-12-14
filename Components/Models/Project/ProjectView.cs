@@ -18,7 +18,7 @@ public class ProjectView : SMARTBaseClass {
     public string LinkIDEmployeeSoldBy { get; set; }
 
   
-    public ShipLocation ProjectShipLocation { get; set; }
+    public ShipLocationView ProjectShipLocation { get; set; }
 
     public IList<ProjectGroupView> ProjectGroups { get; set; }
 }

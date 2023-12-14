@@ -11,26 +11,38 @@ public class SmartEstimateMappingProfile : Profile
 {
     public SmartEstimateMappingProfile()
     {
-        // IList<Project> projects = new Projects();
-        // IList<Project> projectList = new Projects();
-        // projectList.As
-        // List<Project> projects1 = new Projects();
+        // var shipLocation = new ShipLocation();
+        // var addresses = shipLocation.Addresses;
+        // IList<Address> addressList = addresses;
+        // ICollection<Address> addressCollection = addresses;
 
         CreateMap<Project, ProjectView>().ReverseMap();
         CreateMap<IList<Project>, IQueryable<ProjectView>>()
-            .ConvertUsing<CollectionToQueryableConverter<Project, ProjectView>>();
+            .ConvertUsing<ListToQueryableConverter<Project, ProjectView>>();
 
         CreateMap<ProjectGroup, ProjectGroupView>().ReverseMap();
         CreateMap<ProjectGroups, IQueryable<ProjectGroupView>>()
-            .ConvertUsing<CollectionToQueryableConverter<ProjectGroup, ProjectGroupView>>();
+            .ConvertUsing<ListToQueryableConverter<ProjectGroup, ProjectGroupView>>();
 
         CreateMap<LibraryProduct, LibraryProductView>().ReverseMap();
         CreateMap<LibraryProducts, IQueryable<LibraryProductView>>()
-            .ConvertUsing<CollectionToQueryableConverter<LibraryProduct, LibraryProductView>>();
+            .ConvertUsing<ListToQueryableConverter<LibraryProduct, LibraryProductView>>();
+
+        CreateMap<ShipLocation, ShipLocationView>().ReverseMap();
+        CreateMap<ShipLocations, IQueryable<ShipLocationView>>()
+            .ConvertUsing<ListToQueryableConverter<ShipLocation, ShipLocationView>>();
+
+        CreateMap<Address, AddressView>().ReverseMap();
+        CreateMap<Addresses, IQueryable<AddressView>>()
+            .ConvertUsing<ListToQueryableConverter<Address, AddressView>>();
+
+        CreateMap<Contact, ContactView>().ReverseMap();
+        CreateMap<Contacts, IQueryable<ContactView>>()
+            .ConvertUsing<ListToQueryableConverter<Contact, ContactView>>();
     }
 }
 
-public class CollectionToQueryableConverter<C, Q>: ITypeConverter<IList<C>, IQueryable<Q>>
+public class ListToQueryableConverter<C, Q>: ITypeConverter<IList<C>, IQueryable<Q>>
 {
     public IQueryable<Q> Convert(
         IList<C> source, 
