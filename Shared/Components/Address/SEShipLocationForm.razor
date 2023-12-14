@@ -1,0 +1,38 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using Daemon.RazorUI.Input
+@using SmartEstimate.Models
+
+@inject ShipLocationStore ShipLocationStore
+
+@namespace SmartEstimate.Shared.Components
+
+<EditForm 
+    @ref=@_editForm
+    Model=@_newShipLocation     
+    FormName="add-ship-location"
+    OnValidSubmit=@AddLocation
+>
+    <button disabled=@IsAddingShipLocation>ComboBox Goes Here!</button>
+    <span>Locations Count: @ShipLocations!.Count()</span>
+    <span onclick=@(() => IsAddingShipLocation) >Add New Address</span>
+    @if(IsAddingShipLocation) {
+      <DmnInputAddress />
+    }
+
+</EditForm>
+
+@code {
+    private EditForm _editForm;
+    private ShipLocationView _newShipLocation = new("");
+    private bool IsAddingShipLocation { get; set; } = false;
+    private List<ShipLocationView> ShipLocations { get; set; } = new();
+
+    protected override async Task OnInitializedAsync() {
+        ShipLocations = await ShipLocationStore.Get();
+    }
+
+    private void AddLocation() {
+        // Add ShipLocation to ActiveDealer.ShipLocations
+        // set Project.ActiveShipLocation to new ShipLocation
+    }
+}

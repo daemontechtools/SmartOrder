@@ -3,9 +3,10 @@
 
 @using Microsoft.AspNetCore.Components.Forms
 @using SMART.Common.CompanyManagement
+@using Daemon.RazorUI.Input
 @using SmartEstimate.Models
 
-@inject SmartStore SmartStore
+@inject ShipLocationStore ShipLocationStore
 @inject ILogger<ShippingOptions> Logger
 
 @namespace SmartEstimate.Shared.Components
@@ -15,10 +16,13 @@
 
 @if(_project!.IsShipped) {
   <div class="border-t border-gray-300 mb-4"></div>
-  <h1>Location ComboBox</h1>
-  //<span>Locations Count: @ShipLocations!.Count()</span>
-  @if(_project!.ProjectShipLocation is not null) {
-    <SEAddressView ShipLocation=@_project!.ProjectShipLocation />
+  <h1>Location ComboBox</h1> // On VAlue Chnage of ComboBox, Assign
+  
+  // Display Read Only View of Ship Location
+  @if(_project!.ProjectShipLocation is not null && !IsAddingShipLocation) {
+    <SEShipLocationView ShipLocation=@_project!.ProjectShipLocation />
+  } else {
+    <SEShipLocationForm ShipLocation=@_shipLocation/>
   }
 }
 
@@ -28,24 +32,25 @@
 @code {
 
   private ProjectView? _project { get; set; }
+  private ShipLocationView? _shipLocation { get; set; }
 
   [CascadingParameter]
   public EditContext? EditContext { get; set; }
 
-  private IList<ShipLocation>? ShipLocations;
+  private IQueryable<ShipLocationView>? ShipLocations;
+  private bool IsAddingShipLocation = false;
+    
       
-  protected override async Task OnInitializedAsync()
-  {
+  protected override async Task OnInitializedAsync() {
     _project = EditContext!.Model as ProjectView;
-
-    //IList<ShipLocation> locationCollection = await SmartStore.GetShipLocations();
-    //ShipLocations = locationCollection.ToList();
-
+    _shipLocation = (_project?.ProjectShipLocation is not null)
+      ? _project.ProjectShipLocation
+      : new ShipLocationView("");
+    ShipLocations = await ShipLocationStore.ReadableStore.Get();
     EditContext.OnFieldChanged += OnFieldChanged;
   }
 
-  private void OnFieldChanged(object? sender, FieldChangedEventArgs e)
-  {
+  private void OnFieldChanged(object? sender, FieldChangedEventArgs e) {
     StateHasChanged();
   }
 }
