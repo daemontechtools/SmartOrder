@@ -21,8 +21,10 @@ builder.Services.AddScoped<ModalService>();
 // TODO: This should work as Scoped
 builder.Services.AddSingleton<OrderApi>();
 builder.Services.AddSingleton<ProjectApi>();
-builder.Services.AddSingleton<ShipLocationStore>();
 builder.Services.AddSingleton<ProjectStore>();
+builder.Services.AddSingleton<ShipLocationApi>();
+builder.Services.AddSingleton<ShipLocationStore>();
+
 
 builder.WebHost.UseWebRoot("wwwroot");
 builder.WebHost.UseStaticWebAssets();
