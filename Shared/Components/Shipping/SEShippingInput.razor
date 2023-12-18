@@ -15,14 +15,15 @@
 <ShippingOptions />
 
 @if(_project!.IsShipped) {
-  <div class="border-t border-gray-300 mb-4"></div>
-  
-  // Display Read Only View of Ship Location
-  @if(_project!.ProjectShipLocation is not null && !IsAddingShipLocation) {
-    <SEShipLocationView ShipLocation=@_project!.ProjectShipLocation />
-  } else {
-    <SEShipLocationForm ShipLocation=@_project!.ProjectShipLocation/>
-  }
+  <div class="flex flex-col">
+    <div class="border-t border-gray-300 mb-4"></div>
+    
+    @if(_project!.ProjectShipLocation is not null && !IsAddingShipLocation) {
+      <SEShipLocationView ShipLocation=@_project!.ProjectShipLocation />
+    } else {
+      <SEShipLocationForm ShipLocation=@_shipLocation/>
+    }
+  </div>
 }
 
 
