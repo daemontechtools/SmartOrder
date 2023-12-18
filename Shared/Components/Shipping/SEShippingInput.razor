@@ -1,6 +1,7 @@
 @using static Microsoft.AspNetCore.Components.Web.RenderMode
 @rendermode InteractiveServer
 
+@using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Forms
 @using SMART.Common.CompanyManagement
 @using Daemon.RazorUI.Input
@@ -17,15 +18,24 @@
 @if(_project!.IsShipped) {
   <div class="flex flex-col">
     <div class="border-t border-gray-300 mb-4"></div>
-    
-    @if(_project!.ProjectShipLocation is not null && !IsAddingShipLocation) {
-      <SEShipLocationView ShipLocation=@_project!.ProjectShipLocation />
+
+      <div class="flex flex-col">
+        <h3>Change Address</h3>
+        <button disabled>Address ComboBox</button>
+        <span onclick=@OnAddressClick>Add New Address</span>
+      </div>
+
+    @if(!IsAddingShipLocation && _project!.ProjectShipLocation is null) {
+      <span>No Current Shipping Address</span>
+    } else if(IsAddingShipLocation) {
+      <h3>Adding New Shipping Address</h3>
+      <SEShipLocationForm ShipLocation=@_project!.ProjectShipLocation />
     } else {
-      <SEShipLocationForm ShipLocation=@_shipLocation/>
+      <h3>Current Shipping Address</h3>
+      <SEShipLocationView ShipLocation=@_project!.ProjectShipLocation />
     }
   </div>
 }
-
 
 
 
@@ -51,6 +61,11 @@
   }
 
   private void OnFieldChanged(object? sender, FieldChangedEventArgs e) {
+    StateHasChanged();
+  }
+
+  private void OnAddressClick(MouseEventArgs e) {
+    IsAddingShipLocation = true;
     StateHasChanged();
   }
 }

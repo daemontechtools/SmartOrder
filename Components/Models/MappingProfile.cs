@@ -11,10 +11,7 @@ public class SmartEstimateMappingProfile : Profile
 {
     public SmartEstimateMappingProfile()
     {
-        // var shipLocation = new ShipLocation();
-        // var addresses = shipLocation.Addresses;
-        // IList<Address> addressList = addresses;
-        // ICollection<Address> addressCollection = addresses;
+
 
         CreateMap<Project, ProjectView>().ReverseMap();
         CreateMap<IList<Project>, IQueryable<ProjectView>>()

@@ -1,39 +1,91 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using Daemon.RazorUI.Input
+@using Daemon.RazorUI.Layout
 @using SmartEstimate.Models
 
 @inject ShipLocationStore ShipLocationStore
-
+@inject ILogger<SEShipLocationForm> Logger
+ 
 @namespace SmartEstimate.Shared.Components
+
+
+
 
 <EditForm 
     @ref=@_editForm
     Model=@ShipLocation
     FormName="add-ship-location"
     OnValidSubmit=@AddLocation
+    class="flex flex-col"
 >
-    <button disabled=true>ComboBox Goes Here!</button>
-    <span>Locations Count: @ShipLocations!.Count()</span>
-    @foreach (var location in ShipLocations) {
-        <div class="flex flex-col">
-            <h3>Ship Location Info</h3>
-            <span>Name: <span>@location.LocationName</span></span>
-            <span>Street: <span>@location.DefaultAddress.Street</span></span> 
-        </div>
-    }
-    <span onclick=@(() => IsAddingShipLocation) >Add New Address</span>
-    @if(IsAddingShipLocation) {
-      <DmnInputAddress />
-    }
+    <DmnSectionHeader 
+        Title="Add Address"
+        TitleClass="!text-xl"
+        SubmitButtonText="Add"
+        CancelButtonText="Clear"
+        IsLoading=@_isSubmitting
+        OnSubmitClick=@OnSubmitClick
+        OnCancelClick=@OnCancelClick
+    />
 
+    <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
+    <div class="sm:col-span-3">
+        <DmnInputText 
+            Label="Location Name"
+            @bind-Value=@ShipLocation!.LocationName
+        />
+    </div>
+
+    <div class="sm:col-span-3">
+        <DmnInputText 
+            Label="Email Address" 
+            @bind-Value=@ShipLocation!.DefaultContact.DefaultEmail
+        />
+    </div>
+
+    <div class="col-span-full">
+        <DmnInputText 
+            Label="Street Address" 
+            @bind-Value=@ShipLocation!.DefaultAddress.Street
+        />
+    </div>
+        <div class="col-span-full">
+        <DmnInputText 
+            Label="Address Line 2" 
+            @bind-Value=@ShipLocation!.DefaultAddress.StreetLine2
+        />
+    </div>
+
+    <div class="sm:col-span-2 sm:col-start-1">
+        <DmnInputText 
+            Label="City" 
+            @bind-Value=@ShipLocation!.DefaultAddress.City
+        />
+    </div>
+
+    <div class="sm:col-span-2">
+        <DmnInputText 
+            Label="Province" 
+            @bind-Value=@ShipLocation!.DefaultAddress.StateProvince
+        />
+    </div>
+
+    <div class="sm:col-span-2">
+        <DmnInputText 
+            Label="Postal Code" 
+            @bind-Value=@ShipLocation!.DefaultAddress.PostalCode
+        />
+    </div>
+</div>
 </EditForm>
 
 @code {
 
     [Parameter]
-    public ShipLocationView ShipLocation { get; set; }
-
+    public ShipLocationView? ShipLocation { get; set; }
+ 
     private EditForm _editForm;
+    private bool _isSubmitting = false;
     private bool IsAddingShipLocation { get; set; } = false;
     private IQueryable<ShipLocationView> ShipLocations { get; set; } = new List<ShipLocationView>().AsQueryable();
 
@@ -45,8 +97,29 @@
         ShipLocations = await ShipLocationStore.ReadableStore.Get(true);
     }
 
-    private void AddLocation() {
+    private async Task OnSubmitClick()
+    {
+        if (_editForm!.EditContext!.Validate()) {
+            await AddLocation();
+        }
+    }
+
+    private void OnCancelClick()
+    {
+        ShipLocation = new("");
+        StateHasChanged();
+    }
+    private async Task AddLocation() {
         // Add ShipLocation to ActiveDealer.ShipLocations
         // set Project.ActiveShipLocation to new ShipLocation
+        _isSubmitting = true;
+        Logger.LogInformation($"Creating new project: {ShipLocation!.LocationName}");
+        ShipLocationView newLocation = await ShipLocationStore!
+            .WritableStore
+            .Create(ShipLocation!);
+
+        Logger.LogInformation($"Created new project: {newLocation.LocationName}");
+        //Project.ActiveShipLocation = newLocation;
+        _isSubmitting = false;
     }
 }
