@@ -17,5 +17,6 @@ public class ShipLocationView : SMARTBaseClass {
     public ContactView DefaultContact { get; set; }
     
     [Required]
+    [ValidateComplexType]
     public AddressView DefaultAddress { get; set; }
 }

@@ -9,8 +9,7 @@
 @namespace SmartEstimate.Shared.Components
 
 
-
-
+<ValidationSummary />
 <EditForm 
     @ref=@_editForm
     Model=@ShipLocation
@@ -18,71 +17,83 @@
     OnValidSubmit=@AddLocation
     class="flex flex-col"
 >
+    <ObjectGraphDataAnnotationsValidator />
+    
     <DmnSectionHeader 
-        Title="Add Address"
+        Title="New Shipping Location"
         TitleClass="!text-xl"
         SubmitButtonText="Add"
-        CancelButtonText="Clear"
+        CancelButtonText="Cancel"
         IsLoading=@_isSubmitting
         OnSubmitClick=@OnSubmitClick
         OnCancelClick=@OnCancelClick
     />
 
     <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
-    <div class="sm:col-span-3">
-        <DmnInputText 
-            Label="Location Name"
-            @bind-Value=@ShipLocation!.LocationName
-        />
-    </div>
-
-    <div class="sm:col-span-3">
-        <DmnInputText 
-            Label="Email Address" 
-            @bind-Value=@ShipLocation!.DefaultContact.DefaultEmail
-        />
-    </div>
-
-    <div class="col-span-full">
-        <DmnInputText 
-            Label="Street Address" 
-            @bind-Value=@ShipLocation!.DefaultAddress.Street
-        />
-    </div>
+        <div class="sm:col-span-3">
+            <DmnInputText 
+                Label="Location Name"
+                @bind-Value=@ShipLocation!.LocationName
+            />
+        </div>
+        <div class="sm:col-span-3"></div>
+        <div class="sm:col-span-3">
+            <DmnInputText 
+                Label="Email Address" 
+                @bind-Value=@ShipLocation!.DefaultContact.DefaultEmail
+            />
+        </div>
+        <div class="sm:col-span-3">
+            <DmnInputText 
+                Label="Phone Number" 
+                @bind-Value=@ShipLocation!.DefaultContact.DefaultPhone
+            />
+        </div>
         <div class="col-span-full">
-        <DmnInputText 
-            Label="Address Line 2" 
-            @bind-Value=@ShipLocation!.DefaultAddress.StreetLine2
-        />
+            <DmnInputText 
+                Label="Street Address" 
+                @bind-Value=@ShipLocation!.DefaultAddress.Street
+            />
+        </div>
+            <div class="col-span-full">
+            <DmnInputText 
+                Label="Address Line 2" 
+                @bind-Value=@ShipLocation!.DefaultAddress.StreetLine2
+            />
+        </div>
+        <div class="sm:col-span-2 sm:col-start-1">
+            <DmnInputText 
+                Label="City" 
+                @bind-Value=@ShipLocation!.DefaultAddress.City
+            />
+        </div>
+        <div class="sm:col-span-2">
+            <DmnInputText 
+                Label="Province" 
+                @bind-Value=@ShipLocation!.DefaultAddress.StateProvince
+            />
+        </div>
+        <div class="sm:col-span-2">
+            <DmnInputText 
+                Label="Postal Code" 
+                @bind-Value=@ShipLocation!.DefaultAddress.PostalCode
+            />
+        </div>
     </div>
-
-    <div class="sm:col-span-2 sm:col-start-1">
-        <DmnInputText 
-            Label="City" 
-            @bind-Value=@ShipLocation!.DefaultAddress.City
-        />
-    </div>
-
-    <div class="sm:col-span-2">
-        <DmnInputText 
-            Label="Province" 
-            @bind-Value=@ShipLocation!.DefaultAddress.StateProvince
-        />
-    </div>
-
-    <div class="sm:col-span-2">
-        <DmnInputText 
-            Label="Postal Code" 
-            @bind-Value=@ShipLocation!.DefaultAddress.PostalCode
-        />
-    </div>
-</div>
 </EditForm>
+
 
 @code {
 
     [Parameter]
     public ShipLocationView? ShipLocation { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    [Parameter]
+    public EventCallback<ShipLocationView> OnCreate { get; set; }
+        
  
     private EditForm _editForm;
     private bool _isSubmitting = false;
@@ -106,20 +117,18 @@
 
     private void OnCancelClick()
     {
-        ShipLocation = new("");
-        StateHasChanged();
+        OnCancel.InvokeAsync();
     }
     private async Task AddLocation() {
         // Add ShipLocation to ActiveDealer.ShipLocations
         // set Project.ActiveShipLocation to new ShipLocation
         _isSubmitting = true;
         Logger.LogInformation($"Creating new project: {ShipLocation!.LocationName}");
-        ShipLocationView newLocation = await ShipLocationStore!
+        @* ShipLocationView newLocation = await ShipLocationStore!
             .WritableStore
             .Create(ShipLocation!);
-
-        Logger.LogInformation($"Created new project: {newLocation.LocationName}");
-        //Project.ActiveShipLocation = newLocation;
+        Logger.LogInformation($"Created new project: {newLocation.LocationName}"); *@
+        //await OnCreate.InvokeAsync(newLocation);
         _isSubmitting = false;
     }
 }

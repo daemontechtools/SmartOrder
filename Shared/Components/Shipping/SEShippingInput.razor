@@ -17,26 +17,40 @@
 
 @if(_project!.IsShipped) {
   <div class="flex flex-col">
-    <div class="border-t border-gray-300 mb-4"></div>
+    <div class="border-t border-gray-300 mb-4 mt-2"></div>
 
-      <div class="flex flex-col">
-        <h3>Change Address</h3>
-        <button disabled>Address ComboBox</button>
-        <span onclick=@OnAddressClick>Add New Address</span>
-      </div>
+    <div class="flex flex-col">
+      <div class="whitespace-nowrap w-40 text-center p-1 bg-stone-500 text-slate-100 border rounded-md border-slate-600">Address ComboBox</div>
+      @if(!IsAddingShipLocation) {
+        <span 
+          onclick=@OnAddressClick
+          class="
+            text-sky-500
+            font-semibold
+            hover:text-sky-400
+            cursor-pointer
+            pt-0.5
+        ">
+          Add New Address
+        </span>
+      }
+    </div>
+    <div class="mb-4"></div>
 
     @if(!IsAddingShipLocation && _project!.ProjectShipLocation is null) {
       <span>No Current Shipping Address</span>
     } else if(IsAddingShipLocation) {
-      <h3>Adding New Shipping Address</h3>
-      <SEShipLocationForm ShipLocation=@_project!.ProjectShipLocation />
+      <SEShipLocationForm 
+        ShipLocation=@_project!.ProjectShipLocation
+        OnCancel=@OnShipLocationCancel 
+        OnCreate=@OnShipLocationCreate
+      />
     } else {
       <h3>Current Shipping Address</h3>
       <SEShipLocationView ShipLocation=@_project!.ProjectShipLocation />
     }
   </div>
 }
-
 
 
 @code {
@@ -68,4 +82,15 @@
     IsAddingShipLocation = true;
     StateHasChanged();
   }
+  
+  private void OnShipLocationCancel() {
+    IsAddingShipLocation = false;
+    StateHasChanged();
+  }
+
+  private void OnShipLocationCreate(ShipLocationView shipLocation) {
+    _project!.ProjectShipLocation = shipLocation;
+    IsAddingShipLocation = false;
+    StateHasChanged();
+  }        
 }
