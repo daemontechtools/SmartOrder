@@ -120,15 +120,13 @@
         OnCancel.InvokeAsync();
     }
     private async Task AddLocation() {
-        // Add ShipLocation to ActiveDealer.ShipLocations
-        // set Project.ActiveShipLocation to new ShipLocation
         _isSubmitting = true;
         Logger.LogInformation($"Creating new project: {ShipLocation!.LocationName}");
-        @* ShipLocationView newLocation = await ShipLocationStore!
+        ShipLocationView newLocation = await ShipLocationStore!
             .WritableStore
             .Create(ShipLocation!);
-        Logger.LogInformation($"Created new project: {newLocation.LocationName}"); *@
-        //await OnCreate.InvokeAsync(newLocation);
+        Logger.LogInformation($"Created new project: {newLocation.LocationName}");
+        await OnCreate.InvokeAsync(newLocation);
         _isSubmitting = false;
     }
 }
