@@ -9,7 +9,7 @@
 @inject ILogger<ProjectNew> Logger
 
 
-<div class="flex flex-col h-full"
+<div class="flex flex-col bg-slate-100"
     <SEBreadcrumbNav
         Options=@(new List<NavOptionProps> {
             new NavOptionProps { Path = "/quotes" },
@@ -25,7 +25,7 @@
             OnValidSubmit=@AddQuote
         >
             <DataAnnotationsValidator />
-            <ContentViewHeader 
+            <DmnSectionHeader 
                 Title="Create Quote"
                 TitleClass="!text-3xl"
                 Subtitle="Let's do some business"
@@ -40,12 +40,12 @@
                     w-full 
                     border-b 
                     border-stone-300
-                    mt-2 mb-6
+                    mt-2 mb-5
                 "
             />
             <DmnInputText 
                 Label="Customer Name" 
-                LabelClass="!text-base font-semibold" 
+                LabelClass="!text-base font-semibold pb-3" 
                 @bind-Value=@_newProject!.Name
             />
             <div class="m-3"></div>

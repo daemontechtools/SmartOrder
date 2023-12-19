@@ -1,6 +1,7 @@
 @using static Microsoft.AspNetCore.Components.Web.RenderMode
 @rendermode InteractiveServer
 
+@using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Forms
 @using SMART.Common.CompanyManagement
 @using Daemon.RazorUI.Input
@@ -15,17 +16,41 @@
 <ShippingOptions />
 
 @if(_project!.IsShipped) {
-  <div class="border-t border-gray-300 mb-4"></div>
-  
-  // Display Read Only View of Ship Location
-  @if(_project!.ProjectShipLocation is not null && !IsAddingShipLocation) {
-    <SEShipLocationView ShipLocation=@_project!.ProjectShipLocation />
-  } else {
-    <SEShipLocationForm ShipLocation=@_project!.ProjectShipLocation/>
-  }
+  <div class="flex flex-col">
+    <div class="border-t border-gray-300 mb-4 mt-2"></div>
+
+    <div class="flex flex-col">
+      <div class="whitespace-nowrap w-40 text-center p-1 bg-stone-500 text-slate-100 border rounded-md border-slate-600">Address ComboBox</div>
+      @if(!IsAddingShipLocation) {
+        <span 
+          onclick=@OnAddressClick
+          class="
+            text-sky-500
+            font-semibold
+            hover:text-sky-400
+            cursor-pointer
+            pt-0.5
+        ">
+          Add New Address
+        </span>
+      }
+    </div>
+    <div class="mb-4"></div>
+
+    @if(!IsAddingShipLocation && _project!.ProjectShipLocation is null) {
+      <span>No Current Shipping Address</span>
+    } else if(IsAddingShipLocation) {
+      <SEShipLocationForm 
+        ShipLocation=@_project!.ProjectShipLocation
+        OnCancel=@OnShipLocationCancel 
+        OnCreate=@OnShipLocationCreate
+      />
+    } else {
+      <h3>Current Shipping Address</h3>
+      <SEShipLocationView ShipLocation=@_project!.ProjectShipLocation />
+    }
+  </div>
 }
-
-
 
 
 @code {
@@ -52,4 +77,20 @@
   private void OnFieldChanged(object? sender, FieldChangedEventArgs e) {
     StateHasChanged();
   }
+
+  private void OnAddressClick(MouseEventArgs e) {
+    IsAddingShipLocation = true;
+    StateHasChanged();
+  }
+  
+  private void OnShipLocationCancel() {
+    IsAddingShipLocation = false;
+    StateHasChanged();
+  }
+
+  private void OnShipLocationCreate(ShipLocationView shipLocation) {
+    _project!.ProjectShipLocation = shipLocation;
+    IsAddingShipLocation = false;
+    StateHasChanged();
+  }        
 }

@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using SMART.Common.Base;
-using SMART.Common.CompanyManagement;
 
 namespace SmartEstimate.Models;
 
@@ -14,6 +13,7 @@ public class ProjectView : SMARTBaseClass {
     public string Name { get; set; }
 
    
+    [Required]
     public bool IsShipped { get; set; } = false;
     public string LinkIDEmployeeSoldBy { get; set; }
 
