@@ -1,0 +1,109 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using Daemon.RazorUI.Input
+@using Daemon.RazorUI.Layout
+@using SmartEstimate.Models
+
+@inject ContactStore ContactStore
+@inject ILogger<SEContactForm> Logger
+ 
+@namespace SmartEstimate.Shared.Components
+
+
+<EditForm 
+    @ref=@_editForm
+    Model=@Contact
+    FormName="contact-form"
+    class="flex flex-col"
+>
+    <ObjectGraphDataAnnotationsValidator />
+    
+    <DmnSectionHeader 
+        Title="New Contact"
+        TitleClass="!text-xl"
+        SubmitButtonText=@((_isNewContact ? "Add" : "Update"))
+        CancelButtonText=@((_isNewContact ? "Cancel" : "Delete"))
+        IsLoading=@_isSubmitting
+        OnSubmitClick=@OnSubmitClick
+        OnCancelClick=@OnCancelClick
+    />
+
+    <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
+        <div class="sm:col-span-3">
+            <DmnInputText 
+                Label="Contact Name"
+                @bind-Value=@Contact!.DisplayName
+            />
+        </div>
+        <div class="sm:col-span-3"></div>
+        <div class="sm:col-span-3">
+            <DmnInputText 
+                Label="Email Address" 
+                @bind-Value=@Contact!.DefaultEmail.DisplayAs
+            />
+        </div>
+        <div class="sm:col-span-3">
+            <DmnInputText 
+                Label="Phone Number" 
+                @bind-Value=@Contact!.DefaultPhone.DisplayAs
+            />
+        </div>
+    </div>
+</EditForm>
+
+
+@code {
+
+    [Parameter]
+    public ContactView? Contact { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    [Parameter]
+    public EventCallback<ContactView> OnChange { get; set; }
+        
+ 
+    private EditForm _editForm;
+    private bool _isSubmitting = false;
+    private bool _isNewContact = true;
+    private bool IsAddingShipLocation { get; set; } = false;
+    private IQueryable<ContactView> Contacts { get; set; } = new List<ContactView>().AsQueryable();
+
+    protected override void OnParametersSet() {
+        if(Contact is null) {
+            _isNewContact = true;
+        }
+        Contact ??= new("");
+    }
+
+    protected override async Task OnInitializedAsync() {
+        Contacts = await ContactStore.ReadableStore.Get(true);
+    }
+
+    private async Task OnSubmitClick() {
+        if (!_editForm!.EditContext!.Validate()) {
+            return;
+        }
+        await UpsertLocation();
+    }
+
+    private void OnCancelClick()
+    {
+        OnCancel.InvokeAsync();
+    }
+
+    private async Task UpsertLocation() {
+        _isSubmitting = true;
+        Logger.LogInformation($"Upserting new contact: {Contact!.DisplayName}");
+        ContactView newContact = (_isNewContact) 
+            ? await ContactStore!
+                .WritableStore
+                .Create(Contact!) 
+            : await ContactStore!
+                .WritableStore
+                .Update(Contact!);
+        Logger.LogInformation($"Upserted new contact: {Contact!.DisplayName}");
+        await OnChange.InvokeAsync(newContact);
+        _isSubmitting = false;
+    }
+}

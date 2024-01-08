@@ -54,13 +54,15 @@
     [Parameter]
     public string? ProjectLinkId { get; set; }
 
-    private ProjectView _project;
+    private ProjectView? _project;
 
     private List<RowTemplateProps> ListItems { get; set; } = new List<RowTemplateProps>();
 
     protected override async Task OnInitializedAsync()
     {
-        _project = await ProjectStore.ReadableStore.GetById(ProjectLinkId!);
+        _project = await ProjectStore!
+            .ReadableStore
+            .GetOne(p => p.LinkID == ProjectLinkId);
         ListItems = new List<RowTemplateProps>() {
             new RowTemplateProps() {
                 Title = "secret_plans.pdf",

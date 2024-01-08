@@ -4,7 +4,7 @@ using SMART.Common.Base;
 namespace SmartEstimate.Models;
 
 
-public class ProjectView : SMARTBaseClass {
+public class ProjectView : SMARTBaseClassView { 
 
     public ProjectView(string LinkID) : base(LinkID) { }
 
@@ -35,8 +35,7 @@ public class RequiredIfAttribute : ValidationAttribute
     private readonly string _propertyName;
     private readonly object _expectedValue;
 
-    public RequiredIfAttribute(string propertyName, object expectedValue)
-    {
+    public RequiredIfAttribute(string propertyName, object expectedValue) {
         _propertyName = propertyName;
         _expectedValue = expectedValue;
     }

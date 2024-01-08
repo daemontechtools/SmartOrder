@@ -38,14 +38,18 @@
     protected override async Task OnInitializedAsync()
     {
         _logger.LogInformation("Load Project: {ProjectLinkId}", ProjectLinkId ?? "NULL");
-        _project = await _projectStore!.ReadableStore.GetById(ProjectLinkId!);
+        _project = await _projectStore!
+            .ReadableStore
+            .GetOne(p => p.LinkID == ProjectLinkId);
         _projectStore!.Storage.OnStateChanged += OnStateChanged!;
         _isLoading = false;
     }
 
     private async void OnStateChanged(object sender, EventArgs e)
     {
-        _project = await _projectStore!.ReadableStore.GetById(ProjectLinkId!);
+        _project = await _projectStore!
+            .ReadableStore
+            .GetOne(p => p.LinkID == ProjectLinkId);
         await InvokeAsync(StateHasChanged);
     }
 }

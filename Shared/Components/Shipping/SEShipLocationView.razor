@@ -10,26 +10,31 @@
 <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
     <div class="sm:col-span-3">
         <SEAddressElement
-            Label="Company"
-            Value=@ShipLocation!.LinkIDCompany
+            Label="Location Name"
+            Value=@ShipLocation!.LocationName
         />
     </div>
-
+    <div class="sm:col-span-3"></div>
     <div class="sm:col-span-3">
         <SEAddressElement 
-            Label="Contact Name" 
-            Value=@ShipLocation!.DefaultContact.DisplayName
+            Label="Email Address" 
+            Value=@ShipLocation!.DefaultContact.DefaultEmail.DisplayAs
         />
     </div>
 
     <div class="col-span-3">
         <SEAddressElement 
+            Label="Phone Number" 
+            Value=@ShipLocation!.DefaultContact.DefaultPhone.DisplayAs
+        />
+    </div>
+    <div class="col-span-full">
+        <SEAddressElement 
             Label="Street Address" 
             Value=@ShipLocation!.DefaultAddress.Street
         />
     </div>
-
-        <div class="col-span-3">
+    <div class="col-span-full">
         <SEAddressElement 
             Label="Address Line 2" 
             Value=@ShipLocation!.DefaultAddress.StreetLine2

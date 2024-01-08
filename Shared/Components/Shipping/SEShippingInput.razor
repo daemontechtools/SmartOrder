@@ -17,16 +17,16 @@
     <div class="border-t border-gray-300 mb-3 mt-3"></div>
 
     <div class="flex flex-col">
-      <div class="relative">
         <DmnComboBox 
+          Data=@_shipLocations
+          Value=@Project?.ProjectShipLocation
+          ValueExpression=@(() => Project!.ProjectShipLocation)
+          ValueChanged=@(l => OnAddressChange(l))
+          TextFieldName=@nameof(ShipLocationView.LocationName)
           Label="Shipping Location"
           Class="pb-0"
-          Options=@_shipLocationOptions 
-          @bind-Value=@_currentShipLocationLinkId
-          @onchange=@OnShipLocationChanged
         />
-        <ValidationMessage For=@(() => Project.ProjectShipLocation) /> 
-      </div>
+
       @if(!_isAddingShipLocation) {
         <span 
           @onclick=@OnAddressClick
@@ -44,17 +44,12 @@
     </div>
     <div class="mb-4"></div>
 
-    @if(!_isAddingShipLocation && Project?.ProjectShipLocation is null) {
-      <span>No Current Shipping Address</span>
-    } else if(_isAddingShipLocation) {
+    @if(Project?.ProjectShipLocation is not null || _isAddingShipLocation) {
       <SEShipLocationForm 
         ShipLocation=@Project?.ProjectShipLocation
-        OnCancel=@OnShipLocationCancel 
-        OnCreate=@OnShipLocationCreate
       />
     } else {
-      <h3>Current Shipping Address</h3>
-      <SEShipLocationView ShipLocation=@Project?.ProjectShipLocation />
+        <span>No Current Shipping Address</span>
     }
   </div>
 }
@@ -72,24 +67,20 @@
   public EditContext? EditContext { get; set; }
 
   private IQueryable<ShipLocationView>? _shipLocations;
-  private IQueryable<DmnSelectOption>? _shipLocationOptions;
-  private string? _currentShipLocationLinkId;
-  
 
   private bool _isAddingShipLocation = false;
     
-      
+
   protected override async Task OnInitializedAsync() {
-    //_project = EditContext!.Model as ProjectView;
-    _currentShipLocationLinkId = Project?.ProjectShipLocation?.LinkID; //_project!.ProjectShipLocation?.LinkID;
     _shipLocations = await ShipLocationStore.ReadableStore.Get(true);
-    _shipLocationOptions = _shipLocations.Select(
-      sl => new DmnSelectOption {
-        Value = sl.LinkID,
-        Label = sl.LocationName
-      }
-    );
     EditContext!.OnFieldChanged += OnFieldChanged;
+  }
+
+  private void OnAddressChange(object obj) {
+    ShipLocationView? shipLocation = obj as ShipLocationView;
+    Logger.LogInformation($"OnAddressChange: {shipLocation?.LocationName}");
+    Project!.ProjectShipLocation = shipLocation!;
+    StateHasChanged();
   }
 
   void OnFieldChanged(object? sender, FieldChangedEventArgs e) {
@@ -101,7 +92,7 @@
     //StateHasChanged();
   }
   
-  private void OnShipLocationCancel() {
+  @* private void OnShipLocationCancel() {
     _isAddingShipLocation = false;
     //StateHasChanged();
   }
@@ -112,9 +103,10 @@
     StateHasChanged();
   }      
 
-  private void OnShipLocationChanged(ChangeEventArgs e) {
-    _currentShipLocationLinkId = e.Value?.ToString();
-    Logger.LogInformation($"ShipLocationChanged: {_currentShipLocationLinkId}");
-    StateHasChanged();
-  }  
+ private void OnShipLocationChanged(ChangeEventArgs e) {
+    Logger.LogInformation($"ShipLocationChanged??????????");
+    //_currentShipLocationLinkId = e.Value?.ToString();
+    
+    //StateHasChanged();
+  }  *@
 }

@@ -99,7 +99,10 @@
     protected override async Task OnInitializedAsync()
     {
         _project = await ProjectStore.ReadableStore
-            .GetById(ProjectLinkId!);
+            .GetOne(p => p.LinkID == ProjectLinkId);
+        if(_project is null) {
+            throw new InvalidOperationException($"Project with LinkID {ProjectLinkId} not found");
+        }
         _projectGroup = _project.ProjectGroups
             .FirstOrDefault(g => g.LinkID == ProjectGroupLinkId);
         if (LibraryProductLinkId is not null)

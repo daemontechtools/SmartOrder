@@ -45,7 +45,7 @@ public class ProjectApi : IModelApi<Project> {
 
     public async Task<Project> Create(Project project) {
         await Connect();
-        await _orderApi.AddQuote(project);
+        await _orderApi.AddQuote(project.Name);
         IList<Project> projects = await _orderApi.GetProjects();
         IQueryable<Project> queryable = projects.AsQueryable();
         Project? newModel = queryable.Where(p => p.LinkID == project.LinkID).FirstOrDefault();
@@ -57,7 +57,7 @@ public class ProjectApi : IModelApi<Project> {
 
     public async Task Delete(Project project) {
         await Connect();
-        await _orderApi.DeleteProject(project);
+        await _orderApi.DeleteProject(project.LinkID);
     }
 
     public Task<Project> Update(Project project) {

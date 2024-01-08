@@ -55,13 +55,14 @@ public class ShipLocationApi : IModelApi<ShipLocation> {
         return newModel;
     }
 
-    public Task Delete(ShipLocation location) {
-        _logger.LogWarning("Delete not implemented");
-        return Task.CompletedTask;
+    public async Task<ShipLocation> Update(ShipLocation location) {
+        await Connect();
+        await _orderApi.UpdateShipLocation(location.LinkID);
+        return location;
     }
 
-    public Task<ShipLocation> Update(ShipLocation location) {
-        _logger.LogWarning("Update not implemented");
-        return Task.FromResult(location);
+    public async Task Delete(ShipLocation location) {
+        await Connect();
+        await _orderApi.DeleteShipLocation(location.LinkID);
     }
 }

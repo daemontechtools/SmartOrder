@@ -53,8 +53,9 @@
     
     protected override async Task OnInitializedAsync()
     {
-        
-        _project = await ProjectStore.ReadableStore.GetById(ProjectLinkId);
+        _project = await ProjectStore
+            .ReadableStore
+            .GetOne(p => p.LinkID == ProjectLinkId);
 
         _roomProfileProps.Add(new RoomProfileProps { Title = "Door Style" });
         _roomProfileProps.Add(new RoomProfileProps { Title = "Finish" });

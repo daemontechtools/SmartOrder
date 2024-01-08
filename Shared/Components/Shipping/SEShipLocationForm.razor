@@ -9,12 +9,10 @@
 @namespace SmartEstimate.Shared.Components
 
 
-<ValidationSummary />
 <EditForm 
     @ref=@_editForm
     Model=@ShipLocation
-    FormName="add-ship-location"
-    OnValidSubmit=@AddLocation
+    FormName="ship-location-form"
     class="flex flex-col"
 >
     <ObjectGraphDataAnnotationsValidator />
@@ -22,8 +20,8 @@
     <DmnSectionHeader 
         Title="New Shipping Location"
         TitleClass="!text-xl"
-        SubmitButtonText="Add"
-        CancelButtonText="Cancel"
+        SubmitButtonText=@((_isNewLocation ? "Add" : "Update"))
+        CancelButtonText=@((_isNewLocation ? "Cancel" : "Delete"))
         IsLoading=@_isSubmitting
         OnSubmitClick=@OnSubmitClick
         OnCancelClick=@OnCancelClick
@@ -37,16 +35,17 @@
             />
         </div>
         <div class="sm:col-span-3"></div>
+        <ContactForm />
         <div class="sm:col-span-3">
             <DmnInputText 
                 Label="Email Address" 
-                @bind-Value=@ShipLocation!.DefaultContact.DefaultEmail
+                @bind-Value=@ShipLocation!.DefaultContact.DefaultEmail.DisplayAs
             />
         </div>
         <div class="sm:col-span-3">
             <DmnInputText 
                 Label="Phone Number" 
-                @bind-Value=@ShipLocation!.DefaultContact.DefaultPhone
+                @bind-Value=@ShipLocation!.DefaultContact.DefaultPhone.DisplayAs
             />
         </div>
         <div class="col-span-full">
@@ -92,15 +91,19 @@
     public EventCallback OnCancel { get; set; }
 
     [Parameter]
-    public EventCallback<ShipLocationView> OnCreate { get; set; }
+    public EventCallback<ShipLocationView> OnChange { get; set; }
         
  
     private EditForm _editForm;
     private bool _isSubmitting = false;
+    private bool _isNewLocation = true;
     private bool IsAddingShipLocation { get; set; } = false;
     private IQueryable<ShipLocationView> ShipLocations { get; set; } = new List<ShipLocationView>().AsQueryable();
 
-    protected override void OnParametersSet(){
+    protected override void OnParametersSet() {
+        if(ShipLocation is null) {
+            _isNewLocation = true;
+        }
         ShipLocation ??= new("");
     }
 
@@ -108,10 +111,15 @@
         ShipLocations = await ShipLocationStore.ReadableStore.Get(true);
     }
 
-    private async Task OnSubmitClick()
-    {
-        if (_editForm!.EditContext!.Validate()) {
+    private async Task OnSubmitClick() {
+        if (!_editForm!.EditContext!.Validate()) {
+            return;
+        }
+
+        if(_isNewLocation) {
             await AddLocation();
+        } else {
+            await UpdateLocation();
         }
     }
 
@@ -119,6 +127,7 @@
     {
         OnCancel.InvokeAsync();
     }
+
     private async Task AddLocation() {
         _isSubmitting = true;
         Logger.LogInformation($"Creating new project: {ShipLocation!.LocationName}");
@@ -126,7 +135,18 @@
             .WritableStore
             .Create(ShipLocation!);
         Logger.LogInformation($"Created new project: {newLocation.LocationName}");
-        await OnCreate.InvokeAsync(newLocation);
+        await OnChange.InvokeAsync(newLocation);
+        _isSubmitting = false;
+    }
+    
+    private async Task UpdateLocation() {
+        _isSubmitting = true;
+        Logger.LogInformation($"Updating project: {ShipLocation!.LocationName}");
+        ShipLocationView updatedLocation = await ShipLocationStore!
+            .WritableStore
+            .Update(ShipLocation!);
+        Logger.LogInformation($"Updated project: {updatedLocation.LocationName}");
+        await OnChange.InvokeAsync(updatedLocation);
         _isSubmitting = false;
     }
 }
