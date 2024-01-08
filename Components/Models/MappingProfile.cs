@@ -11,9 +11,12 @@ public class SmartEstimateMappingProfile : Profile
 {
     public SmartEstimateMappingProfile()
     {
+        // var location = new ShipLocation("");
+        // var email = location.DefaultContact.DefaultEmail;
+        // email.
 
-
-        CreateMap<Project, ProjectView>().ReverseMap();
+        CreateMap<Project, ProjectView>()
+            .ReverseMap();
         CreateMap<IList<Project>, IQueryable<ProjectView>>()
             .ConvertUsing<ListToQueryableConverter<Project, ProjectView>>();
 
@@ -36,6 +39,8 @@ public class SmartEstimateMappingProfile : Profile
         CreateMap<Contact, ContactView>().ReverseMap();
         CreateMap<Contacts, IQueryable<ContactView>>()
             .ConvertUsing<ListToQueryableConverter<Contact, ContactView>>();
+
+        CreateMap<CommunicationLink, CommunicationLinkView>().ReverseMap();
     }
 }
 

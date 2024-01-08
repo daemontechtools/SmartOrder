@@ -31,6 +31,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _project = await ProjectStore!.ReadableStore.GetById(ProjectLinkId!);
+      _project = await ProjectStore!
+        .ReadableStore
+        .GetOne(p => p.LinkID == ProjectLinkId);
     }
 }

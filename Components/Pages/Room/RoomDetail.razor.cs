@@ -31,7 +31,7 @@ public partial class RoomDetail : ComponentBase
     {
         _project = await _projectStore!
             .ReadableStore
-            .GetById(ProjectLinkId!);
+            .GetOne(p => p.LinkID == ProjectLinkId);
         //_projectGroup.ProjectGroup
         _projectGroup = _project.ProjectGroups
             .FirstOrDefault(g => g.LinkID == ProjectGroupLinkId);

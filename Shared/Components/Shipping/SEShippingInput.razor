@@ -1,6 +1,3 @@
-@using static Microsoft.AspNetCore.Components.Web.RenderMode
-@rendermode InteractiveServer
-
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Forms
 @using SMART.Common.CompanyManagement
@@ -15,17 +12,27 @@
 
 <ShippingOptions />
 
-@if(_project!.IsShipped) {
+@if(Project!.IsShipped) {
   <div class="flex flex-col">
-    <div class="border-t border-gray-300 mb-4 mt-2"></div>
+    <div class="border-t border-gray-300 mb-3 mt-3"></div>
 
     <div class="flex flex-col">
-      <div class="whitespace-nowrap w-40 text-center p-1 bg-stone-500 text-slate-100 border rounded-md border-slate-600">Address ComboBox</div>
-      @if(!IsAddingShipLocation) {
+        <DmnComboBox 
+          Data=@_shipLocations
+          Value=@Project?.ProjectShipLocation
+          ValueExpression=@(() => Project!.ProjectShipLocation)
+          ValueChanged=@(l => OnAddressChange(l))
+          TextFieldName=@nameof(ShipLocationView.LocationName)
+          Label="Shipping Location"
+          Class="pb-0"
+        />
+
+      @if(!_isAddingShipLocation) {
         <span 
-          onclick=@OnAddressClick
+          @onclick=@OnAddressClick
           class="
             text-sky-500
+            text-right
             font-semibold
             hover:text-sky-400
             cursor-pointer
@@ -37,17 +44,12 @@
     </div>
     <div class="mb-4"></div>
 
-    @if(!IsAddingShipLocation && _project!.ProjectShipLocation is null) {
-      <span>No Current Shipping Address</span>
-    } else if(IsAddingShipLocation) {
+    @if(Project?.ProjectShipLocation is not null || _isAddingShipLocation) {
       <SEShipLocationForm 
-        ShipLocation=@_project!.ProjectShipLocation
-        OnCancel=@OnShipLocationCancel 
-        OnCreate=@OnShipLocationCreate
+        ShipLocation=@Project?.ProjectShipLocation
       />
     } else {
-      <h3>Current Shipping Address</h3>
-      <SEShipLocationView ShipLocation=@_project!.ProjectShipLocation />
+        <span>No Current Shipping Address</span>
     }
   </div>
 }
@@ -55,42 +57,56 @@
 
 @code {
 
-  private ProjectView? _project { get; set; }
-  private ShipLocationView? _shipLocation { get; set; }
+  [Parameter]
+  public ProjectView? Project { get; set; }
+
+  //private ProjectView? _project { get; set; }
+  //private ShipLocationView? _shipLocation { get; set; }
 
   [CascadingParameter]
   public EditContext? EditContext { get; set; }
 
-  private IQueryable<ShipLocationView>? ShipLocations;
-  private bool IsAddingShipLocation = false;
+  private IQueryable<ShipLocationView>? _shipLocations;
+
+  private bool _isAddingShipLocation = false;
     
-      
+
   protected override async Task OnInitializedAsync() {
-    _project = EditContext!.Model as ProjectView;
-    _shipLocation = (_project?.ProjectShipLocation is not null)
-      ? _project.ProjectShipLocation
-      : new ShipLocationView("");
-    ShipLocations = await ShipLocationStore.ReadableStore.Get();
-    EditContext.OnFieldChanged += OnFieldChanged;
+    _shipLocations = await ShipLocationStore.ReadableStore.Get(true);
+    EditContext!.OnFieldChanged += OnFieldChanged;
   }
 
-  private void OnFieldChanged(object? sender, FieldChangedEventArgs e) {
+  private void OnAddressChange(object obj) {
+    ShipLocationView? shipLocation = obj as ShipLocationView;
+    Logger.LogInformation($"OnAddressChange: {shipLocation?.LocationName}");
+    Project!.ProjectShipLocation = shipLocation!;
+    StateHasChanged();
+  }
+
+  void OnFieldChanged(object? sender, FieldChangedEventArgs e) {
     StateHasChanged();
   }
 
   private void OnAddressClick(MouseEventArgs e) {
-    IsAddingShipLocation = true;
-    StateHasChanged();
+    _isAddingShipLocation = true;
+    //StateHasChanged();
   }
   
-  private void OnShipLocationCancel() {
-    IsAddingShipLocation = false;
-    StateHasChanged();
+  @* private void OnShipLocationCancel() {
+    _isAddingShipLocation = false;
+    //StateHasChanged();
   }
 
   private void OnShipLocationCreate(ShipLocationView shipLocation) {
-    _project!.ProjectShipLocation = shipLocation;
-    IsAddingShipLocation = false;
+    Project!.ProjectShipLocation = shipLocation;
+    _isAddingShipLocation = false;
     StateHasChanged();
-  }        
+  }      
+
+ private void OnShipLocationChanged(ChangeEventArgs e) {
+    Logger.LogInformation($"ShipLocationChanged??????????");
+    //_currentShipLocationLinkId = e.Value?.ToString();
+    
+    //StateHasChanged();
+  }  *@
 }
