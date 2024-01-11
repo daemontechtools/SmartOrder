@@ -1,0 +1,159 @@
+@page "/quotes/{projectLinkId}/rooms/new"
+@page "/quotes/{projectLinkId}/rooms/{roomLinkId}"
+@rendermode InteractiveServer
+@using SmartEstimate.Models
+
+@namespace SmartEstimate.Pages
+
+@inject NavigationManager NavigationManager
+@inject ILogger<RoomForm> Logger
+@inject ProjectStore ProjectStore
+
+
+<div class="flex flex-col bg-slate-100"
+    <SEBreadcrumbNav 
+        Options=@(new List<NavOptionProps> {
+            new NavOptionProps { Path = "/quotes" },
+            new NavOptionProps { Path = $"/quotes/{ProjectLinkId}", Label = @_project?.Name },
+            new NavOptionProps { Path = $"/quotes/{ProjectLinkId}/rooms/new", Label = "New Room" },
+        }) 
+    />
+
+    <div class="flex flex-1 flex-col container mt-6">
+        @if(RoomLinkId != null && _room == null) {
+            <span>Loading...</span>
+        } else {
+            <EditForm 
+                @ref=@_editForm
+                Model=@_room     
+                FormName="add-room"
+                OnValidSubmit=@AddRoom
+            >
+                <ObjectGraphDataAnnotationsValidator />
+                <DmnSectionHeader 
+                    Title="Create Room"
+                    TitleClass="!text-3xl"
+                    Subtitle="Let's create a Room!"
+                    SubmitButtonText="Save"
+                    CancelButtonText="Clear"
+                    IsLoading=@_isSubmitting
+                    OnSubmitClick=@OnSubmitClick
+                    OnCancelClick=@OnCancelClick
+                />
+                <div 
+                    class="
+                        w-full 
+                        border-b 
+                        border-stone-300
+                        mt-2 mb-5
+                    "
+                />
+                <DmnInputText 
+                    Label="Customer Name" 
+                    LabelClass="!text-base font-semibold" 
+                    @bind-Value=@_room!.Name
+                />
+                @* <DmnComboBox 
+                    Data=@_shipLocations
+                    Value=@Project?.ProjectShipLocation
+                    ValueExpression=@(() => Project!.ProjectShipLocation)
+                    ValueChanged=@(l => OnAddressChange(l))
+                    TextFieldName=@nameof(ShipLocationView.LocationName)
+                    Label="Shipping Location"
+                    Class="pb-0"
+                /> *@
+                <div class="m-3"></div>
+            </EditForm> 
+        }
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public string? ProjectLinkId { get; set; }  
+    private ProjectView? _project { get; set; }
+
+    [Parameter]
+    public string? RoomLinkId { get; set; }
+
+    [SupplyParameterFromForm]
+    private ProjectGroupView? _room { get; set; }
+
+    private EditForm _editForm = default!;
+    private bool _isSubmitting = false;
+    private bool _isNew = true;
+
+    protected async override Task OnInitializedAsync() {
+        _project = await ProjectStore!
+            .ReadableStore
+            .GetOne(p => p.LinkID == ProjectLinkId);
+        if(RoomLinkId != null) {
+            _room = await ProjectStore!
+                .GetRoomById(
+                    RoomLinkId,
+                    ProjectLinkId!
+                );
+            _isNew = false;
+        } else {
+            _room = new("");
+        }
+    }
+
+    private async Task OnSubmitClick()
+    {
+        if (!_editForm!.EditContext!.Validate()) {
+            return;
+        }
+
+        if(_isNew) {
+            await AddRoom();
+        } else {
+            await UpdateRoom();
+        }
+    }
+
+    private void OnCancelClick() {
+        if(_isNew) {
+            _room = new("");
+            StateHasChanged();
+        } else {
+            NavigationManager.NavigateTo($"/quotes/{ProjectLinkId}/rooms/{RoomLinkId}");
+        }
+    }
+
+    private async Task AddRoom()
+    {
+        _isSubmitting = true;
+        Logger.LogInformation($"Creating new room: {_room!.Name}");
+        ProjectGroupView newRoom = await ProjectStore!
+            .AddRoom(
+                ProjectLinkId,
+                _room!
+                
+            );
+        Logger.LogInformation($"Created new room: {newRoom.Name}");
+        NavigationManager.NavigateTo($"/quotes/{ProjectLinkId}");
+        _isSubmitting = false;
+    }
+
+    private async Task UpdateRoom() {
+        _isSubmitting = true;
+        Logger.LogInformation($"Updating room: {_room!.Name}");
+        ProjectGroupView updatedRoom = await ProjectStore!
+            .UpdateRoom(
+                ProjectLinkId,
+                _room!
+            );
+        Logger.LogInformation($"Updated room: {updatedRoom.Name}");
+        NavigationManager.NavigateTo($"/quotes/{ProjectLinkId}");
+        _isSubmitting = false;
+    }
+    
+    @* private void OnAddressChange(object obj) {
+        ShipLocationView? shipLocation = obj as ShipLocationView;
+        Logger.LogInformation($"OnAddressChange: {shipLocation?.LocationName}");
+        Project!.ProjectShipLocation = shipLocation!;
+        StateHasChanged();
+    } *@
+}

@@ -45,8 +45,7 @@
         _isLoading = false;
     }
 
-    private async void OnStateChanged(object sender, EventArgs e)
-    {
+    private async void OnStateChanged(object sender, EventArgs e) {
         _project = await _projectStore!
             .ReadableStore
             .GetOne(p => p.LinkID == ProjectLinkId);

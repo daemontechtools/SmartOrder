@@ -85,6 +85,9 @@
 
 
 @code {
+    [Inject]
+    private ProjectStore? _projectStore { get; set; }
+
     private PersistingComponentStateSubscription? _stateSubscription;
 
     [Parameter]
@@ -114,6 +117,7 @@
             _logger.LogInformation("Restored project groups from state");
             _projectGroups = restoredProjectGroups?.AsQueryable();
         }
+        _projectStore!.Storage.OnStateChanged += OnStateChanged!;
         _deleteConfirmationInput = new ModalContentProps 
         {
             Title = "Delete Room",
@@ -124,6 +128,10 @@
             ButtonClass = "bg-red-500 hover:bg-red-400",
             OnConfirm = OnDeleteConfirm 
         };
+    }
+
+    private async void OnStateChanged(object sender, EventArgs e) {
+        await InvokeAsync(StateHasChanged);
     }
 
     private Task PersistProjectGroups()

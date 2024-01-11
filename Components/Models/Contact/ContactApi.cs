@@ -38,9 +38,8 @@ public class ContactApi : IModelApi<Contact> {
         }
     }
 
-    public async Task<IList<Contact>> Get() {
-        await Connect();
-        return await _orderApi.GetContacts();
+    public Task<IList<Contact>> Get() {
+        return Task.FromResult(_orderApi.GetContacts());
     }
 
     public async Task<Contact> Create(Contact contact) {
