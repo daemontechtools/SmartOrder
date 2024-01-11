@@ -1,7 +1,7 @@
-using SMART.Common.Base;
+
 
 namespace SmartEstimate.Models;
 
-public class LibraryProductView : SMARTBaseClass {
+public class LibraryProductView : SMARTBaseClassView {
     public LibraryProductView(string LinkID) : base(LinkID) { }
 }

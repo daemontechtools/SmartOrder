@@ -20,7 +20,7 @@
     />
 
     <div class="flex flex-1 flex-col container mt-6">
-        @if(RoomLinkId != null && _room == null) {
+        @if(_room == null) {
             <span>Loading...</span>
         } else {
             <EditForm 
@@ -64,7 +64,12 @@
                 /> *@
                 <div class="m-3"></div>
             </EditForm> 
+
+            @* @if(!_isNew) {
+                <QuickGrid Items=@_room
+            } *@
         }
+
     </div>
 </div>
 

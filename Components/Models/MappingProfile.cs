@@ -11,12 +11,10 @@ public class SmartEstimateMappingProfile : Profile
 {
     public SmartEstimateMappingProfile()
     {
-        // var location = new ShipLocation("");
-        // var email = location.DefaultContact.DefaultEmail;
-        // email.
+        LibraryProduct libraryProduct = new("1");
+        libraryProduct.
 
-        CreateMap<Project, ProjectView>()
-            .ReverseMap();
+        CreateMap<Project, ProjectView>().ReverseMap();
         CreateMap<IList<Project>, IQueryable<ProjectView>>()
             .ConvertUsing<ListToQueryableConverter<Project, ProjectView>>();
 
@@ -31,7 +29,6 @@ public class SmartEstimateMappingProfile : Profile
         CreateMap<ShipLocation, ShipLocationView>().ReverseMap();
         CreateMap<ShipLocations, IQueryable<ShipLocationView>>()
             .ConvertUsing<ListToQueryableConverter<ShipLocation, ShipLocationView>>();
-
         CreateMap<Address, AddressView>().ReverseMap();
         CreateMap<Addresses, IQueryable<AddressView>>()
             .ConvertUsing<ListToQueryableConverter<Address, AddressView>>();
