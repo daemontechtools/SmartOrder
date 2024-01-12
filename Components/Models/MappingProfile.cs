@@ -9,11 +9,10 @@ namespace SmartEstimate.Models;
 
 public class SmartEstimateMappingProfile : Profile
 {
-    public SmartEstimateMappingProfile()
-    {
-        LibraryProduct libraryProduct = new("1");
-        libraryProduct.
-
+    public SmartEstimateMappingProfile() {
+        // ProjectGroup a = new ProjectGroup("a");
+        // LibraryProduct p = new LibraryProduct("p");
+        // p.PriceLibrary = 1;
         CreateMap<Project, ProjectView>().ReverseMap();
         CreateMap<IList<Project>, IQueryable<ProjectView>>()
             .ConvertUsing<ListToQueryableConverter<Project, ProjectView>>();

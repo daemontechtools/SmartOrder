@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using SMART.Common.Base;
 
 namespace SmartEstimate.Models;
 

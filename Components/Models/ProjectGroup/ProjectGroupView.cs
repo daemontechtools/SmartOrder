@@ -1,9 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using SMART.Common.Base;
 
 namespace SmartEstimate.Models;
 
-public class ProjectGroupView : SMARTBaseClass {
+public class ProjectGroupView : SMARTBaseClassView {
 
     public ProjectGroupView(string LinkID) : base(LinkID) { }
 
@@ -12,6 +11,7 @@ public class ProjectGroupView : SMARTBaseClass {
     public string ProductDoorStyle { get; set; }
     public string ProductFinishExterior { get; set; }
     public string ProductFinishInterior { get; set; }
-    public string ProductHinge { get; set; }
+    //public string ProductHinge { get; set; }
+    public string ProductSlide { get; set; }
     public double PriceSubTotal { get; set; }
 }
