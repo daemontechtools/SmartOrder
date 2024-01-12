@@ -1,23 +1,29 @@
 @page "/quotes/{projectLinkId}/rooms/new"
-@page "/quotes/{projectLinkId}/rooms/{roomLinkId}"
+@page "/quotes/{projectLinkId}/rooms/{projectGroupLinkId}"
 @rendermode InteractiveServer
-@using SmartEstimate.Models
 
 @namespace SmartEstimate.Pages
 
-@inject NavigationManager NavigationManager
-@inject ILogger<RoomForm> Logger
-@inject ProjectStore ProjectStore
-
-
-<div class="flex flex-col bg-slate-100"
+<div class="flex flex-col bg-slate-100">
+    
     <SEBreadcrumbNav 
         Options=@(new List<NavOptionProps> {
-            new NavOptionProps { Path = "/quotes" },
-            new NavOptionProps { Path = $"/quotes/{ProjectLinkId}", Label = @_project?.Name },
-            new NavOptionProps { Path = $"/quotes/{ProjectLinkId}/rooms/new", Label = "New Room" },
+            new NavOptionProps { 
+                Path = "/quotes", Label = "Quotes" 
+            },
+            new NavOptionProps { 
+                Path = $"/quotes/{ProjectLinkId}", 
+                Label = _project!.Name 
+            },
+            new NavOptionProps { 
+                Path = $"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}", 
+                Label = (_room is null) 
+                    ? "New Room"
+                    : _room!.Name 
+            }
         }) 
     />
+
 
     <div class="flex flex-1 flex-col container mt-6">
         @if(_room == null) {
@@ -53,206 +59,16 @@
                     LabelClass="!text-base font-semibold" 
                     @bind-Value=@_room!.Name
                 />
-                @* <DmnComboBox 
-                    Data=@_shipLocations
-                    Value=@Project?.ProjectShipLocation
-                    ValueExpression=@(() => Project!.ProjectShipLocation)
-                    ValueChanged=@(l => OnAddressChange(l))
-                    TextFieldName=@nameof(ShipLocationView.LocationName)
-                    Label="Shipping Location"
-                    Class="pb-0"
-                /> *@
                 <div class="m-3"></div>
             </EditForm> 
 
             @if(!_isNew) {
-                @if(_products == null) {
-                    <span>No Products</span>
-                } else {
-
-                    @* <DmnSectionHeader 
-                        Title="Products"
-                        Subtitle="What's a room without some products?"
-                        SubmitButtonText="Add Product"
-                        OnSubmitClick=@AddProduct
-                        Class="mb-6"
-                    />
-                    <QuickGrid Items=_products>
-                        <TemplateColumn               
-                            Title="ID"
-                            SortBy=@_sortByName
-                            Sortable=true 
-                        >
-                            <NavLink href=@($"/quotes/{ProjectLinkId}/rooms/{RoomLinkId}/products/{context.LinkID}")>
-                                @context.LinkID
-                            </NavLink>
-                        </TemplateColumn>
-                        <TemplateColumn               
-                            Title="Code"
-                            SortBy=@_sortByName
-                            Sortable=true 
-                        >
-                            <NavLink href=@($"/quotes/{ProjectLinkId}/rooms/{RoomLinkId}/products/{context.LinkID}")>
-                                @context.ProductCode
-                            </NavLink>
-                        </TemplateColumn>
-                        <PropertyColumn 
-                            Title="Qty"
-                            Property=@(p => p.Quantity)
-                        />
-                        <PropertyColumn 
-                            Title="Width"
-                            Property=@(p => p.Width) 
-                        />
-                        <PropertyColumn 
-                            Title="Height"
-                            Property=@(p => p.Height)
-                        />
-                        <PropertyColumn 
-                            Title="Depth"
-                            Property=@(p => p.Depth)
-                        />
-                        <PropertyColumn 
-                            Title="Left"
-                            Property=@(p => p.ProductLeftSide)
-                        />
-                        <PropertyColumn 
-                            Title="Right"
-                            Property=@(p => p.ProductRightSide)
-                        />
-                        <PropertyColumn 
-                            Title="Price"
-                            Property=@(p => p.PriceLibrary)
-                        />
-                        <PropertyColumn 
-                            Title="Comments"
-                            Property=@(p => p.Comments)
-                        />
-                        <TemplateColumn 
-                            Class="flex gap-x-2 justify-end"
-                        >
-                            <button @onclick=@(() => DeleteProduct(context.LinkID))>
-                                <TrashIcon Props=@(new IconProps() {
-                                    Class=@"
-                                        w-[22px]
-                                        cursor-pointer 
-                                        stroke-gray-400
-                                        hover:stroke-rose-500 
-                                        duration-300 
-                                        ease-in-out
-                                    " 
-                                }) />
-                            </button>         
-                        </TemplateColumn>
-                    </QuickGrid> *@
-                }
+                <RoomDetailProducts 
+                    Products=@_products 
+                    ProjectLinkId=@ProjectLinkId
+                    ProjectGroupLinkId=@ProjectGroupLinkId
+                /> 
             }
         }
-
     </div>
 </div>
-
-@code {
-
-    [Parameter]
-    public string? ProjectLinkId { get; set; }  
-    private ProjectView? _project { get; set; }
-    private IQueryable<ProductView>? _products { get; set; }
-    private GridSort<ProductView> _sortByName = GridSort<ProductView>
-        .ByAscending(p => p.Name);
-
-    [Parameter]
-    public string? RoomLinkId { get; set; }
-
-    [SupplyParameterFromForm]
-    private ProjectGroupView? _room { get; set; }
-
-    private EditForm _editForm = default!;
-    private bool _isSubmitting = false;
-    private bool _isNew = true;
-
-    protected async override Task OnInitializedAsync() {
-        _project = await ProjectStore!
-            .ReadableStore
-            .GetOne(p => p.LinkID == ProjectLinkId);
-
-        if(RoomLinkId != null) {
-            _room = await ProjectStore!
-                .GetRoomById(
-                    RoomLinkId,
-                    ProjectLinkId!
-                );
-            _products = new List<ProductView>().AsQueryable(); 
-            _isNew = false;
-        } else {
-            _room = new("");
-        }
-    }
-
-    private async Task OnSubmitClick()
-    {
-        if (!_editForm!.EditContext!.Validate()) {
-            return;
-        }
-
-        if(_isNew) {
-            await AddRoom();
-        } else {
-            await UpdateRoom();
-        }
-    }
-
-    private void OnCancelClick() {
-        if(_isNew) {
-            _room = new("");
-            StateHasChanged();
-        } else {
-            NavigationManager.NavigateTo($"/quotes/{ProjectLinkId}/rooms/{RoomLinkId}");
-        }
-    }
-
-    private async Task AddRoom()
-    {
-        _isSubmitting = true;
-        Logger.LogInformation($"Creating new room: {_room!.Name}");
-        ProjectGroupView newRoom = await ProjectStore!
-            .AddRoom(
-                ProjectLinkId!,
-                _room!
-                
-            );
-        Logger.LogInformation($"Created new room: {newRoom.Name}");
-        NavigationManager.NavigateTo($"/quotes/{ProjectLinkId}");
-        _isSubmitting = false;
-    }
-
-    private async Task UpdateRoom() {
-        _isSubmitting = true;
-        Logger.LogInformation($"Updating room: {_room!.Name}");
-        ProjectGroupView updatedRoom = await ProjectStore!
-            .UpdateRoom(
-                ProjectLinkId!,
-                _room!
-            );
-        Logger.LogInformation($"Updated room: {updatedRoom.Name}");
-        NavigationManager.NavigateTo($"/quotes/{ProjectLinkId}");
-        _isSubmitting = false;
-    }
-    
-    @* private void OnAddressChange(object obj) {
-        ShipLocationView? shipLocation = obj as ShipLocationView;
-        Logger.LogInformation($"OnAddressChange: {shipLocation?.LocationName}");
-        Project!.ProjectShipLocation = shipLocation!;
-        StateHasChanged();
-    } *@
-    
-    private void AddProduct() {
-        NavigationManager.NavigateTo($"/quotes/{ProjectLinkId}/rooms/{RoomLinkId}/products");
-    }
-
-    private void DeleteProduct(string productLinkId)
-    {
-        @* _itemIdToDelete = productId;
-        ModalService!.Show(_deleteConfirmationInput); *@
-    }
-}

@@ -8,7 +8,7 @@
 @inject ILogger<RoomDetailProducts> Logger
 
 
-@* <DmnSectionHeader 
+<DmnSectionHeader 
     Title="Products"
     Subtitle="What's a room without some products?"
     SubmitButtonText="Add Product"
@@ -21,7 +21,7 @@
         SortBy=@_sortByName
         Sortable=true 
     >
-        <NavLink href=@($"/quotes/{QuoteId}/rooms/{RoomId}/products/{context.LinkID}")>
+        <NavLink href=@($"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}/products/{context.LinkID}")>
             @context.LinkID
         </NavLink>
     </TemplateColumn>
@@ -30,8 +30,8 @@
         SortBy=@_sortByName
         Sortable=true 
     >
-        <NavLink href=@($"/quotes/{QuoteId}/rooms/{RoomId}/products/{context.}")>
-            @context.Code
+        <NavLink href=@($"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}/products/{context.LinkID}")>
+            @context.ProductCode
         </NavLink>
     </TemplateColumn>
     <PropertyColumn 
@@ -52,20 +52,20 @@
     />
     <PropertyColumn 
         Title="Left"
-        Property=@(p => p.Left)
+        Property=@(p => p.ProductLeftSide)
     />
     <PropertyColumn 
         Title="Right"
-        Property=@(p => p.Right)
+        Property=@(p => p.ProductRightSide)
     />
     <PropertyColumn 
         Title="Price"
-        Property=@(p => p.Price)
+        Property=@(p => p.PriceLibrary)
     />
-    <PropertyColumn 
+    @* <PropertyColumn 
         Title="EXT"
         Property=@(p => p.EXT)
-    />
+    /> *@
     <PropertyColumn 
         Title="Comments"
         Property=@(p => p.Comments)
@@ -73,7 +73,7 @@
     <TemplateColumn 
         Class="flex gap-x-2 justify-end"
     >
-        <button @onclick=@(() => DeleteProduct(context.Id))>
+        <button @onclick=@(() => DeleteProduct(context.LinkID))>
             <TrashIcon Props=@(new IconProps() {
                 Class=@"
                     w-[22px]
@@ -86,25 +86,33 @@
             }) />
         </button>         
     </TemplateColumn>
-</QuickGrid> *@
+</QuickGrid>
+@if(!Products.Any()) {
+    <div class="flex justify-center">
+        <div class="text-gray-400 text-2xl">
+            No products found
+        </div>
+    </div>
+}
     
 
 
 @code {
     [Parameter]
-    public int QuoteId { get; set; }
+    public string ProjectLinkId { get; set; }
 
     [Parameter]
-    public int RoomId { get; set; }
+    public string ProjectGroupLinkId { get; set; }
 
     [Parameter]
-    public IQueryable<ProductView> Products { get; set; } = new List<ProductView>().AsQueryable();
+    public IQueryable<ProductView> Products { get; set; } 
+        = new List<ProductView>().AsQueryable();
 
     private GridSort<ProductView> _sortByName = GridSort<ProductView>
         .ByAscending(p => p.Name);
 
     private ModalContentProps _deleteConfirmationInput;
-    private int? _itemIdToDelete;
+    private string? _itemIdToDelete;
 
     protected override void OnInitialized() {
         _deleteConfirmationInput = new ModalContentProps {
@@ -121,17 +129,18 @@
 
     private void OnClick()
     {
-        NavigationManager.NavigateTo($"/quotes/{QuoteId}/rooms/{RoomId}/products");
+        NavigationManager
+            .NavigateTo(
+                $"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}/products"
+            );
     }
 
-    private void DeleteProduct(int productId)
-    {
-        _itemIdToDelete = productId;
+    private void DeleteProduct(string productLinkId) {
+        _itemIdToDelete = productLinkId;
         ModalService!.Show(_deleteConfirmationInput);
     }
 
-    private async Task OnDeleteConfirm(bool confirmed)
-    {
+    private async Task OnDeleteConfirm(bool confirmed) {
         ModalService!.Hide();
     }
 }
