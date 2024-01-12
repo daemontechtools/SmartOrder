@@ -65,9 +65,88 @@
                 <div class="m-3"></div>
             </EditForm> 
 
-            @* @if(!_isNew) {
-                <QuickGrid Items=@_room
-            } *@
+            @if(!_isNew) {
+                @if(_products == null) {
+                    <span>No Products</span>
+                } else {
+
+                    @* <DmnSectionHeader 
+                        Title="Products"
+                        Subtitle="What's a room without some products?"
+                        SubmitButtonText="Add Product"
+                        OnSubmitClick=@AddProduct
+                        Class="mb-6"
+                    />
+                    <QuickGrid Items=_products>
+                        <TemplateColumn               
+                            Title="ID"
+                            SortBy=@_sortByName
+                            Sortable=true 
+                        >
+                            <NavLink href=@($"/quotes/{ProjectLinkId}/rooms/{RoomLinkId}/products/{context.LinkID}")>
+                                @context.LinkID
+                            </NavLink>
+                        </TemplateColumn>
+                        <TemplateColumn               
+                            Title="Code"
+                            SortBy=@_sortByName
+                            Sortable=true 
+                        >
+                            <NavLink href=@($"/quotes/{ProjectLinkId}/rooms/{RoomLinkId}/products/{context.LinkID}")>
+                                @context.ProductCode
+                            </NavLink>
+                        </TemplateColumn>
+                        <PropertyColumn 
+                            Title="Qty"
+                            Property=@(p => p.Quantity)
+                        />
+                        <PropertyColumn 
+                            Title="Width"
+                            Property=@(p => p.Width) 
+                        />
+                        <PropertyColumn 
+                            Title="Height"
+                            Property=@(p => p.Height)
+                        />
+                        <PropertyColumn 
+                            Title="Depth"
+                            Property=@(p => p.Depth)
+                        />
+                        <PropertyColumn 
+                            Title="Left"
+                            Property=@(p => p.ProductLeftSide)
+                        />
+                        <PropertyColumn 
+                            Title="Right"
+                            Property=@(p => p.ProductRightSide)
+                        />
+                        <PropertyColumn 
+                            Title="Price"
+                            Property=@(p => p.PriceLibrary)
+                        />
+                        <PropertyColumn 
+                            Title="Comments"
+                            Property=@(p => p.Comments)
+                        />
+                        <TemplateColumn 
+                            Class="flex gap-x-2 justify-end"
+                        >
+                            <button @onclick=@(() => DeleteProduct(context.LinkID))>
+                                <TrashIcon Props=@(new IconProps() {
+                                    Class=@"
+                                        w-[22px]
+                                        cursor-pointer 
+                                        stroke-gray-400
+                                        hover:stroke-rose-500 
+                                        duration-300 
+                                        ease-in-out
+                                    " 
+                                }) />
+                            </button>         
+                        </TemplateColumn>
+                    </QuickGrid> *@
+                }
+            }
         }
 
     </div>
@@ -78,6 +157,9 @@
     [Parameter]
     public string? ProjectLinkId { get; set; }  
     private ProjectView? _project { get; set; }
+    private IQueryable<ProductView>? _products { get; set; }
+    private GridSort<ProductView> _sortByName = GridSort<ProductView>
+        .ByAscending(p => p.Name);
 
     [Parameter]
     public string? RoomLinkId { get; set; }
@@ -93,12 +175,14 @@
         _project = await ProjectStore!
             .ReadableStore
             .GetOne(p => p.LinkID == ProjectLinkId);
+
         if(RoomLinkId != null) {
             _room = await ProjectStore!
                 .GetRoomById(
                     RoomLinkId,
                     ProjectLinkId!
                 );
+            _products = new List<ProductView>().AsQueryable(); 
             _isNew = false;
         } else {
             _room = new("");
@@ -133,7 +217,7 @@
         Logger.LogInformation($"Creating new room: {_room!.Name}");
         ProjectGroupView newRoom = await ProjectStore!
             .AddRoom(
-                ProjectLinkId,
+                ProjectLinkId!,
                 _room!
                 
             );
@@ -147,7 +231,7 @@
         Logger.LogInformation($"Updating room: {_room!.Name}");
         ProjectGroupView updatedRoom = await ProjectStore!
             .UpdateRoom(
-                ProjectLinkId,
+                ProjectLinkId!,
                 _room!
             );
         Logger.LogInformation($"Updated room: {updatedRoom.Name}");
@@ -161,4 +245,14 @@
         Project!.ProjectShipLocation = shipLocation!;
         StateHasChanged();
     } *@
+    
+    private void AddProduct() {
+        NavigationManager.NavigateTo($"/quotes/{ProjectLinkId}/rooms/{RoomLinkId}/products");
+    }
+
+    private void DeleteProduct(string productLinkId)
+    {
+        @* _itemIdToDelete = productId;
+        ModalService!.Show(_deleteConfirmationInput); *@
+    }
 }

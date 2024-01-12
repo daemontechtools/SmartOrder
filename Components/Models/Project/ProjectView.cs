@@ -4,7 +4,7 @@ using SMART.Common.Base;
 namespace SmartEstimate.Models;
 
 
-public class ProjectView : SMARTBaseClassView { 
+public class ProjectView : SMARTBaseClass { 
 
     public ProjectView(string LinkID) : base(LinkID) { }
 
@@ -23,7 +23,7 @@ public class ProjectView : SMARTBaseClassView {
         true, 
         ErrorMessage = "Shipping Location is required when IsShipped is true."
     )]
-    //[Required]
+    [Required]
     public ShipLocationView ProjectShipLocation { get; set; }
 
     public IList<ProjectGroupView> ProjectGroups { get; set; }

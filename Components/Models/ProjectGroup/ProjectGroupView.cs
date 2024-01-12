@@ -14,4 +14,6 @@ public class ProjectGroupView : SMARTBaseClassView {
     //public string ProductHinge { get; set; }
     public string ProductSlide { get; set; }
     public double PriceSubTotal { get; set; }
+
+    public IList<ProductView> ProjectGroupProducts { get; set; }
 }

@@ -38,7 +38,7 @@
                         @context.Name
                     </NavLink>
                 </TemplateColumn>
-                <PropertyColumn 
+                @* <PropertyColumn 
                     Title="Door Style"
                     Property=@(r => r.ProductDoorStyle)
                 />
@@ -49,17 +49,17 @@
                 <PropertyColumn 
                     Title="Interior"
                     Property=@(r => r.ProductFinishInterior)
-                />
-                <PropertyColumn 
+                /> *@
+                @* <PropertyColumn 
                     Title="Drawer Hardware"
-                    Property=@(r => r.ProductHinge)
-                />
-                <PropertyColumn 
+                    Property=@(r => r.ProductSlide)
+                /> *@
+                @* <PropertyColumn 
                     Title="Drawer Hardware"
                     Property=@(r => r.PriceSubTotal)
                     Format="C"
                     Sortable=true 
-                />
+                /> *@
                 <TemplateColumn 
                     Class="flex gap-x-2 justify-end"
                 >

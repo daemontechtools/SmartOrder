@@ -8,7 +8,7 @@
 @inject ILogger<RoomDetailProducts> Logger
 
 
-<DmnSectionHeader 
+@* <DmnSectionHeader 
     Title="Products"
     Subtitle="What's a room without some products?"
     SubmitButtonText="Add Product"
@@ -21,8 +21,8 @@
         SortBy=@_sortByName
         Sortable=true 
     >
-        <NavLink href=@($"/quotes/{QuoteId}/rooms/{RoomId}/products/{context.Id}")>
-            @context.Id
+        <NavLink href=@($"/quotes/{QuoteId}/rooms/{RoomId}/products/{context.LinkID}")>
+            @context.LinkID
         </NavLink>
     </TemplateColumn>
     <TemplateColumn               
@@ -30,7 +30,7 @@
         SortBy=@_sortByName
         Sortable=true 
     >
-        <NavLink href=@($"/quotes/{QuoteId}/rooms/{RoomId}/products/{context.Id}")>
+        <NavLink href=@($"/quotes/{QuoteId}/rooms/{RoomId}/products/{context.}")>
             @context.Code
         </NavLink>
     </TemplateColumn>
@@ -86,7 +86,7 @@
             }) />
         </button>         
     </TemplateColumn>
-</QuickGrid>
+</QuickGrid> *@
     
 
 

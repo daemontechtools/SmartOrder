@@ -22,7 +22,7 @@ public partial class RoomDetail : ComponentBase
 
     private ProjectView? _project;
     private ProjectGroupView? _projectGroup;
-    //private IQueryable<ProductView> _products = new List<ProductView>().AsQueryable();
+    private IQueryable<ProductView> _products = new List<ProductView>().AsQueryable();
     private bool IsLoading = true;
 
     private List<RoomProfileProps> _roomProfileProps = new List<RoomProfileProps>();
@@ -32,10 +32,17 @@ public partial class RoomDetail : ComponentBase
         _project = await _projectStore!
             .ReadableStore
             .GetOne(p => p.LinkID == ProjectLinkId);
-        //_projectGroup.ProjectGroup
-        _projectGroup = _project.ProjectGroups
+        if(_project == null) {
+            throw new Exception("Project not found");
+        }
+        _projectGroup = _project!.ProjectGroups
             .FirstOrDefault(g => g.LinkID == ProjectGroupLinkId);
-        //_products = _room.Products.AsQueryable();
+        if(_projectGroup == null) {
+            throw new Exception("Project Group not found");
+        }
+        _products = _projectGroup
+            .ProjectGroupProducts
+            .AsQueryable();
         IsLoading = false;
 
         _roomProfileProps.Add(new RoomProfileProps { Title = "Door Style" });

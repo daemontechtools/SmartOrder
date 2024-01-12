@@ -79,7 +79,7 @@
 
     private ProjectView? _project;
     private ProjectGroupView? _projectGroup;
-    private LibraryProductView? _product;
+    private ProductView? _product;
 
     private ProductType? _selectedProductType;
 
@@ -103,8 +103,8 @@
         if(_project is null) {
             throw new InvalidOperationException($"Project with LinkID {ProjectLinkId} not found");
         }
-        _projectGroup = _project.ProjectGroups
-            .FirstOrDefault(g => g.LinkID == ProjectGroupLinkId);
+        @* _projectGroup = _project.ProjectGroups
+            .FirstOrDefault(g => g.LinkID == ProjectGroupLinkId); *@
         if (LibraryProductLinkId is not null)
         {
             //_product = _room?.Products.FirstOrDefault(p => p.Id == ProductId);
