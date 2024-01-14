@@ -1,0 +1,183 @@
+@using AutoMapper
+@using SMART.Web.OrderApi
+@using SMART.Common.LibraryManagement
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@rendermode InteractiveServer
+
+@page "/quotes/{projectLinkId}/rooms/{projectGroupLinkId}/products/{productLinkId}"
+@page "/quotes/{projectLinkId}/rooms/{projectGroupLinkId}/products"
+
+@namespace SmartEstimate.Pages
+
+@inject IMapper Mapper
+@inject OrderApi OrderApi
+@inject ProjectStore ProjectStore
+@inject ILogger<ProductForm> Logger
+
+<div class="flex flex-col h-full"
+    <SEBreadcrumbNav
+        Options=@(new List<NavOptionProps> {
+            new NavOptionProps { Path = "/quotes" },
+            new NavOptionProps { Path = $"/quotes/{ProjectLinkId}", Label = _project?.Name },
+            new NavOptionProps { Path = $"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}", Label = _projectGroup?.Name },
+            new NavOptionProps { Path = $"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}/products/new", Label = "New Product" },
+        }) 
+    />
+
+    <div class="flex flex-1 flex-col container mt-6">
+        @if(_product is null) {
+            <div class="flex flex-col items-center justify-center h-full">
+                <div class="text-3xl font-bold text-gray-500">
+                    <span class="ml-4">Loading...</span>
+                </div>
+            </div>
+        } else {
+            <EditForm 
+                @ref=@_editForm
+                Model=@_product     
+                FormName="add-room"
+                OnValidSubmit=@AddProductToProjectGroup
+            >
+                <ObjectGraphDataAnnotationsValidator />
+                <DmnSectionHeader 
+                    Title="Create Product"
+                    TitleClass="!text-3xl"
+                    Subtitle="So many products, so little time"
+                    SubmitButtonText="Save"
+                    CancelButtonText="Clear"
+                /> 
+                <div class="grid grid-cols-5 gap-8">
+                    <div class="col-span-3">
+                        <div class="h-full flex items-center w-2/3">
+                            <div class="center-self w-full">
+                                @* <ProductDetailTypeSelect 
+                                    SelectedProductType=@SelectedProductType
+                                    OnProductTypeChanged="OnProductTypeChanged"
+                                /> *@
+                                <DmnComboBox 
+                                    Data=@_allProducts
+                                    Value=@_selectedProduct
+                                    ValueExpression=@(() => _selectedProduct)
+                                    ValueChanged=@(p => OnProductSelected(p) )
+                                    TextFieldName=@nameof(ProductView.Name)
+                                    Label="Shipping Location"
+                                    Class="pb-0"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-span-2">
+                    <ProductDetailPriceSummary />
+                    </div>
+
+                    @if(SelectedProductType is not null) {
+                        <div class="col-span-3">
+                            <ProductDetailDimensions />
+                            <div class="mt-6" />
+                            //<ProductDetailAddOns ProductType=@SelectedProductType />
+                        </div>
+
+                        <div class="col-span-2">
+                            <DmnFileDropzone 
+                                Class="w-full"
+                                IconClass="w-24 stroke-sky-500" 
+                            />
+                        </div>
+
+                        <div class="col-span-5">
+                            <ProductDetailComments />
+                        </div>
+                    }
+                </div>
+            </EditForm>
+        }
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public string? ProjectLinkId { get; set; }
+
+    [Parameter]
+    public string? ProjectGroupLinkId { get; set; }
+
+    [Parameter]
+    public string? ProductLinkId { get; set; }
+
+    private EditForm? _editForm = default!;
+    private bool _isSubmitting = false;
+
+    private bool _isNew = true;
+
+    private ProjectView? _project;
+    private ProjectGroupView? _projectGroup;
+    private ProductView? _product;
+
+    private IQueryable<ProductView>? _allProducts = new List<ProductView>().AsQueryable();
+    
+    private ProductView? _selectedProduct;
+
+    private ProductType? _selectedProductType;
+
+    public ProductType? SelectedProductType
+    {
+        get => _selectedProductType;
+        set
+        {
+            if (_selectedProductType != value)
+            {
+                _selectedProductType = value;
+                StateHasChanged(); // This will cause the component to rerender
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _project = await ProjectStore.ReadableStore
+            .GetOne(p => p.LinkID == ProjectLinkId);
+        if(_project is null) {
+            throw new InvalidOperationException($"Project with LinkID {ProjectLinkId} not found");
+        }
+        _projectGroup = _project.ProjectGroups
+            .FirstOrDefault(g => g.LinkID == ProjectGroupLinkId);
+        if(ProductLinkId is not null) {
+            _product = _projectGroup?
+                .ProjectGroupProducts
+                .FirstOrDefault(p => p.LinkID == ProjectLinkId);
+            _isNew = false;
+        } else {
+            _product = new("");
+        }
+
+        IList<LibraryProduct> productList = OrderApi.GetProducts();
+        _allProducts = Mapper.Map<IList<ProductView>>(productList).AsQueryable();
+    }
+
+    private void OnProductTypeChanged(ProductType? productType)
+    {
+        SelectedProductType = productType;
+    }
+     
+    private void OnProductSelected(object obj) {
+        ProductView? product = obj as ProductView;
+        Logger.LogInformation($"Product Code selected: {product?.ProductCode}");
+        _selectedProduct = product;
+        StateHasChanged();
+    }
+    private Task AddProductToProjectGroup() {
+        return Task.CompletedTask;
+        @* _isSubmitting = true;
+        _logger!.LogInformation($"Creating new room: {_room!.Name}");
+        ProjectGroupView newRoom = await _projectStore!
+            .AddRoom(
+                ProjectLinkId!,
+                _room!
+                
+            );
+        _logger!.LogInformation($"Created new room: {newRoom.Name}");
+        _navigationManager!.NavigateTo($"/quotes/{ProjectLinkId}");
+        _isSubmitting = false;*@
+    } 
+}
