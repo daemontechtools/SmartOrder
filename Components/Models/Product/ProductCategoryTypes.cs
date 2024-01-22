@@ -3,15 +3,16 @@
 namespace SmartEstimate.Models;
 
 
-public enum ProductType
-{
+public enum ProductCategoryTypes {
     Upper,
     Base,
     Tall,
     Vanity,
     Panel,
+    Filler,
     Moulding,
-    Accessory
+    Accessory,
+    Unknown
 }
 
 public struct ProductAddOn {

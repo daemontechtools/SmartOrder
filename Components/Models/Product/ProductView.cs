@@ -1,9 +1,14 @@
 
+using SMART.Common.ProductionManagement;
+
 namespace SmartEstimate.Models;
 
 public class ProductView : SMARTBaseClassView {
     public ProductView(string LinkID) : base(LinkID) { }
     
+    public ProductTypes Type { get; set; }
+    public string CategoryName { get; set; }
+    public string LinkIDCategory { get; set; }
     public string Name { get; set; }
     public string Comments { get; set; }
     public float PriceLibrary { get; set; }

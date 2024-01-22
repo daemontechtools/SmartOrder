@@ -1,6 +1,10 @@
 @using AutoMapper
 @using SMART.Web.OrderApi
 @using SMART.Common.LibraryManagement
+@using SMART.Common.ProductionManagement
+@using SMART.Common.Functions.WebAppsSupport;
+@using SMART.Common.Utility;
+@using SMART.Common.CompanyManagement;
 @using static Microsoft.AspNetCore.Components.Web.RenderMode
 @rendermode InteractiveServer
 
@@ -60,7 +64,7 @@
                                     ValueExpression=@(() => _selectedProduct)
                                     ValueChanged=@(p => OnProductSelected(p) )
                                     TextFieldName=@nameof(ProductView.Name)
-                                    Label="Shipping Location"
+                                    Label="Select a Product"
                                     Class="pb-0"
                                 />
                             </div>
@@ -118,9 +122,9 @@
     
     private ProductView? _selectedProduct;
 
-    private ProductType? _selectedProductType;
+    private ProductCategoryTypes? _selectedProductType;
 
-    public ProductType? SelectedProductType
+    public ProductCategoryTypes? SelectedProductType
     {
         get => _selectedProductType;
         set
@@ -133,8 +137,10 @@
         }
     }
 
-    protected override async Task OnInitializedAsync()
-    {
+    private Dictionary<ProductCategoryTypes, List<ProductView>> _productTypeDictionary 
+        = new Dictionary<ProductCategoryTypes, List<ProductView>>();
+
+    protected override async Task OnInitializedAsync() {
         _project = await ProjectStore.ReadableStore
             .GetOne(p => p.LinkID == ProjectLinkId);
         if(_project is null) {
@@ -151,19 +157,46 @@
             _product = new("");
         }
 
-        IList<LibraryProduct> productList = OrderApi.GetProducts();
-        _allProducts = Mapper.Map<IList<ProductView>>(productList).AsQueryable();
+        IList<LibraryProduct> products = OrderApi.GetProducts();
+        IList<Category> categories = OrderApi.GetAllCategories();
+        IList<Category> productCategories = categories
+            .Where(c => c.Type == CategoryTypes.Products)
+            .ToList();
+//        IEnumerable<LibraryProduct> btrList = productList.Where(p => OrderApi.GetCategoryById(p.LinkIDCategory)!.Type.ToString() == "10");
+
+        _productTypeDictionary = await ProjectStore
+            .SortProductsByCategory();
+        _allProducts = _productTypeDictionary.Values.SelectMany(list => list).AsQueryable();  
     }
 
-    private void OnProductTypeChanged(ProductType? productType)
-    {
+    private void OnProductTypeChanged(ProductCategoryTypes? productType) {
         SelectedProductType = productType;
     }
      
     private void OnProductSelected(object obj) {
         ProductView? product = obj as ProductView;
-        Logger.LogInformation($"Product Code selected: {product?.ProductCode}");
+        Logger.LogInformation($"Product Code selected: {product?.Name}");
         _selectedProduct = product;
+
+        // Get StyleConfigurations for this product
+        LibraryProduct libraryProduct = Mapper.Map<LibraryProduct>(product);
+        IList<LibraryStyleConfiguration> styleConfiguration = OrderApi.GetDoorStylesForProduct(libraryProduct);
+        foreach(LibraryStyleConfiguration style in styleConfiguration) {
+            Logger.LogInformation($"Style: {style.Finish}");
+        }
+
+        IList<Category> rootCategories = OrderApi.GetRootProductCategories();
+        foreach(Category category in rootCategories) {
+            Logger.LogInformation($"Root Category: {category.CategoryName}");
+        }
+        
+        IList<Category> childCategories = OrderApi.GetChildCategories();
+        foreach(Category category in childCategories) {
+            Logger.LogInformation($"Children Category: {category.CategoryName}");
+        }
+        // Get Categories for this product
+        //IList<Category> categories = OrderApi.GetProductCategories(libraryProduct);
+
         StateHasChanged();
     }
     private Task AddProductToProjectGroup() {

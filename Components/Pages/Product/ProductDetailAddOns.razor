@@ -3,7 +3,7 @@
 
 @namespace SmartEstimate.Pages
 
-@if(_addOns.Any()) {
+@* @if(_addOns.Any()) {
     <div class="flex flex-col">
             <h3 class="text-lg font-semibold mb-2">Add Ons</h3>
             <div class="grid grid-cols-2 gap-4">
@@ -29,4 +29,4 @@
             _addOns = TypeAddOns.GetValueOrDefault(ProductType.Value);
         }
     }
-}
+} *@
