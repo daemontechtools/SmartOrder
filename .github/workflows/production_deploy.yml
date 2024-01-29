@@ -25,23 +25,15 @@ jobs:
         with:
           dotnet-version: '8.x'
           include-prerelease: true
+          source-url: ${{ secrets.AZ_ARTIFACT_FEED_SOURCE }}
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.AZURE_DEVOPS_TOKEN }}
       
       - name: Download Tailwind CSS CLI
         run: |
           curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64
           chmod +x tailwindcss-linux-x64
           mv tailwindcss-linux-x64 tailwindcss
-
-      - name: Remove old nuget.config
-        run: dotnet nuget remove source ${{ secrets.AZ_ARTIFACT_FEED_NAME }}
-      
-      - name: Auth NuGet
-        run: | 
-          dotnet nuget add source ${{ secrets.AZ_ARTIFACT_FEED_SOURCE }} \
-            --name ${{ secrets.AZ_ARTIFACT_FEED_NAME }} \
-            --username az \
-            --password ${{ secrets.AZURE_DEVOPS_TOKEN }} \
-            --store-password-in-clear-text
 
       - name: Dotnet restore      
         run: dotnet restore
