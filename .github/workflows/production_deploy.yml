@@ -33,7 +33,7 @@ jobs:
           mv tailwindcss-linux-x64 tailwindcss
           
       - name: Add custom nuget source
-        run: dotnet nuget add source ${{ env.AZ_ARTIFACT_FEED_SOURCE }} --name ${{ env.AZ_ARTIFACT_FEED_NAME }} --username az --password ${{ secrets.AZURE_DEVOPS_TOKEN }} --store-password-in-clear-text
+        run: dotnet nuget add source ${{ secrets.AZ_ARTIFACT_FEED_SOURCE }} --name ${{ secrets.AZ_ARTIFACT_FEED_NAME }} --username az --password ${{ secrets.AZURE_DEVOPS_TOKEN }} --store-password-in-clear-text
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
