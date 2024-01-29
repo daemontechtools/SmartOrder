@@ -2,6 +2,7 @@ using AutoMapper;
 using SMART.Web.OrderApi;
 using Daemon.RazorUI.Modal; 
 using SmartEstimate.Models;
+using SmartEstimate.Components;
 
 
 var builder = WebApplication.CreateBuilder(args);
