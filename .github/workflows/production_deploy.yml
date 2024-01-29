@@ -16,7 +16,6 @@ jobs:
     env:
       APP_MODE: "Production"
       TAILWINDCSS: "./tailwindcss"
-      VSS_NUGET_EXTERNAL_FEED_ENDPOINTS: '{"endpointCredentials": [{"endpoint":${{ secrets.AZ_ARTIFACT_FEED_SOURCE }}, "username":"optional", "password":${{ secrets.AZURE_DEVOPS_TOKEN }}}]}'
 
     steps:
       - uses: actions/checkout@v4
