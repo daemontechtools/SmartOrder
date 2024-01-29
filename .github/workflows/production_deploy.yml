@@ -33,7 +33,7 @@ jobs:
           mv tailwindcss-linux-x64 tailwindcss
 
       - name: Remove old nuget.config
-        run: dotnet nuget remove source ${{ secrets.AZ_ARTIFACT_FEED_NAME }} --configfile nuget.configts
+        run: dotnet nuget remove source ${{ secrets.AZ_ARTIFACT_FEED_NAME }} --configfile nuget.config
       
       - name: Auth NuGet
         run: | 
