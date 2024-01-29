@@ -17,6 +17,8 @@ public class SmartEstimateMappingProfile : Profile
         // Product product = new();
         //product.LinkID = "p";
         //CategoryTypes.
+        //LibraryStyleConfiguration style = new("");
+        //style
 
         CreateMap<Project, ProjectView>().ReverseMap();
         // CreateMap<Projects, IQueryable<ProjectView>>()

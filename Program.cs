@@ -2,7 +2,6 @@ using AutoMapper;
 using SMART.Web.OrderApi;
 using Daemon.RazorUI.Modal; 
 using SmartEstimate.Models;
-using SmartEstimate.Components;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,10 +37,9 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHttpsRedirection();
     app.UseHsts();
 }
-
-app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();

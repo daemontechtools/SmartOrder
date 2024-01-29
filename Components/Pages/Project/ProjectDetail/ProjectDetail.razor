@@ -29,15 +29,12 @@
     private ProjectView? _project;
     private bool _isLoading = true;
 
-    protected override void OnInitialized()
-    {
-        _logger.LogInformation("INITIALIZING ProjectDetail");
-    }
-
+    @* protected override void OnInitialized()
+    { *@
 
     protected override async Task OnInitializedAsync()
     {
-        _logger.LogInformation("Load Project: {ProjectLinkId}", ProjectLinkId ?? "NULL");
+        //_logger.LogInformation("Load Project: {ProjectLinkId}", ProjectLinkId ?? "NULL");
         _project = await _projectStore!
             .ReadableStore
             .GetOne(p => p.LinkID == ProjectLinkId);

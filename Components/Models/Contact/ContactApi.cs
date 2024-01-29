@@ -24,12 +24,12 @@ public class ContactApi : IModelApi<Contact> {
         try {
             _logger.LogInformation("Connecting to SMART");
             await _orderApi.Connect(new ApiCreds {
-                FactoryLinkId = "0818M26D1TT4",
-                DealerName = "Bathrooms First",
-                UserName = "Bathrooms First Agent"
-                //FactoryLinkId = "078DP04B0284",
-                // DealerName = "Tamarack",
-                // UserName = "Tamarack Agent"
+                // FactoryLinkId = "0818M26D1TT4",
+                // DealerName = "Bathrooms First",
+                // UserName = "Bathrooms First Agent"
+                FactoryLinkId = "078DP04B0284",
+                DealerName = "Tamarack",
+                UserName = "Tamarack Agent"
             });
             await _orderApi.LoadLibrary();
         } catch(Exception e) {

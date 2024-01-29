@@ -12,7 +12,6 @@ public class ProductView : SMARTBaseClassView {
     public string Name { get; set; }
     public string Comments { get; set; }
     public float PriceLibrary { get; set; }
-    public string ProductCode { get; set; }
     public string ProductDoorSwing { get; set; }
     public string ProductDoorStyle { get; set; }
     public string ProductLeftSide { get; set; }

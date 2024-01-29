@@ -17,6 +17,7 @@
 @inject OrderApi OrderApi
 @inject ProjectStore ProjectStore
 @inject ILogger<ProductForm> Logger
+@inject PersistentComponentState ApplicationState
 
 <div class="flex flex-col h-full"
     <SEBreadcrumbNav
@@ -29,7 +30,7 @@
     />
 
     <div class="flex flex-1 flex-col container mt-6">
-        @if(_product is null) {
+        @if(_isLoading) {
             <div class="flex flex-col items-center justify-center h-full">
                 <div class="text-3xl font-bold text-gray-500">
                     <span class="ml-4">Loading...</span>
@@ -67,10 +68,52 @@
                                     Label="Select a Product"
                                     Class="pb-0"
                                 />
+
+                                @if(_selectedProduct is not null) {
+                                    <DmnComboBox
+                                        Data=@_styleConfigurations
+                                        Value=@_selectedStyleConfiguration
+                                        ValueExpression=@(() => _selectedStyleConfiguration)
+                                        ValueChanged=@(p => OnStyleSelected(p))
+                                        TextFieldName=@nameof(LibraryStyleConfiguration.Name)
+                                        Label="Select a Door Style"
+                                    />
+                                }
+
+                                @if(_selectedStyleConfiguration is not null) {
+                                    <DmnComboBox
+                                        Data=@_finishes
+                                        Value=@_selectedFinish
+                                        ValueExpression=@(() => _selectedFinish)
+                                        Label="Select a Finish"
+                                    />
+                                }
+                                
+                                @if(_selectedStyleConfiguration is not null) {
+                                    <DmnComboBox
+                                        Data=@_doorHardwares
+                                        Value=@_selectedDoorHardware
+                                        ValueExpression=@(() => _selectedDoorHardware)
+                                        Label="Select a Door Hardware"
+                                    />
+                                }
+
+                                
+
+                                @* <InputSelect 
+                                    @bind-Value=_selectedProductType
+                                    class="mt-4"
+                                >
+                                    <option value="">Select a Product Type</option>
+                                    @foreach(ProductCategoryTypes type in Enum.GetValues<ProductCategoryTypes>()) {
+                                            <option value=@type>@type</option>
+                                    }
+                                </InputSelect> *@
+
                             </div>
                         </div>
                     </div>
-                    <div class="col-span-2">
+                    @* <div class="col-span-2">
                     <ProductDetailPriceSummary />
                     </div>
 
@@ -91,7 +134,7 @@
                         <div class="col-span-5">
                             <ProductDetailComments />
                         </div>
-                    }
+                    } *@
                 </div>
             </EditForm>
         }
@@ -113,6 +156,7 @@
     private bool _isSubmitting = false;
 
     private bool _isNew = true;
+    private bool _isLoading = true;
 
     private ProjectView? _project;
     private ProjectGroupView? _projectGroup;
@@ -122,30 +166,39 @@
     
     private ProductView? _selectedProduct;
 
-    private ProductCategoryTypes? _selectedProductType;
+    private ProductCategoryTypes? _selectedProductType { get; set; }
 
-    public ProductCategoryTypes? SelectedProductType
-    {
-        get => _selectedProductType;
-        set
-        {
-            if (_selectedProductType != value)
-            {
-                _selectedProductType = value;
-                StateHasChanged(); // This will cause the component to rerender
-            }
-        }
-    }
+    private IQueryable<LibraryStyleConfiguration>? _styleConfigurations;
+    private LibraryStyleConfiguration? _selectedStyleConfiguration;
+
+    private IQueryable<string>? _finishes;
+    private string? _selectedFinish;
+
+    private IQueryable<string>? _doorHardwares;
+    private string? _selectedDoorHardware;
+    
 
     private Dictionary<ProductCategoryTypes, List<ProductView>> _productTypeDictionary 
         = new Dictionary<ProductCategoryTypes, List<ProductView>>();
 
+    private PersistingComponentStateSubscription? _stateSubscription;
+
     protected override async Task OnInitializedAsync() {
-        _project = await ProjectStore.ReadableStore
-            .GetOne(p => p.LinkID == ProjectLinkId);
-        if(_project is null) {
-            throw new InvalidOperationException($"Project with LinkID {ProjectLinkId} not found");
+        _stateSubscription = ApplicationState?.RegisterOnPersisting(PersistFormState);
+        
+        if(!ApplicationState!.TryTakeFromJson(
+            "project", 
+            out ProjectView? restoredProject
+        )) {
+            _project = await ProjectStore.ReadableStore
+                .GetOne(p => p.LinkID == ProjectLinkId);
+            if(_project is null) {
+                throw new InvalidOperationException($"Project with LinkID {ProjectLinkId} not found");
+            }
+        } else {
+            _project = restoredProject!;
         }
+
         _projectGroup = _project.ProjectGroups
             .FirstOrDefault(g => g.LinkID == ProjectGroupLinkId);
         if(ProductLinkId is not null) {
@@ -157,20 +210,38 @@
             _product = new("");
         }
 
-        IList<LibraryProduct> products = OrderApi.GetProducts();
-        IList<Category> categories = OrderApi.GetAllCategories();
-        IList<Category> productCategories = categories
-            .Where(c => c.Type == CategoryTypes.Products)
-            .ToList();
 //        IEnumerable<LibraryProduct> btrList = productList.Where(p => OrderApi.GetCategoryById(p.LinkIDCategory)!.Type.ToString() == "10");
+        
+        if(!ApplicationState!.TryTakeFromJson(
+            "productTypeDictionary", 
+            out Dictionary<ProductCategoryTypes, List<ProductView>>? restoredProductTypeDictionary
+        )) {
+            _productTypeDictionary = await ProjectStore.SortProductsByCategory();
+        } else {
+            _productTypeDictionary = restoredProductTypeDictionary!;
+        }
 
-        _productTypeDictionary = await ProjectStore
-            .SortProductsByCategory();
         _allProducts = _productTypeDictionary.Values.SelectMany(list => list).AsQueryable();  
+        
+        _isLoading = false;
     }
 
-    private void OnProductTypeChanged(ProductCategoryTypes? productType) {
-        SelectedProductType = productType;
+    protected override void OnAfterRender(bool firstRender) {       
+        if(_selectedProductType is not null) {
+            ProductCategoryTypes productType = (ProductCategoryTypes)_selectedProductType;
+            _allProducts = _productTypeDictionary[productType].AsQueryable();
+        }
+    }
+    
+    private Task PersistFormState() {
+        ApplicationState?.PersistAsJson("productTypeDictionary", _productTypeDictionary);
+        ApplicationState?.PersistAsJson("project", _project);
+        return Task.CompletedTask;
+    }
+
+    private void OnProductTypeChanged(ChangeEventArgs e) {
+        ProductCategoryTypes productType = (ProductCategoryTypes)Enum.Parse(typeof(ProductCategoryTypes), e.Value.ToString());
+        _selectedProductType = productType;
     }
      
     private void OnProductSelected(object obj) {
@@ -179,13 +250,14 @@
         _selectedProduct = product;
 
         // Get StyleConfigurations for this product
-        LibraryProduct libraryProduct = Mapper.Map<LibraryProduct>(product);
-        IList<LibraryStyleConfiguration> styleConfiguration = OrderApi.GetDoorStylesForProduct(libraryProduct);
-        foreach(LibraryStyleConfiguration style in styleConfiguration) {
-            Logger.LogInformation($"Style: {style.Finish}");
-        }
-
-        IList<Category> rootCategories = OrderApi.GetRootProductCategories();
+        _styleConfigurations = OrderApi
+            .GetDoorStylesForProduct(product!.LinkID)
+            .AsQueryable();
+        @* foreach(LibraryStyleConfiguration style in styleConfiguration) {
+            Logger.LogInformation($"Style: {style}");
+        } *@
+        
+        @* IList<Category> rootCategories = OrderApi.GetRootProductCategories();
         foreach(Category category in rootCategories) {
             Logger.LogInformation($"Root Category: {category.CategoryName}");
         }
@@ -193,12 +265,34 @@
         IList<Category> childCategories = OrderApi.GetChildCategories();
         foreach(Category category in childCategories) {
             Logger.LogInformation($"Children Category: {category.CategoryName}");
-        }
+        } *@
         // Get Categories for this product
         //IList<Category> categories = OrderApi.GetProductCategories(libraryProduct);
 
         StateHasChanged();
     }
+    
+    private void OnStyleSelected(object obj) {
+        LibraryStyleConfiguration? styleConfiguration = obj as LibraryStyleConfiguration;
+        //Logger.LogInformation($"Style selected: {styleConfiguration?.Name}");
+        _selectedStyleConfiguration = styleConfiguration;
+
+        
+
+        _finishes = OrderApi
+            .GetAllowedFinishes(styleConfiguration!)
+            .AsQueryable();
+        Logger.LogInformation($"Finishes: {_finishes.Count()}");
+
+        if(_finishes.Count() < 1) {
+            _finishes.Append("None");
+        } 
+
+        _doorHardwares = OrderApi
+            .GetAllowedDrawerHardware(styleConfiguration!)
+            .AsQueryable();
+    }
+
     private Task AddProductToProjectGroup() {
         return Task.CompletedTask;
         @* _isSubmitting = true;
