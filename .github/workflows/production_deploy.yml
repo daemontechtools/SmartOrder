@@ -33,7 +33,7 @@ jobs:
           mv tailwindcss-linux-x64 tailwindcss
 
       - name: Install Node.js
-        run: dotnet nuget remove source ${{ secrets.AZ_ARTIFACT_FEED_SOURCE }}
+        run: dotnet nuget remove source ${{ secrets.AZ_ARTIFACT_FEED_NAME }}
       
       - name: Auth NuGet
         run: | 
