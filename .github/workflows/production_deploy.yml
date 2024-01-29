@@ -32,8 +32,8 @@ jobs:
           chmod +x tailwindcss-linux-x64
           mv tailwindcss-linux-x64 tailwindcss
 
-      - name: Install Node.js
-        run: dotnet nuget remove source ${{ secrets.AZ_ARTIFACT_FEED_NAME }}
+      - name: Remove old nuget.config
+        run: dotnet nuget remove source ${{ secrets.AZ_ARTIFACT_FEED_NAME }} --configfile nuget.configts
       
       - name: Auth NuGet
         run: | 
@@ -41,6 +41,7 @@ jobs:
             --name ${{ secrets.AZ_ARTIFACT_FEED_NAME }} \
             --username az \
             --password ${{ secrets.AZURE_DEVOPS_TOKEN }} \
+            --store-password-in-clear-text \
             --configfile nuget.config
 
       - name: Dotnet restore      
