@@ -35,9 +35,6 @@ jobs:
           chmod +x tailwindcss-linux-x64
           mv tailwindcss-linux-x64 tailwindcss
 
-      - name: Dotnet restore      
-        run: dotnet restore
-
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
