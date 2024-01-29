@@ -34,7 +34,7 @@ jobs:
           mv tailwindcss-linux-x64 tailwindcss
 
       - name: Dotnet restore      
-        run: dotnet restore --configuration Release
+        run: dotnet restore
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
