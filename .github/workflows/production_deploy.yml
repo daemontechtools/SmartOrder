@@ -32,8 +32,8 @@ jobs:
           chmod +x tailwindcss-linux-x64
           mv tailwindcss-linux-x64 tailwindcss
           
-      - name: Add custom nuget source
-        run: dotnet nuget add source ${{ secrets.AZ_ARTIFACT_FEED_SOURCE }} --name ${{ secrets.AZ_ARTIFACT_FEED_NAME }} --username az --password ${{ secrets.AZURE_DEVOPS_TOKEN }} --store-password-in-clear-text
+      - name: Add Azure Artifact Feed Key
+        run: dotnet nuget setapikey ${{ secrets.AZURE_DEVOPS_TOKEN }} -ConfigFile ./nuget.config
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
