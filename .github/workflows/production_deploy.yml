@@ -41,7 +41,7 @@ jobs:
             --name ${{ secrets.AZ_ARTIFACT_FEED_NAME }} \
             --username az \
             --password ${{ secrets.AZURE_DEVOPS_TOKEN }} \
-            --configfile ./nuget.config
+            --configfile nuget.config
 
       - name: Dotnet restore      
         run: dotnet restore
