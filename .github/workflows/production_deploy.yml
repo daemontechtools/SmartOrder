@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'production'
+      name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
@@ -62,8 +62,8 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'SmartWebOrder'
-          slot-name: 'production'
-          publish-profile: ${{ secrets.AzureAppService_PublishProfile_90E2455802D94A90A52517DB80F529AD }}
+          slot-name: 'Production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_90E2455802D94A90A52517DB80F529AD }}
           package: .
 
 
