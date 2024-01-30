@@ -15,6 +15,7 @@ jobs:
     
     env:
       APP_MODE: "Production"
+      BUILD_CONFIGURATION: 'Release' 
       TAILWINDCSS: "./tailwindcss"
 
     steps:
