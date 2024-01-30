@@ -264,3 +264,4 @@ obj/
 wwwroot/css 
 
 .env
+nuget.config
