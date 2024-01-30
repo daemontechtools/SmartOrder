@@ -67,8 +67,5 @@ jobs:
         with:
           app-name: 'SmartWebOrder'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_90E2455802D94A90A52517DB80F529AD }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B682C198CDAC40859ECD3C7ABD49EFF5 }}
           package: .
-
-
-
