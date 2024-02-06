@@ -21,7 +21,7 @@
             },
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development",
-                "TAILWINDCSS": "/usr/bin/tailwindcss"
+                "TAILWINDCSS": "/usr/local/bin/tailwindcss"
             },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"

@@ -9,6 +9,10 @@
     <NoWarn>1591</NoWarn>
     <NoWarn>$(NoWarn);NETSDK1057</NoWarn>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' != 'true'">
+    <TAILWINDCSS_PATH>tailwindcss</TAILWINDCSS_PATH> 
+  </PropertyGroup>
   
   <ItemGroup>
     <None Update="./Data/app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
