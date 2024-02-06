@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 appStylesPathIn="./Styles/styles.css"
-appStylesPathOut="./wwwroot/css/razor-ui.css"
+appStylesPathOut="./wwwroot/css/site.css"
 
 if [ -z "${TAILWINDCSS_PATH}" ]; then
   # Not set, so use default
