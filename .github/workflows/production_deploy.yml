@@ -16,7 +16,7 @@ jobs:
     env:
       APP_MODE: "Production"
       BUILD_CONFIGURATION: 'Release' 
-      TAILWINDCSS: "./tailwindcss"
+      TAILWINDCSS_PATH: ${{github.workspace}}/tailwindcss
 
     steps:
       - uses: actions/checkout@v4
@@ -34,7 +34,7 @@ jobs:
         run: |
           curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64
           chmod +x tailwindcss-linux-x64
-          mv tailwindcss-linux-x64 tailwindcss
+          mv tailwindcss-linux-x64 $TAILWINDCSS_PATH
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
