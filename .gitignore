@@ -263,5 +263,5 @@ __pycache__/
 obj/
 wwwroot/css 
 
-.env
+env.json
 nuget.config

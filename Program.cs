@@ -4,8 +4,17 @@ using Daemon.RazorUI.Modal;
 using SmartEstimate.Models;
 using SmartEstimate.Components;
 
-
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddEnvironmentVariables()
+    .AddJsonFile("env.json", optional: true, reloadOnChange: true);
+
+Console.WriteLine("Loaded Environment Variables");
+foreach(var c in builder.Configuration.AsEnumerable()) {
+    Console.WriteLine(c.Key+"="+c.Value);
+}
+
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
