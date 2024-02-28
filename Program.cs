@@ -1,3 +1,6 @@
+using Auth0.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using AutoMapper;
 using SMART.Web.OrderApi;
 using Daemon.RazorUI.Modal; 
@@ -16,6 +19,13 @@ builder.Configuration
 // }
 
 
+builder.Services
+    .AddAuth0WebAppAuthentication(options => {
+        options.Domain = builder.Configuration["Auth0:Domain"];
+        options.ClientId = builder.Configuration["Auth0:ClientId"];
+    });
+
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
@@ -25,6 +35,7 @@ var mapperConfig = new MapperConfiguration(cfg =>
 {
     cfg.AddProfile<SmartEstimateMappingProfile>();
 });
+
 IMapper mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 builder.Services.AddScoped<ModalService>();
@@ -50,12 +61,40 @@ if(!app.Environment.IsDevelopment()) {
     app.UseHsts();
 }
 
+// app.UseRouting();
+// app.UseAuthentication();
+// app.UseAuthorization();
+
+// app.MapBlazorHub();
+// app.MapFallbackToPage("App");
+
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
 
+
+app.MapGet("/Account/Login", async (HttpContext httpContext, string redirectUri = "/") =>
+{
+  var authenticationProperties = new LoginAuthenticationPropertiesBuilder()
+          .WithRedirectUri(redirectUri)
+          .Build();
+
+  await httpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
+});
+
+app.MapGet("/Account/Logout", async (HttpContext httpContext, string redirectUri = "/") =>
+{
+  var authenticationProperties = new LogoutAuthenticationPropertiesBuilder()
+          .WithRedirectUri(redirectUri)
+          .Build();
+
+  await httpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
+  await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+});
+
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
 
 app.Run();
