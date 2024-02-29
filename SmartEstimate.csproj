@@ -49,23 +49,9 @@
 
 
   <!-- Integrate TailwindCSS -->
-  <Target 
-    Name="Start Tailwind"
-    Condition="'$(Configuration)'!='Release'"
-    AfterTargets="Build"
-  >
-    <Exec Command="nohup ./build-tailwind.sh --watch &amp;" />
-  </Target>
-  <Target
-    Name="Kill Tailwind"
-    Condition="'$(Configuration)'!='Release'"
-    AfterTargets="Clean"
-  >
-    <Exec Command="killall tailwindcss" />
-  </Target>
 
-  <!-- Only do this when we actually have scoped css to process
-  <Target Name="ProcessScopedCssFilesWithTailwind" AfterTargets="_GenerateScopedCssFiles">
+  <!-- Only do this when we actually have scoped css to process -->
+  <!-- <Target Name="ProcessScopedCssFilesWithTailwind" AfterTargets="_GenerateScopedCssFiles">
     <MSBuild Projects="$(MSBuildProjectFile)" Properties="CurrentScopedCssFile=%(_ScopedCssOutputs.Identity)" Targets="ProcessScopedCssFileWithTailwind">
     </MSBuild>
   </Target>
@@ -73,8 +59,7 @@
   <Target Name="ProcessScopedCssFileWithTailwind">
     <Message Importance="high" Text="Processing with Tailwind: $(CurrentScopedCssFile)" />
     <Exec Command="$(TAILWINDCSS) -i $(CurrentScopedCssFile) -o $(CurrentScopedCssFile)" WorkingDirectory="$(MSBuildProjectDirectory)" />
-  </Target> 
-  -->
+  </Target>  -->
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Release'">
     <Exec Command="$(ProjectDir)build-tailwind.sh" />
