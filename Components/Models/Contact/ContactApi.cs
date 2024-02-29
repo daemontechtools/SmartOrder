@@ -16,46 +16,20 @@ public class ContactApi : IModelApi<Contact> {
         _logger = logger;
     }
 
-    private async Task Connect() {
-         if(_orderApi.IsConnected()) {
-            return;
-         }
-
-        try {
-            _logger.LogInformation("Connecting to SMART");
-            await _orderApi.Connect(new ApiCreds {
-                // FactoryLinkId = "0818M26D1TT4",
-                // DealerName = "Bathrooms First",
-                // UserName = "Bathrooms First Agent"
-                FactoryLinkId = "078DP04B0284",
-                DealerName = "Tamarack",
-                UserName = "Tamarack Agent"
-            });
-            await _orderApi.LoadLibrary();
-        } catch(Exception e) {
-            _logger.LogError(e, "Failed to connect to SMART");
-            Console.WriteLine(e);
-        }
-    }
-
     public Task<IList<Contact>> Get() {
         return Task.FromResult(_orderApi.GetContacts());
     }
 
-    public async Task<Contact> Create(Contact contact) {
-        await Connect(); 
-        return new Contact("");
+    public Task<Contact> Create(Contact contact) {
+        return Task.FromResult(new Contact(""));
         //return await _orderApi.AddContact(contact);
     }
 
     public async Task Delete(Contact contact) {
-        await Connect();
-        //await _orderApi.DeleteContact(contact);
+        await _orderApi.DeleteContact(contact.LinkID);
     }
 
     public async Task<Contact> Update(Contact contact) {
-        await Connect();
-        return new Contact("");
-        //await _orderApi.UpdateContact(contact);
+        return await _orderApi.UpdateContact(contact.LinkID);
     }
 }

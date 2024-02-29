@@ -85,10 +85,31 @@ app.UseAntiforgery();
 //   await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 // });
 
+app.Use(async (context, next) => {
+    var loggerFactory = context.RequestServices.GetRequiredService<ILoggerFactory>();
+    var logger = loggerFactory.CreateLogger<Program>();
+
+    var orderApi = context.RequestServices.GetRequiredService<OrderApi>();
+    if(orderApi.IsConnected()) {
+        logger.LogInformation("Reusing old connection");
+    } else {
+        logger.LogInformation("Connecting to SMART");
+        await orderApi.Connect(new ApiCreds {
+            // FactoryLinkId = "0818M26D1TT4",
+            // DealerName = "Bathrooms First",
+            // UserName = "Bathrooms First Agent"
+            FactoryLinkId = "078DP04B0284",
+            DealerName = "Tamarack",
+            UserName = "Tamarack Agent"
+        });
+        await orderApi.LoadLibrary();
+    }
+    await next();
+});
+
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
-
 
 
 app.Run();
