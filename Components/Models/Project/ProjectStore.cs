@@ -5,6 +5,7 @@ using SMART.Common.LibraryManagement;
 using Daemon.DataAccess.DataStore;
 using SMART.Web.OrderApi;
 using SMART.Common.Utility;
+using System.Runtime.CompilerServices;
 
 
 namespace SmartEstimate.Models;
@@ -44,6 +45,13 @@ public class ProjectStore {
             Api
         );
     }
+
+    public IQueryable<ProductView> GetAllProducts() {
+        var products = _orderApi.GetProducts();
+        return _mapper
+            .Map<IList<ProductView>>(products)
+            .AsQueryable();
+    } 
 
     public async Task<Dictionary<ProductCategoryTypes, List<ProductView>>> SortProductsByCategory() {
         return await Task.Run((Func<Dictionary<ProductCategoryTypes, List<ProductView>>>)(() => {
