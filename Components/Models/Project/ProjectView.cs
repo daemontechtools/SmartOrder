@@ -23,7 +23,6 @@ public class ProjectView : SMARTBaseClass {
         true, 
         ErrorMessage = "Shipping Location is required when IsShipped is true."
     )]
-    [Required]
     public ShipLocationView ProjectShipLocation { get; set; }
 
     public IList<ProjectGroupView> ProjectGroups { get; set; }
