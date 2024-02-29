@@ -5,12 +5,12 @@
 @using SmartEstimate.Models
 
 @inject ShipLocationStore ShipLocationStore
-@inject ILogger<ShippingOptions> Logger
+@inject ILogger<SEShippingOptions> Logger
 
 @namespace SmartEstimate.Shared.Components
 
 
-<ShippingOptions />
+<SEShippingOptions />
 
 @if(Project!.IsShipped) {
   <div class="flex flex-col">

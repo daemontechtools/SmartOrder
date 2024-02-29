@@ -1,6 +1,7 @@
 @page "/quotes/new"
 @rendermode InteractiveServer
 @using SmartEstimate.Models
+@using SmartEstimate.Shared.Components
 
 @namespace SmartEstimate.Pages
 
@@ -71,6 +72,8 @@
     {
         if (_editForm!.EditContext!.Validate()) {
             await AddQuote();
+        } else {
+            Logger.LogInformation("Validation failed!!!!");
         }
     }
 

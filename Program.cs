@@ -7,6 +7,7 @@ using Daemon.RazorUI.Modal;
 using SmartEstimate.Models;
 using SmartEstimate.Components;
 
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
@@ -17,7 +18,6 @@ builder.Configuration
 // foreach(var c in builder.Configuration.AsEnumerable()) {
 //     Console.WriteLine(c.Key+"="+c.Value);
 // }
-
 
 builder.Services
     .AddAuth0WebAppAuthentication(options => {
@@ -61,19 +61,11 @@ if(!app.Environment.IsDevelopment()) {
     app.UseHsts();
 }
 
-// app.UseRouting();
-// app.UseAuthentication();
-// app.UseAuthorization();
-
-// app.MapBlazorHub();
-// app.MapFallbackToPage("App");
-
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 app.UseAntiforgery();
 
-
+// Handle Auth0 authentication routes
 app.MapGet("/Account/Login", async (HttpContext httpContext, string redirectUri = "/") =>
 {
   var authenticationProperties = new LoginAuthenticationPropertiesBuilder()
@@ -93,8 +85,10 @@ app.MapGet("/Account/Logout", async (HttpContext httpContext, string redirectUri
   await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 });
 
+
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
 
 
 app.Run();
