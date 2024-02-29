@@ -2,9 +2,9 @@
 @using SMART.Web.OrderApi
 @using SMART.Common.LibraryManagement
 @using SMART.Common.ProductionManagement
-@using SMART.Common.Functions.WebAppsSupport;
-@using SMART.Common.Utility;
-@using SMART.Common.CompanyManagement;
+@using SMART.Common.Functions.WebAppsSupport
+@using SMART.Common.Utility
+@using SMART.Common.CompanyManagement
 @using static Microsoft.AspNetCore.Components.Web.RenderMode
 @rendermode InteractiveServer
 
@@ -239,11 +239,11 @@
         return Task.CompletedTask;
     }
 
-    private void OnProductTypeChanged(ChangeEventArgs e) {
+    @* private void OnProductTypeChanged(ChangeEventArgs e) {
         ProductCategoryTypes productType = (ProductCategoryTypes)Enum.Parse(typeof(ProductCategoryTypes), e.Value.ToString());
         _selectedProductType = productType;
-    }
-     
+    } *@
+    
     private void OnProductSelected(object obj) {
         ProductView? product = obj as ProductView;
         Logger.LogInformation($"Product Code selected: {product?.Name}");
@@ -253,6 +253,10 @@
         _styleConfigurations = OrderApi
             .GetDoorStylesForProduct(product!.LinkID)
             .AsQueryable();
+
+        var filteredStyleConfigs = _styleConfigurations
+            .Where(c => c.Finish != null && c.Finish.Length > 10);
+        _styleConfigurations = filteredStyleConfigs;
         @* foreach(LibraryStyleConfiguration style in styleConfiguration) {
             Logger.LogInformation($"Style: {style}");
         } *@
@@ -283,6 +287,9 @@
             .GetAllowedFinishes(styleConfiguration!)
             .AsQueryable();
         Logger.LogInformation($"Finishes: {_finishes.Count()}");
+        foreach(string finish in _finishes) {
+            Logger.LogInformation(finish);
+        }
 
         if(_finishes.Count() < 1) {
             _finishes.Append("None");
