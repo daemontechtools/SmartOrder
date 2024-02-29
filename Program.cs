@@ -1,6 +1,6 @@
-using Auth0.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+// using Auth0.AspNetCore.Authentication;
+// using Microsoft.AspNetCore.Authentication;
+// using Microsoft.AspNetCore.Authentication.Cookies;
 using AutoMapper;
 using SMART.Web.OrderApi;
 using Daemon.RazorUI.Modal; 
@@ -19,11 +19,11 @@ builder.Configuration
 //     Console.WriteLine(c.Key+"="+c.Value);
 // }
 
-builder.Services
-    .AddAuth0WebAppAuthentication(options => {
-        options.Domain = builder.Configuration["Auth0:Domain"];
-        options.ClientId = builder.Configuration["Auth0:ClientId"];
-    });
+// builder.Services
+//     .AddAuth0WebAppAuthentication(options => {
+//         options.Domain = builder.Configuration["Auth0:Domain"];
+//         options.ClientId = builder.Configuration["Auth0:ClientId"];
+//     });
 
 
 // Add services to the container.
@@ -66,24 +66,24 @@ app.UseStaticFiles();
 app.UseAntiforgery();
 
 // Handle Auth0 authentication routes
-app.MapGet("/Account/Login", async (HttpContext httpContext, string redirectUri = "/") =>
-{
-  var authenticationProperties = new LoginAuthenticationPropertiesBuilder()
-          .WithRedirectUri(redirectUri)
-          .Build();
+// app.MapGet("/Account/Login", async (HttpContext httpContext, string redirectUri = "/") =>
+// {
+//   var authenticationProperties = new LoginAuthenticationPropertiesBuilder()
+//           .WithRedirectUri(redirectUri)
+//           .Build();
 
-  await httpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
-});
+//   await httpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
+// });
 
-app.MapGet("/Account/Logout", async (HttpContext httpContext, string redirectUri = "/") =>
-{
-  var authenticationProperties = new LogoutAuthenticationPropertiesBuilder()
-          .WithRedirectUri(redirectUri)
-          .Build();
+// app.MapGet("/Account/Logout", async (HttpContext httpContext, string redirectUri = "/") =>
+// {
+//   var authenticationProperties = new LogoutAuthenticationPropertiesBuilder()
+//           .WithRedirectUri(redirectUri)
+//           .Build();
 
-  await httpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
-  await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-});
+//   await httpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
+//   await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+// });
 
 
 app.MapRazorComponents<App>()
