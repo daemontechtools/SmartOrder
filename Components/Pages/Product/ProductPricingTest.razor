@@ -25,6 +25,8 @@
                 Subtitle="Test Product Search, Category Sorting, Finish and Drawer Hardware Selection and getting the Price of the product"
                 SubmitButtonText="Get Price"
                 CancelButtonText="Clear"
+                OnSubmitClick=@OnSubmitClick
+                OnCancelClick=@OnCancelClick
             /> 
             <EditForm 
                 @ref=@_editForm
@@ -33,7 +35,7 @@
                 OnValidSubmit=@GetProductPrice
             >
                 <ObjectGraphDataAnnotationsValidator />
-                <div class="grid grid-cols-5 gap-8 mt-8">
+                <div class="grid grid-cols-6 gap-8 mt-8">
                     <div class="col-span-3">
                         <div class="h-full flex items-center w-2/3">
                             <div class="center-self w-full">
@@ -75,6 +77,7 @@
                                         Data=@_finishes
                                         Value=@_selectedFinish
                                         ValueExpression=@(() => _selectedFinish)
+                                        ValueChanged=@(p => _selectedFinish = p as string)
                                         Label="Select a Finish"
                                     />
                                 }
@@ -85,6 +88,7 @@
                                         Data=@_doorHardwares
                                         Value=@_selectedDoorHardware
                                         ValueExpression=@(() => _selectedDoorHardware)
+                                        ValueChanged=@(p => _selectedDoorHardware = p as string)
                                         Label="Select a Door Hardware"
                                     />
                                 }
@@ -104,6 +108,39 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-span-3">
+                        <div class="flex flex-col">
+                            <label>
+                                Width:
+                               <InputNumber @bind-Value=@_newProduct.Width />
+                            </label>
+                            <div class="mt-3" />
+                            <label>
+                                Height:
+                               <InputNumber @bind-Value=@_newProduct.Height />
+                            </label>
+                            <div class="mt-3" />
+                            <label>
+                                Depth:
+                               <InputNumber @bind-Value=@_newProduct.Depth />
+                            </label>
+
+
+                            <div class="mt-5" />
+                            <label>
+                                Left End Finished:
+                                <InputCheckbox @bind-Value=@_leftEndFinished />
+                            </label>
+                            <label>
+                                Right End Finished:
+                                <InputCheckbox @bind-Value=@_rightEndFinished />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-span-6 border-solid border-2 border-stone-700 flex mt-8 p-3 text-xl">
+                   <h2 class="mr-2">Product Price:</h2> 
+                   <span>@_productPrice</span>
                 </div>
             </EditForm>
         }
@@ -134,6 +171,11 @@
 
     private IQueryable<string>? _doorHardwares;
     private string? _selectedDoorHardware;
+
+    private bool _leftEndFinished = false;
+    private bool _rightEndFinished = false;
+
+    private float _productPrice = 0;
 
     
 
@@ -201,9 +243,38 @@
         _selectedDoorHardware = null;
     }
 
-    private Task GetProductPrice() {
-        return Task.CompletedTask;
-        @* _isSubmitting = true;
-        _isSubmitting = false; *@
+    private void OnSubmitClick(){
+        if (_editForm!.EditContext!.Validate()) {
+            GetProductPrice();
+        } else {
+            Logger.LogInformation("Validation failed!!!!");
+        }
+    }
+
+    private void OnCancelClick() {
+        Logger.LogInformation("On Cancel Click");
+    }
+
+    private void GetProductPrice() {
+        _isSubmitting = true;
+        Logger.LogInformation("Get Product Price");
+        
+        var customProduct = new ProductView(_selectedProduct.LinkID);
+        customProduct.Width = _newProduct.Width;
+        customProduct.Height = _newProduct.Height;
+        customProduct.Depth = _newProduct.Depth;
+        customProduct.ProductFinishInterior = _selectedFinish;
+        customProduct.ProductLeftSide = _leftEndFinished ? "Finished" : "Unfinished";
+        customProduct.ProductRightSide = _rightEndFinished ? "Finished" : "Unfinished";
+        customProduct.ProductSlide = _selectedDoorHardware ?? "";
+        customProduct.ProductDoorSwing = "Left";
+        customProduct.Comments = "";
+
+        _productPrice = ProjectStore.GetProductPrice(
+            customProduct,
+            _selectedStyleConfiguration.Name
+        );
+        Logger.LogInformation("Product Price: "+_productPrice);
+        _isSubmitting = false;
     } 
 }

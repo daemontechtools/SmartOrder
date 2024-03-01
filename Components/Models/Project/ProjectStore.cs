@@ -59,6 +59,34 @@ public class ProjectStore {
             .Map<Dictionary<ProductCategoryTypes, List<ProductView>>>(sortedCabinets);
     }
 
+    public float GetProductPrice(
+        ProductView productView,
+        string doorStyleName
+    ) {
+        //var libraryProduct = _mapper.Map<LibraryProduct>(productView);
+        var libraryProduct = _orderApi
+            .GetProducts()
+            .FirstOrDefault(p => p.LinkID == productView.LinkID)
+        ?? throw new Exception("Unable to find Library Product with LinkID: "+productView.LinkID);
+        
+        libraryProduct.Width = productView.Width;
+        libraryProduct.Height = productView.Height;
+        libraryProduct.Depth = productView.Depth;
+        libraryProduct.ProductFinishInterior = productView.ProductFinishInterior;
+        libraryProduct.ProductLeftSide = productView.ProductLeftSide;
+        libraryProduct.ProductRightSide = productView.ProductRightSide;
+        libraryProduct.ProductSlide = productView.ProductSlide;
+        libraryProduct.ProductDoorSwing = productView.ProductDoorSwing;
+
+        return _orderApi.GetProductPrice(
+            libraryProduct,
+            productView.Width,
+            productView.Height,
+            productView.Depth,
+            doorStyleName,
+            productView.Comments
+        );
+    }
 
 
     public async Task<ProjectGroupView> GetRoomById(
