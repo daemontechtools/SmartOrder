@@ -8,7 +8,7 @@
 @inject IMapper Mapper
 @inject OrderApi OrderApi
 @inject ProjectStore ProjectStore
-@inject ILogger<ProductForm> Logger
+@inject ILogger<ProductPricingTest> Logger
 
 <div class="flex flex-col h-full"
     <div class="flex flex-1 flex-col container mt-6">
@@ -58,6 +58,7 @@
                                 </div> *@
 
                                 @if(_selectedProduct is not null) {
+                                    <div class="mt-3" />
                                     <DmnComboBox
                                         Data=@_styleConfigurations
                                         Value=@_selectedStyleConfiguration
@@ -69,6 +70,7 @@
                                 }
 
                                 @if(_selectedStyleConfiguration is not null) {
+                                    <div class="mt-3" />
                                     <DmnComboBox
                                         Data=@_finishes
                                         Value=@_selectedFinish
@@ -78,6 +80,7 @@
                                 }
                                 
                                 @if(_selectedStyleConfiguration is not null) {
+                                    <div class="mt-3" />
                                     <DmnComboBox
                                         Data=@_doorHardwares
                                         Value=@_selectedDoorHardware
@@ -172,17 +175,12 @@
         _styleConfigurations = OrderApi
             .GetDoorStylesForProduct(product!.LinkID)
             .AsQueryable();
+        _selectedStyleConfiguration = null;
 
-        var filteredStyleConfigs = _styleConfigurations
-            .Where(c => c.Finish != null && c.Finish.Length > 10);
-        _styleConfigurations = filteredStyleConfigs;
-
-        
-        // Handle potential update of categories
-        //IList<Category> categories = OrderApi.GetProductCategories(libraryProduct);
-        //if(_cat)
-
-        StateHasChanged();
+        _finishes = null;
+        _selectedFinish = null;
+        _doorHardwares = null;
+        _selectedDoorHardware = null;
     }
     
     private void OnStyleSelected(object obj) {
@@ -190,23 +188,17 @@
         //Logger.LogInformation($"Style selected: {styleConfiguration?.Name}");
         _selectedStyleConfiguration = styleConfiguration;
 
-        
-
         _finishes = OrderApi
             .GetAllowedFinishes(styleConfiguration!)
             .AsQueryable();
         Logger.LogInformation($"Finishes: {_finishes.Count()}");
-        foreach(string finish in _finishes) {
-            Logger.LogInformation(finish);
-        }
-
-        if(_finishes.Count() < 1) {
-            _finishes.Append("None");
-        } 
+        _selectedFinish = null;
 
         _doorHardwares = OrderApi
             .GetAllowedDrawerHardware(styleConfiguration!)
             .AsQueryable();
+        Logger.LogInformation($"Door Hardwares: {_doorHardwares.Count()}");
+        _selectedDoorHardware = null;
     }
 
     private Task GetProductPrice() {
