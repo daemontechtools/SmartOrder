@@ -216,7 +216,7 @@
             "productTypeDictionary", 
             out Dictionary<ProductCategoryTypes, List<ProductView>>? restoredProductTypeDictionary
         )) {
-            _productTypeDictionary = await ProjectStore.SortProductsByCategory();
+            _productTypeDictionary = ProjectStore.GetSortedCabinets();
         } else {
             _productTypeDictionary = restoredProductTypeDictionary!;
         }
