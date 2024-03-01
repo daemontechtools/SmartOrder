@@ -2,6 +2,7 @@
 
 @namespace SmartEstimate.Pages
 
+@page "/"
 @page "/test-product-pricing"
 
 @inject IMapper Mapper
@@ -32,7 +33,7 @@
                 OnValidSubmit=@GetProductPrice
             >
                 <ObjectGraphDataAnnotationsValidator />
-                <div class="grid grid-cols-5 gap-8">
+                <div class="grid grid-cols-5 gap-8 mt-8">
                     <div class="col-span-3">
                         <div class="h-full flex items-center w-2/3">
                             <div class="center-self w-full">
@@ -108,15 +109,16 @@
 
 
 @code {
+    
+    private bool _isLoading = true;
 
     private EditForm? _editForm = default!;
     private bool _isSubmitting = false;
 
-    private bool _isLoading = true;
-
     private ProductView _newProduct = new("");
+
     private IQueryable<ProductView>? _allProducts;
-    
+    private Dictionary<ProductCategoryTypes, List<ProductView>> _sortedProducts;
     private ProductView? _selectedProduct;
 
     private ProductCategoryTypes? _selectedProductType { get; set; }
@@ -130,8 +132,6 @@
     private IQueryable<string>? _doorHardwares;
     private string? _selectedDoorHardware;
 
-    private string TEST_PROJECT_NAME = "Product Test Project";
-    private string TEST_PROJECT_GROUP_NAME = "Product Test Project Group";
     
 
     private Dictionary<ProductCategoryTypes, List<ProductView>> _productTypeDictionary 
@@ -139,7 +139,8 @@
 
 
     protected override void OnInitialized() {
-        _allProducts = ProjectStore.GetAllProducts(); 
+        _allProducts = ProjectStore.GetAllCabinets(); 
+        _sortedProducts = ProjectStore.GetSortedCabinets();
         _isLoading = false;
     }
 
