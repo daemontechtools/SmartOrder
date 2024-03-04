@@ -4,9 +4,8 @@
 using AutoMapper;
 using SMART.Web.OrderApi;
 using Daemon.RazorUI.Modal; 
-using SmartEstimate.Models;
-using SmartEstimate.Components;
-using SmartEstimate.Shared.Config;
+using SO.Data;
+using SO.Components;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,10 +14,10 @@ builder.Configuration
     .AddEnvironmentVariables()
     .AddJsonFile("env.json", optional: true, reloadOnChange: true);
 
-// Console.WriteLine("Loaded Environment Variables");
-// foreach(var c in builder.Configuration.AsEnumerable()) {
-//     Console.WriteLine(c.Key+"="+c.Value);
-// }
+Console.WriteLine("Loaded Environment Variables");
+foreach(var c in builder.Configuration.AsEnumerable()) {
+    Console.WriteLine(c.Key+"="+c.Value);
+}
 
 // builder.Services
 //     .AddAuth0WebAppAuthentication(options => {
@@ -34,7 +33,7 @@ builder.Services.AddRazorComponents()
 // Add AutoMapper profile
 var mapperConfig = new MapperConfiguration(cfg =>
 {
-    cfg.AddProfile<SmartEstimateMappingProfile>();
+    cfg.AddProfile<SmartOrderMappingProfile>();
 });
 
 IMapper mapper = mapperConfig.CreateMapper();
@@ -94,9 +93,9 @@ app.Use(async (context, next) => {
     if(!orderApi.IsConnected()) {
         logger.LogInformation("Connecting to SMART");
         await orderApi.Connect(new ApiCreds {
-            FactoryLinkId = Config.tkFactoryLinkId,
-            DealerName = Config.tkDealerName,
-            UserName = Config.tkUserName
+            FactoryLinkId = builder.Configuration["SMART_FACTORY_ID"]!,
+            DealerName = builder.Configuration["SMART_DEALER_NAME"]!,
+            UserName = builder.Configuration["SMART_USER_NAME"]!
         });
         await orderApi.LoadLibrary();
     }
