@@ -14,10 +14,10 @@ builder.Configuration
     .AddEnvironmentVariables()
     .AddJsonFile("env.json", optional: true, reloadOnChange: true);
 
-Console.WriteLine("Loaded Environment Variables");
-foreach(var c in builder.Configuration.AsEnumerable()) {
-    Console.WriteLine(c.Key+"="+c.Value);
-}
+// Console.WriteLine("Loaded Environment Variables");
+// foreach(var c in builder.Configuration.AsEnumerable()) {
+    //     Console.WriteLine(c.Key+"="+c.Value);
+// }
 
 // builder.Services
 //     .AddAuth0WebAppAuthentication(options => {
