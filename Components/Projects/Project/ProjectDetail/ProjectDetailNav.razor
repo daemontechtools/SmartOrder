@@ -1,0 +1,28 @@
+@namespace SO.Components.Projects
+
+
+<nav class="
+    container-wide
+    flex 
+    py-2.5 
+    w-full 
+    gap-x-6
+    text-sm font-semibold text-stone-700
+    bg-stone-300
+">
+    @foreach (var option in MenuOptions)
+    {
+        <NavLink 
+            href=@(option.Item2)
+            class="px-3 py-1.5"
+            ActiveClass="
+                text-sky-500
+                rounded-md
+                bg-sky-100
+            "
+            Match=NavLinkMatch.All
+        >
+            @option.Item1
+        </NavLink>
+    }
+</nav>

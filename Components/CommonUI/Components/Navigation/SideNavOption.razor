@@ -1,0 +1,46 @@
+﻿@using Microsoft.AspNetCore.Components.Routing
+@using Daemon.RazorUI.Icons
+
+@namespace Daemon.RazorUI.Navigation
+
+@inject NavigationManager NavigationManager
+
+
+<NavLink 
+    href=@Props?.Path
+    class="
+        flex items-center justify-center lg:justify-start group-hover:justify-start
+        px-0 py-2 lg:px-3 group-hover:px-3 group-hover:py-2 
+        font-semibold
+        rounded-md
+        cursor-pointer select-none
+        text-stone-300 hover:text-stone-400
+        hover:bg-stone-700 hover:bg-opacity-75
+        no-underline hover:no-underline
+    "
+    ActiveClass="bg-stone-900"
+>
+    @if (ChildContent != null) { 
+        <div class="
+            lg:mr-4 group-hover:mr-4 w-7 
+            flex-shrink-0 
+            text-stone-200 hover:text-stone-400
+        ">
+            @ChildContent    
+        </div>
+    }
+    <span class="
+        hidden lg:block group-hover:block
+    ">
+        @Props?.Label
+    </span>
+</NavLink>
+
+@code {
+
+    [Parameter]
+    public NavOptionProps? Props { get; set; }
+    
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

@@ -1,0 +1,45 @@
+@using Daemon.RazorUI.Icons
+
+@namespace Daemon.RazorUI.Input
+
+@inject ILogger<Search> Logger
+
+<div class="
+  h-16 
+  container-wide
+  border-b border-stone-900 
+  bg-stone-600 
+  text-stone-300
+  placeholder:text-stone-300
+">
+    <SearchIcon Props=@(new IconProps() { Class = "stroke-stone-400 w-6 mr-1.5" }) />
+
+    <input 
+      id="search-field" 
+      class="
+          h-full w-full 
+          border-0 
+          bg-transparent 
+          !p-0
+          placeholder-stone-400 
+          text-stone-100
+          focus:ring-0
+      " 
+      placeholder="Search..." 
+      type="text" 
+      name="search"
+      @oninput=OnInputHandler
+    >
+</div>
+
+@code {
+
+  [Parameter]
+  public EventCallback<string> OnInput { get; set; }
+
+  private void OnInputHandler(ChangeEventArgs e)
+  {
+    //Logger.LogInformation($"On Input handler Search input: {e.Value}");
+    OnInput.InvokeAsync(e.Value.ToString());
+  }
+}

@@ -1,0 +1,93 @@
+﻿@using Microsoft.Extensions.Logging
+@using Daemon.RazorUI.Animations
+
+@namespace Daemon.RazorUI.Layout
+
+@inject ILogger<DmnSectionHeader> Logger
+
+<div class=@($"flex w-full justify-between {Class}")>
+    <div class="flex flex-col pr-10">
+        @if(Title is not null)
+        {
+            <h1 class=@($@"
+                text-2xl font-semibold 
+                leading-6 text-gray-900 
+                outline-none
+                {TitleClass}
+            ")>
+                @Title
+            </h1>
+        }
+        @if(Subtitle is not null)
+        {
+          <p class="mt-3 text-sm text-gray-700">@Subtitle</p>  
+        }
+    </div>
+
+    <div class="flex self-start gap-x-4">
+        @if(CancelButtonText is not null) {
+            <div 
+                class="
+                    daemon-button 
+                    bg-transparent 
+                    text-gray-600
+                    hover:bg-red-500
+                    hover:text-white
+                "
+                @onclick=@HandleCancelClick
+            >
+                @CancelButtonText
+            </div>
+        }
+        @if(SubmitButtonText is not null) {
+            <div 
+                class="daemon-button bg-sky-500 text-white"
+                @onclick=@HandleSubmitClick
+            >
+                @if(IsLoading) {
+                    <Spinner Class="w-4 h-4" />
+                } else {
+                    @SubmitButtonText
+                }
+            </div>
+        }
+    </div>
+    
+</div>
+
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string? TitleClass { get; set; }
+
+    [Parameter]
+    public string Subtitle { get; set; }
+
+    [Parameter]
+    public string? SubmitButtonText { get; set; }
+
+    [Parameter]
+    public EventCallback OnSubmitClick { get; set; }
+    private async Task HandleSubmitClick()
+    {
+        await OnSubmitClick.InvokeAsync();
+    }
+
+    [Parameter]
+    public string? CancelButtonText { get; set; }
+    [Parameter]
+    public EventCallback OnCancelClick { get; set; }
+    private async Task HandleCancelClick()
+    {
+        await OnCancelClick.InvokeAsync();
+    }
+
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public bool IsLoading { get; set; } = false;
+}

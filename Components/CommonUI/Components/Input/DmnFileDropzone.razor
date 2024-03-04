@@ -1,0 +1,58 @@
+@using Daemon.RazorUI.Icons
+
+@namespace Daemon.RazorUI.Input
+
+
+<label 
+    for="cover-photo" 
+    class="block text-sm font-medium leading-6 text-gray-900"
+>
+    @Label
+</label>
+<div class=@($@"
+    flex flex-col
+    px-6 py-10
+    justify-center
+    items-center
+    rounded-xl
+    border-2
+    border-dashed
+    border-sky-500
+    {Class}
+")>
+    <UploadIcon Props=@(new IconProps { Class = $"{IconClass}" }) />
+    <div class="mt-4 flex text-sm leading-6 text-gray-600">
+        <label 
+            for="file-upload" 
+            class="
+                relative 
+                cursor-pointer 
+                whitespace-nowrap
+                font-semibold text-sky-500 
+                bg-transparent
+                focus-within:outline-none focus-within:ring-2 
+                focus-within:ring-sky-500 focus-within:ring-offset-2 
+                hover:text-sky-500
+            "
+        >
+            <span>Upload a file</span>
+            <input id="file-upload" name="file-upload" type="file" class="sr-only">
+        </label>
+        <p class="pl-1 whitespace-nowrap">or drag and drop</p>
+    </div>
+    <p class="text-xs leading-5 text-gray-600 whitespace-nowrap">PDF, JPG, PNG up to 10MB</p>
+</div>
+
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = "";
+
+
+    [Parameter]
+    public string Class { get; set; } = "";
+
+
+    [Parameter]
+    public string IconClass { get; set; } = "";
+}

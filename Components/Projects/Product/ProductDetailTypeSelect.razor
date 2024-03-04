@@ -1,0 +1,50 @@
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@rendermode InteractiveServer
+
+@namespace SO.Components.Projects
+
+@inject ILogger<ProductDetailTypeSelect> Logger
+
+
+<InputSelect 
+    id="location" 
+    name="location" 
+    class="
+        mt-2 block 
+        w-full 
+        rounded-md border-0 
+        py-1.5 pl-3 pr-10 
+        text-gray-900 
+        ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-sky-500 
+        sm:text-sm sm:leading-6
+    "
+    @bind-Value="SelectedProductType"
+
+>
+    <option value="" disabled selected>Select Product Type</option>
+    @foreach(ProductCategoryTypes type in Enum.GetValues(typeof(ProductCategoryTypes)))
+    {
+        <option>@type</option>
+    }
+</InputSelect>
+
+@code {
+    private ProductCategoryTypes? _selectedProductType;
+
+    [Parameter]
+    public ProductCategoryTypes? SelectedProductType
+    {
+        get => _selectedProductType;
+        set
+        {
+            if (_selectedProductType != value)
+            {
+                _selectedProductType = value;
+                OnProductTypeChanged.InvokeAsync(value);
+            }
+        }
+    }
+
+    [Parameter]
+    public EventCallback<ProductCategoryTypes?> OnProductTypeChanged { get; set; }
+}

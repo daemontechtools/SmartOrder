@@ -1,0 +1,58 @@
+table.quickgrid[theme=default] {
+    @apply 
+        min-w-full divide-y 
+        divide-gray-300 
+        shadow ring-1 ring-black ring-opacity-5 
+        sm:rounded-lg 
+        overflow-hidden;
+}
+
+table.quickgrid[theme=default] thead {
+    @apply bg-gray-50;
+}
+
+
+table.quickgrid[theme=default] thead th:first-child {
+    @apply py-3.5 pl-4 pr-1 sm:pl-6;
+}
+table.quickgrid[theme=default] thead th:not(:first-child):not(:last-child) {
+    @apply px-1 py-3.5;
+}
+table.quickgrid[theme=default] thead th:not(:last-child) {
+    @apply text-left text-sm font-semibold text-gray-900;
+}
+table.quickgrid[theme=default] thead th:last-child {
+    @apply relative py-3.5 pl-1 pr-2 sm:pr-6; 
+}
+
+table.quickgrid[theme=default] thead th .col-header-content {
+    @apply p-0;
+}
+
+
+table.quickgrid[theme=default] thead .col-title {
+    @apply p-0 hover:bg-inherit;
+}
+
+
+table.quickgrid[theme=default] tbody {
+    @apply divide-y divide-gray-200 bg-white;
+}
+
+table.quickgrid[theme=default] tbody tr {
+    @apply hover:bg-sky-50 cursor-pointer duration-500;
+}
+
+table.quickgrid[theme=default] tbody td {
+    @apply whitespace-nowrap text-sm !py-4 cursor-default;
+}
+table.quickgrid[theme=default] tbody td:first-child {
+    @apply pl-4 pr-1 font-medium text-gray-900 sm:pl-6;
+}
+table.quickgrid[theme=default] tbody td:not(:first-child):not(:last-child) {
+    @apply text-gray-500 px-1;
+}
+table.quickgrid[theme=default] tbody td:last-child {
+    @apply relative pl-3 pr-4 text-right sm:pr-6;
+}
+

@@ -1,0 +1,115 @@
+﻿@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@rendermode InteractiveServer
+
+@using Daemon.RazorUI.Animations
+@using Microsoft.Extensions.Logging
+
+@namespace Daemon.RazorUI.Modal
+
+@inject ModalService _modalService
+@inject ILogger<ModalContent> Logger
+
+
+<div class="sm:flex sm:items-start">
+    <div 
+        class=@($@"
+            flex h-12 w-12 flex-shrink-0 
+            items-center justify-center rounded-full 
+            mx-0
+            {_iconBackgroundClass}
+        ")
+    >
+        @if(Props?.IconType != null)
+        {
+            <div class="w-6">@_icon</div>   
+        }
+    </div>
+    <div class="ml-4 mt-0">
+        <h3 
+            class="
+                text-base font-semibold 
+                leading-6 text-gray-900 
+                text-left
+            " 
+            id="modal-title"
+        >
+            @Props?.Title
+        </h3>
+        <div class="mt-2">
+            <p class="text-sm text-gray-500 text-left">@Props?.Description</p>
+        </div>
+    </div>
+</div>
+<div class="mt-8 sm:mt-4 sm:flex sm:flex-row-reverse">
+    <button 
+        type="button" 
+        class=@($"daemon-button {_buttonClass}")
+        @onclick=@(() => HandleConfirmation(true))
+        disabled=@_isLoading
+    >
+        @if(_isLoading)
+        {
+            <Spinner Class="text-white dark:text-stone-400 fill-orange-600"/>
+        } 
+        else {
+            <span class="text-stone-200">Delete</span>
+        }
+    </button>
+    <button 
+        type="button"
+        class="daemon-button mr-4"
+        @onclick=@(() => HandleConfirmation(false))
+        disabled=@_isLoading
+    >
+        Cancel
+    </button>
+</div>
+
+@code {
+
+    [Parameter] 
+    public ModalContentProps? Props { get; set; }
+
+    private RenderFragment? _icon;
+    private bool _isLoading = false;
+    private string _iconBackgroundClass = "";
+    private string _buttonClass = "";
+
+    private async Task HandleConfirmation(bool confirmed)
+    {
+        if(Props == null || Props?.OnConfirm == null)
+            return;
+
+        _isLoading = true;
+        await Props?.OnConfirm?.Invoke(confirmed);
+        _isLoading = false;  
+    }
+
+    protected override void OnInitialized()
+    {
+        _iconBackgroundClass = (Props?.IconBackgroundClass != null)
+            ? Props?.IconBackgroundClass
+            : "bg-sky-100";
+        _buttonClass = (Props?.ButtonClass != null) 
+            ? Props?.ButtonClass 
+            : "";
+        InitIcon();
+    }
+
+    private void InitIcon()
+    {
+        if (Props?.IconType != null)
+        {
+            _icon = builder =>
+                {
+                    builder.OpenComponent(0, Props?.IconType);
+                    if (Props?.IconProps != null)
+                    {
+                        builder.AddAttribute(1, "Props", Props?.IconProps);
+                    }
+                    builder.CloseComponent();
+                };
+        }
+    }
+
+}

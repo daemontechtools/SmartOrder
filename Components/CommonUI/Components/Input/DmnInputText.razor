@@ -1,0 +1,28 @@
+@using Microsoft.AspNetCore.Components.Forms
+@namespace Daemon.RazorUI.Input
+@inherits InputText
+
+<label 
+    class=@($@"
+        dmn-input-label pb-7
+        {LabelClass}
+    ")
+>
+    @Label
+    <input 
+        class="dmn-input-text" 
+        @bind="CurrentValueAsString" 
+        @bind:event="oninput" 
+        @attributes="AdditionalAttributes" 
+    />
+    <ValidationMessage For=@ValueExpression />
+</label>
+
+@code {
+       
+    [Parameter]
+    public string Label { get; set; }
+
+    [Parameter]
+    public string LabelClass { get; set; }
+}

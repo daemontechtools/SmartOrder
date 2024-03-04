@@ -1,0 +1,317 @@
+@using AutoMapper
+@using SMART.Web.OrderApi
+@using SMART.Common.LibraryManagement
+@using SMART.Common.ProductionManagement
+@using SMART.Common.Functions.WebAppsSupport
+@using SMART.Common.Utility
+@using SMART.Common.CompanyManagement
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@rendermode InteractiveServer
+
+@page "/quotes/{projectLinkId}/rooms/{projectGroupLinkId}/products/{productLinkId}"
+@page "/quotes/{projectLinkId}/rooms/{projectGroupLinkId}/products"
+
+@namespace SO.Components.Projects
+
+@inject IMapper Mapper
+@inject OrderApi OrderApi
+@inject ProjectStore ProjectStore
+@inject ILogger<ProductForm> Logger
+@inject PersistentComponentState ApplicationState
+
+<div class="flex flex-col h-full"
+    <BreadcrumbNav
+        Options=@(new List<NavOptionProps> {
+            new NavOptionProps { Path = "/quotes" },
+            new NavOptionProps { Path = $"/quotes/{ProjectLinkId}", Label = _project?.Name },
+            new NavOptionProps { Path = $"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}", Label = _projectGroup?.Name },
+            new NavOptionProps { Path = $"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}/products/new", Label = "New Product" },
+        }) 
+    />
+
+    <div class="flex flex-1 flex-col container mt-6">
+        @if(_isLoading) {
+            <div class="flex flex-col items-center justify-center h-full">
+                <div class="text-3xl font-bold text-gray-500">
+                    <span class="ml-4">Loading...</span>
+                </div>
+            </div>
+        } else {
+            <EditForm 
+                @ref=@_editForm
+                Model=@_product     
+                FormName="add-room"
+                OnValidSubmit=@AddProductToProjectGroup
+            >
+                <ObjectGraphDataAnnotationsValidator />
+                <DmnSectionHeader 
+                    Title="Create Product"
+                    TitleClass="!text-3xl"
+                    Subtitle="So many products, so little time"
+                    SubmitButtonText="Save"
+                    CancelButtonText="Clear"
+                /> 
+                <div class="grid grid-cols-5 gap-8">
+                    <div class="col-span-3">
+                        <div class="h-full flex items-center w-2/3">
+                            <div class="center-self w-full">
+                                @* <ProductDetailTypeSelect 
+                                    SelectedProductType=@SelectedProductType
+                                    OnProductTypeChanged="OnProductTypeChanged"
+                                /> *@
+                                <DmnComboBox 
+                                    Data=@_allProducts
+                                    Value=@_selectedProduct
+                                    ValueExpression=@(() => _selectedProduct)
+                                    ValueChanged=@(p => OnProductSelected(p) )
+                                    TextFieldName=@nameof(ProductView.Name)
+                                    Label="Select a Product"
+                                    Class="pb-0"
+                                />
+
+                                @if(_selectedProduct is not null) {
+                                    <DmnComboBox
+                                        Data=@_styleConfigurations
+                                        Value=@_selectedStyleConfiguration
+                                        ValueExpression=@(() => _selectedStyleConfiguration)
+                                        ValueChanged=@(p => OnStyleSelected(p))
+                                        TextFieldName=@nameof(LibraryStyleConfiguration.Name)
+                                        Label="Select a Door Style"
+                                    />
+                                }
+
+                                @if(_selectedStyleConfiguration is not null) {
+                                    <DmnComboBox
+                                        Data=@_finishes
+                                        Value=@_selectedFinish
+                                        ValueExpression=@(() => _selectedFinish)
+                                        Label="Select a Finish"
+                                    />
+                                }
+                                
+                                @if(_selectedStyleConfiguration is not null) {
+                                    <DmnComboBox
+                                        Data=@_doorHardwares
+                                        Value=@_selectedDoorHardware
+                                        ValueExpression=@(() => _selectedDoorHardware)
+                                        Label="Select a Door Hardware"
+                                    />
+                                }
+
+                                
+
+                                @* <InputSelect 
+                                    @bind-Value=_selectedProductType
+                                    class="mt-4"
+                                >
+                                    <option value="">Select a Product Type</option>
+                                    @foreach(ProductCategoryTypes type in Enum.GetValues<ProductCategoryTypes>()) {
+                                            <option value=@type>@type</option>
+                                    }
+                                </InputSelect> *@
+
+                            </div>
+                        </div>
+                    </div>
+                    @* <div class="col-span-2">
+                    <ProductDetailPriceSummary />
+                    </div>
+
+                    @if(SelectedProductType is not null) {
+                        <div class="col-span-3">
+                            <ProductDetailDimensions />
+                            <div class="mt-6" />
+                            //<ProductDetailAddOns ProductType=@SelectedProductType />
+                        </div>
+
+                        <div class="col-span-2">
+                            <DmnFileDropzone 
+                                Class="w-full"
+                                IconClass="w-24 stroke-sky-500" 
+                            />
+                        </div>
+
+                        <div class="col-span-5">
+                            <ProductDetailComments />
+                        </div>
+                    } *@
+                </div>
+            </EditForm>
+        }
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public string? ProjectLinkId { get; set; }
+
+    [Parameter]
+    public string? ProjectGroupLinkId { get; set; }
+
+    [Parameter]
+    public string? ProductLinkId { get; set; }
+
+    private EditForm? _editForm = default!;
+    private bool _isSubmitting = false;
+
+    private bool _isNew = true;
+    private bool _isLoading = true;
+
+    private ProjectView? _project;
+    private ProjectGroupView? _projectGroup;
+    private ProductView? _product;
+
+    private IQueryable<ProductView>? _allProducts = new List<ProductView>().AsQueryable();
+    
+    private ProductView? _selectedProduct;
+
+    private ProductCategoryTypes? _selectedProductType { get; set; }
+
+    private IQueryable<LibraryStyleConfiguration>? _styleConfigurations;
+    private LibraryStyleConfiguration? _selectedStyleConfiguration;
+
+    private IQueryable<string>? _finishes;
+    private string? _selectedFinish;
+
+    private IQueryable<string>? _doorHardwares;
+    private string? _selectedDoorHardware;
+    
+
+    private Dictionary<ProductCategoryTypes, List<ProductView>> _productTypeDictionary 
+        = new Dictionary<ProductCategoryTypes, List<ProductView>>();
+
+    private PersistingComponentStateSubscription? _stateSubscription;
+
+    protected override async Task OnInitializedAsync() {
+        _stateSubscription = ApplicationState?.RegisterOnPersisting(PersistFormState);
+        
+        if(!ApplicationState!.TryTakeFromJson(
+            "project", 
+            out ProjectView? restoredProject
+        )) {
+            _project = await ProjectStore.ReadableStore
+                .GetOne(p => p.LinkID == ProjectLinkId);
+            if(_project is null) {
+                throw new InvalidOperationException($"Project with LinkID {ProjectLinkId} not found");
+            }
+        } else {
+            _project = restoredProject!;
+        }
+
+        _projectGroup = _project.ProjectGroups
+            .FirstOrDefault(g => g.LinkID == ProjectGroupLinkId);
+        if(ProductLinkId is not null) {
+            _product = _projectGroup?
+                .ProjectGroupProducts
+                .FirstOrDefault(p => p.LinkID == ProjectLinkId);
+            _isNew = false;
+        } else {
+            _product = new("");
+        }
+
+//        IEnumerable<LibraryProduct> btrList = productList.Where(p => OrderApi.GetCategoryById(p.LinkIDCategory)!.Type.ToString() == "10");
+        
+        if(!ApplicationState!.TryTakeFromJson(
+            "productTypeDictionary", 
+            out Dictionary<ProductCategoryTypes, List<ProductView>>? restoredProductTypeDictionary
+        )) {
+            _productTypeDictionary = ProjectStore.GetSortedCabinets();
+        } else {
+            _productTypeDictionary = restoredProductTypeDictionary!;
+        }
+
+        _allProducts = _productTypeDictionary.Values.SelectMany(list => list).AsQueryable();  
+        
+        _isLoading = false;
+    }
+
+    protected override void OnAfterRender(bool firstRender) {       
+        if(_selectedProductType is not null) {
+            ProductCategoryTypes productType = (ProductCategoryTypes)_selectedProductType;
+            _allProducts = _productTypeDictionary[productType].AsQueryable();
+        }
+    }
+    
+    private Task PersistFormState() {
+        ApplicationState?.PersistAsJson("productTypeDictionary", _productTypeDictionary);
+        ApplicationState?.PersistAsJson("project", _project);
+        return Task.CompletedTask;
+    }
+
+    @* private void OnProductTypeChanged(ChangeEventArgs e) {
+        ProductCategoryTypes productType = (ProductCategoryTypes)Enum.Parse(typeof(ProductCategoryTypes), e.Value.ToString());
+        _selectedProductType = productType;
+    } *@
+    
+    private void OnProductSelected(object obj) {
+        ProductView? product = obj as ProductView;
+        Logger.LogInformation($"Product Code selected: {product?.Name}");
+        _selectedProduct = product;
+
+        // Get StyleConfigurations for this product
+        _styleConfigurations = OrderApi
+            .GetDoorStylesForProduct(product!.LinkID)
+            .AsQueryable();
+
+        var filteredStyleConfigs = _styleConfigurations
+            .Where(c => c.Finish != null && c.Finish.Length > 10);
+        _styleConfigurations = filteredStyleConfigs;
+        @* foreach(LibraryStyleConfiguration style in styleConfiguration) {
+            Logger.LogInformation($"Style: {style}");
+        } *@
+        
+        @* IList<Category> rootCategories = OrderApi.GetRootProductCategories();
+        foreach(Category category in rootCategories) {
+            Logger.LogInformation($"Root Category: {category.CategoryName}");
+        }
+        
+        IList<Category> childCategories = OrderApi.GetChildCategories();
+        foreach(Category category in childCategories) {
+            Logger.LogInformation($"Children Category: {category.CategoryName}");
+        } *@
+        // Get Categories for this product
+        //IList<Category> categories = OrderApi.GetProductCategories(libraryProduct);
+
+        StateHasChanged();
+    }
+    
+    private void OnStyleSelected(object obj) {
+        LibraryStyleConfiguration? styleConfiguration = obj as LibraryStyleConfiguration;
+        //Logger.LogInformation($"Style selected: {styleConfiguration?.Name}");
+        _selectedStyleConfiguration = styleConfiguration;
+
+        
+
+        _finishes = OrderApi
+            .GetAllowedFinishes(styleConfiguration!)
+            .AsQueryable();
+        Logger.LogInformation($"Finishes: {_finishes.Count()}");
+        foreach(string finish in _finishes) {
+            Logger.LogInformation(finish);
+        }
+
+        if(_finishes.Count() < 1) {
+            _finishes.Append("None");
+        } 
+
+        _doorHardwares = OrderApi
+            .GetAllowedDrawerHardware(styleConfiguration!)
+            .AsQueryable();
+    }
+
+    private Task AddProductToProjectGroup() {
+        return Task.CompletedTask;
+        @* _isSubmitting = true;
+        _logger!.LogInformation($"Creating new room: {_room!.Name}");
+        ProjectGroupView newRoom = await _projectStore!
+            .AddRoom(
+                ProjectLinkId!,
+                _room!
+                
+            );
+        _logger!.LogInformation($"Created new room: {newRoom.Name}");
+        _navigationManager!.NavigateTo($"/quotes/{ProjectLinkId}");
+        _isSubmitting = false;*@
+    } 
+}

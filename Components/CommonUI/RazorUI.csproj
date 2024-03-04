@@ -1,0 +1,67 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RepositoryUrl>https://github.com/daemontechtools/daemon-dotnet</RepositoryUrl>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+    <PackageId>Daemon.RazorUI</PackageId>
+    <MinVerMinimumMajorMinor>1.4</MinVerMinimumMajorMinor>
+    <Authors>Josh Elias</Authors>
+    <Company>Daemon Tech Tools</Company>
+    <Product>RazorUI</Product>
+    <Description>Awesome RazorUI</Description>
+    <PackageTags>Daemon;.Net;Razor;UI;</PackageTags>
+    <PackageProjectUrl>https://github.com/daemontechtools/daemon-dotnet/tree/main/RazorUI</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>daemon_logo.jpg</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <Deterministic>true</Deterministic>
+    <IncludeSymbols>true</IncludeSymbols>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' != 'true'">
+    <TAILWINDCSS_PATH>tailwindcss</TAILWINDCSS_PATH> 
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup> 
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.0" />
+    <PackageReference Include="MinVer" Version="4.3.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="daemon_logo.jpg" Pack="true" PackagePath="daemon_logo.jpg" />
+    <None Include="README.md" Pack="true" PackagePath="README.md" />
+  </ItemGroup>
+
+  <Target Name="ProcessScopedCssFilesWithTailwind" AfterTargets="_GenerateScopedCssFiles">
+    <MSBuild Projects="$(MSBuildProjectFile)" Properties="CurrentScopedCssFile=%(_ScopedCssOutputs.Identity)" Targets="ProcessScopedCssFileWithTailwind">
+    </MSBuild>
+  </Target>
+
+  <Target Name="ProcessScopedCssFileWithTailwind">
+    <Message Importance="high" Text="Processing Scoped CSS with Tailwind: $(CurrentScopedCssFile)" />
+    <Exec Command="$(TAILWINDCSS_PATH) -i $(CurrentScopedCssFile) -o $(CurrentScopedCssFile)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+  </Target>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Release'">
+    <Exec Command="$(ProjectDir)tailwindbuild.sh" />
+  </Target>
+
+</Project>

@@ -1,0 +1,95 @@
+@namespace Daemon.RazorUI.Input
+
+
+<h2 class="text-base font-semibold leading-7 text-gray-900">@Title</h2>
+<p class="mt-1 text-sm leading-6 text-gray-600">@Subtitle</p>
+
+<div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
+    <div class="sm:col-span-3">
+        <DmnInputText 
+            Label="Dealer Name"
+            @bind-Value=@_dealerName
+        />
+    </div>
+
+    <div class="sm:col-span-3">
+        <DmnInputText 
+            Label="Email Address" 
+            @bind-Value=@_emailAddress
+        />
+    </div>
+
+    <div class="col-span-full">
+        <DmnInputText 
+            Label="Street Address" 
+            @bind-Value=@_address.Line1
+        />
+    </div>
+
+    <div class="sm:col-span-2 sm:col-start-1">
+        <DmnInputText 
+            Label="City" 
+            @bind-Value=@_address.City
+        />
+    </div>
+
+    <div class="sm:col-span-2">
+        <DmnInputText 
+            Label="Province" 
+            @bind-Value=@_address.Province
+        />
+    </div>
+
+    <div class="sm:col-span-2">
+        <DmnInputText 
+            Label="Postal Code" 
+            @bind-Value=@_address.PostalCode
+        />
+    </div>
+</div>
+
+    @* [Required]
+    public string Street { get; set; }
+
+    public string StreetLine2 { get; set; }
+
+    [Required]
+    public string City { get; set; }
+
+    [Required]
+    public string StateProvince { get; set; }
+
+    [Required]
+    public string PostalCode { get; set; }
+
+    
+    public string AddressNotes { get; set; }
+} *@
+
+@code {
+
+    private class Address {
+
+        public int Id { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        
+        public string Name { get; set; }
+        public string Line1 { get; set; }
+        public string Line2 { get; set; }
+        public string City { get; set; }
+        public string Province { get; set; }
+        public string PostalCode { get; set; }
+    }
+
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string Subtitle { get; set; }
+
+    private string _dealerName = "";
+    private string _emailAddress = "";
+    private Address _address = new Address();
+}

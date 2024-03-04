@@ -1,0 +1,72 @@
+@rendermode InteractiveServer
+
+@using Microsoft.AspNetCore.Authorization
+@using SMART.Web.OrderApi
+
+
+@namespace SO.Components.Projects
+
+@page "/"
+@page "/quotes"
+
+@* @attribute [Authorize] *@
+  
+
+<div class="flex flex-col h-full">
+    <Search OnInput=OnSearchInput />
+    <div class="container flex flex-col flex-1 justify-between bg-gray-100 h-full pt-8 pb-3">
+        <div class="flex flex-col">
+            <DmnSectionHeader 
+                Title="Quotes"
+                Subtitle="A list of all your quotes including their name, sales associate and created and last updated dates"
+                SubmitButtonText="Add Quote"
+                OnSubmitClick=AddQuote
+                Class="mb-6"
+            />
+
+            @if(IsLoading) {
+                <Spinner Class="text-stone-400 dark:text-stone-400 fill-orange-600" />
+            } else if(!_projects.Any()) {
+                <span>No Quotes Available</span>
+            } else {  
+                <QuickGrid Items=@_projects Pagination=@_pagination>
+                    <TemplateColumn               
+                        Title="ID"
+                    >
+                        <NavLink href=@($"/quotes/{context.LinkID}") class="font-medium">
+                            @context.LinkID
+                        </NavLink>
+                    </TemplateColumn>
+                    <TemplateColumn               
+                        Title="Name"
+                    >
+                        <NavLink href=@($"/quotes/{context.LinkID}") class="font-medium">
+                            @context.Name
+                        </NavLink>
+                    </TemplateColumn>
+                    <PropertyColumn 
+                        Title="Sales Associate"
+                        Property=@(p => p.LinkIDEmployeeSoldBy)
+                    />
+                    <TemplateColumn 
+                        Class="flex gap-x-2 justify-end"
+                    >
+                        <button class="w-[22px] cursor-pointer" onclick=@(() => DeleteQuote(context))>
+                            <TrashIcon Props=@(new IconProps() 
+                                { 
+                                    Class = $@"
+                                        stroke-gray-400 
+                                        hover:stroke-red-500 
+                                        transition-hover
+                                    "
+                                }) 
+                            />
+                        </button>         
+                    </TemplateColumn>
+                </QuickGrid>
+            }
+        </div>
+                
+        <Paginator State=@_pagination />
+   </div>
+</div>

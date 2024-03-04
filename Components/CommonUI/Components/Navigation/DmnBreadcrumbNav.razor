@@ -1,0 +1,59 @@
+@using Microsoft.AspNetCore.Components.Routing
+
+@using Daemon.RazorUI.Icons
+
+@namespace Daemon.RazorUI.Navigation
+
+<div 
+  class=@($@"
+    container-wide 
+    border-b 
+    {Class}
+  ")
+  aria-label="Breadcrumb"
+>
+
+  @for(var i = 0; i < Options.Count; i++) {
+      var option = Options[i];
+
+      <!-- if statment doesn't work in ChildContent -->
+      @if(i == 0) {
+         <NavLink 
+          href=@option.Path
+          class="flex items-center"
+        >
+          @HomeIcon
+        </NavLink>
+      } else {
+        <NavLink
+          href=@option.Path
+          class=@($@"
+            flex items-center font-medium transition-hover
+            {OptionClass}
+          ")
+        >
+            @option.Label
+        </NavLink>
+      }
+
+      @if(i != Options.Count-1) {
+        <ChevronRightIcon Props=@(new IconProps { Class="w-9 stroke-stone-500" }) />
+      }
+  }
+</div>
+
+
+@code {
+
+    [Parameter]
+    public List<NavOptionProps> Options { get; set; } = new List<NavOptionProps>();
+
+    [Parameter]
+    public RenderFragment? HomeIcon { get; set; }
+
+    [Parameter]
+    public string Class { get; set; } = "";
+
+    [Parameter]
+    public string OptionClass { get; set; } = "";
+}

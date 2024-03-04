@@ -1,0 +1,81 @@
+@page "/quotes/{projectLinkId}/documents"
+
+@namespace SO.Components.Projects
+
+@inject ProjectStore ProjectStore
+
+<div class="flex flex-col h-full">
+   <ProjectDetailHeader Project=@_project />
+
+    <div class="
+        container 
+        flex flex-col
+        py-6
+        bg-stone-100
+
+    ">
+        <DmnFileDropzone 
+            Class="w-full"
+            IconClass="w-36 stroke-sky-500"
+        />
+        <div class="border-t border-gray-300 my-6 bg-transparent"></div>
+        <div class="
+            bg-white
+            shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl
+        ">
+            @* <TableTemplate ListItems=@ListItems Context="item">
+                <Actions>
+                    <div class="flex gap-x-2">
+                        <DownloadIcon Props=@(new IconProps() {
+                            Class=@"
+                                w-7
+                                stroke-gray-300
+                                transition-hover
+                                cursor-pointer
+                                hover:stroke-sky-500
+                            "
+                        }) />
+                        <TrashIcon Props=@(new IconProps() {
+                            Class=@"
+                                w-7
+                                stroke-gray-300
+                                transition-hover
+                                cursor-pointer
+                                hover:stroke-red-500
+                            "
+                        }) />
+                    </div>
+                </Actions> 
+            </TableTemplate> *@
+        </div>
+    </div> 
+</div>
+
+
+@code {
+    [Parameter]
+    public string? ProjectLinkId { get; set; }
+
+    private ProjectView? _project;
+
+    @* private List<RowTemplateProps> ListItems { get; set; } = new List<RowTemplateProps>(); *@
+
+    protected override async Task OnInitializedAsync()
+    {
+        _project = await ProjectStore!
+            .ReadableStore
+            .GetOne(p => p.LinkID == ProjectLinkId);
+        @* ListItems = new List<RowTemplateProps>() {
+            new RowTemplateProps() {
+                Title = "secret_plans.pdf",
+                Subtitle = "1.2MB",
+                MainImgSrc = "/images/pdf_icon.svg"
+            },
+            new RowTemplateProps() {
+                Title = "sample.jpg",
+                Subtitle = "2.0MB",
+                MainImgSrc = "/images/cherry.jpg?width=40&quality=80"
+            }
+        }; *@
+    }
+}

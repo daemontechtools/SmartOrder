@@ -1,0 +1,112 @@
+@inherits InputBase<object>
+@namespace Daemon.RazorUI.Input
+
+
+<div class=@($@"
+    flex flex-col
+    {Class}
+")>
+    <label class="
+        font-medium
+        text-gray-900
+    ">
+        @Label
+    </label>
+    
+    <div class="relative">
+        <input 
+            class="dmn-input-text" 
+            @bind=@_searchValue
+            @oninput=@HandleInput
+            @onfocus=@HandleFocus
+            autocomplete="off"
+            @attributes="AdditionalAttributes" 
+        />
+        <ValidationMessage 
+            For=@ValueExpression 
+            class="text-red-500 text-xs italic" 
+        />
+        @if(_isActive) {
+             <div 
+                class="
+                    absolute
+                    z-10 
+                    top-0 left-0
+                    w-full h-full
+                "
+                @onclick=@HandleBlur
+            ></div>
+            <ul 
+                class="
+                    absolute z-20
+                    top-10
+                    mt-1 max-h-60 
+                    w-full 
+                    overflow-auto 
+                    rounded-md 
+                    bg-white 
+                    py-1 
+                    text-base 
+                    shadow-lg 
+                    ring-1 ring-black ring-opacity-5 
+                    focus:outline-none 
+                    sm:text-sm
+                "
+            >
+                <!--
+                    Combobox option, manage highlight styles based on mouseenter/mouseleave and keyboard navigation.
+
+                    Active: "text-white bg-indigo-600", Not Active: "text-gray-900"
+                -->
+                @foreach(var option in _filteredData)
+                {
+                    <li 
+                        class="
+                            relative
+                            cursor-pointer
+                            py-2 pl-3 pr-9 
+                            text-gray-900
+                            group
+                            hover:bg-sky-500 hover:text-white
+                        "
+                        @onclick=@(() => @OnOptionClick(option))
+                    >
+                        <!-- Selected: "font-semibold" -->
+                        <span class="block truncate">@GetTextValue(option)</span>
+
+                        <!--
+                        Checkmark, only display for selected option.
+
+                        Active: "text-white", Not Active: "text-indigo-600"
+                        -->
+                        @if(option == Value)
+                        {
+                            <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-sky-500 group-hover:text-white">
+                                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                                </svg>
+                            </span>
+                        }
+
+                    </li>
+                }
+                @if(!_filteredData.Any()) {
+                    <li class="py-2 pl-3 pr-9 text-gray-900">
+                        No results found
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</div>
+@if(_isActive) {
+    <div 
+        class="
+            fixed
+            z-10 
+            top-0 left-0
+            w-full h-full
+        "
+        @onclick=@HandleBlur
+    ></div>
+}

@@ -1,0 +1,163 @@
+@rendermode InteractiveServer
+
+@using SMART.Common.ProjectManagement
+
+@namespace SO.Components.Projects
+
+@using Microsoft.AspNetCore.Components.QuickGrid
+
+@inject NavigationManager _navigationManager
+@inject PersistentComponentState? _applicationState
+@inject ModalService _modalService
+@inject ILogger<ProjectDetailGroups> _logger 
+
+@implements IDisposable
+
+
+<div class="container flex flex-col flex-1 bg-stone-100 pt-6 pb-3 justify-between">
+    <div>
+        <DmnSectionHeader 
+            Title="Rooms"
+            Subtitle="We heard you like rooms"
+            SubmitButtonText="Add Room"
+            OnSubmitClick=AddRoom
+            Class="mb-6"
+        />
+
+        @if(_projectGroups is null || !_projectGroups.Any()) {
+            <span>No Rooms Available</span>
+        } else {
+            <QuickGrid Items=@_projectGroups Pagination=@_pagination>
+                <TemplateColumn             
+                    Title="Name"
+                >
+                    <NavLink 
+                        href=@($"/quotes/{Project!.LinkID}/rooms/{context.LinkID}")
+                        class="font-medium"
+                    >
+                        @context.Name
+                    </NavLink>
+                </TemplateColumn>
+                @* <PropertyColumn 
+                    Title="Door Style"
+                    Property=@(r => r.ProductDoorStyle)
+                />
+                <PropertyColumn 
+                    Title="Finish"
+                    Property=@(r => r.ProductFinishExterior)
+                />
+                <PropertyColumn 
+                    Title="Interior"
+                    Property=@(r => r.ProductFinishInterior)
+                /> *@
+                @* <PropertyColumn 
+                    Title="Drawer Hardware"
+                    Property=@(r => r.ProductSlide)
+                /> *@
+                @* <PropertyColumn 
+                    Title="Drawer Hardware"
+                    Property=@(r => r.PriceSubTotal)
+                    Format="C"
+                    Sortable=true 
+                /> *@
+                <TemplateColumn 
+                    Class="flex gap-x-2 justify-end"
+                >
+                    <button @onclick=@(() => DeleteRoom(context.LinkID))>
+                        <TrashIcon Props=@(new IconProps() {
+                            Class=@"
+                                w-[22px]
+                                cursor-pointer 
+                                stroke-gray-400
+                                hover:stroke-rose-500 
+                                duration-300 
+                                ease-in-out
+                            " 
+                        }) />
+                    </button>         
+                </TemplateColumn>
+            </QuickGrid>
+        } 
+    </div>
+    <Paginator State=@_pagination />
+</div>
+
+
+
+@code {
+    [Inject]
+    private ProjectStore? _projectStore { get; set; }
+
+    private PersistingComponentStateSubscription? _stateSubscription;
+
+    [Parameter]
+    public ProjectView? Project { get; set; }
+
+
+    //private bool IsLoading { get; set; } = true;
+    private PaginationState _pagination = new PaginationState { ItemsPerPage = 10 };
+
+
+    private IQueryable<ProjectGroupView>? _projectGroups { get; set; }
+    private GridSort<ProjectGroupView> _sortByName = GridSort<ProjectGroupView>
+        .ByAscending(r => r.Name);
+    private ModalContentProps _deleteConfirmationInput;
+    private string? _itemIdToDelete;
+    
+
+    protected override void OnInitialized()
+    {
+        _stateSubscription = _applicationState!.RegisterOnPersisting(PersistProjectGroups);
+        if(!_applicationState!.TryTakeFromJson(
+            "projectGroups", 
+            out List<ProjectGroupView>? restoredProjectGroups
+        )) {
+            _projectGroups = Project?.ProjectGroups.AsQueryable();
+        } else {
+            _logger.LogInformation("Restored project groups from state");
+            _projectGroups = restoredProjectGroups?.AsQueryable();
+        }
+        _projectStore!.Storage.OnStateChanged += OnStateChanged!;
+        _deleteConfirmationInput = new ModalContentProps 
+        {
+            Title = "Delete Room",
+            Description = "Are you sure you want to delete this room?",
+            IconType = typeof(TrashIcon),
+            IconProps = new IconProps() { Class = "stroke-red-500" },
+            IconBackgroundClass = "bg-red-100",
+            ButtonClass = "bg-red-500 hover:bg-red-400",
+            OnConfirm = OnDeleteConfirm 
+        };
+    }
+
+    private async void OnStateChanged(object sender, EventArgs e) {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private Task PersistProjectGroups()
+    {
+        _applicationState?.PersistAsJson("projectGroups", _projectGroups);
+        return Task.CompletedTask;
+    }
+
+    private void AddRoom()
+    {
+        _navigationManager.NavigateTo($"/quotes/{Project!.LinkID}/rooms/new");
+    }
+
+    private void DeleteRoom(string roomId)
+    {
+        _itemIdToDelete = roomId;
+        _modalService!.Show(_deleteConfirmationInput);
+    }
+
+    private async Task OnDeleteConfirm(bool confirmed)
+    {
+        _modalService!.Hide();
+    }
+
+    public void Dispose()
+    {
+        _stateSubscription?.Dispose();
+    }
+}

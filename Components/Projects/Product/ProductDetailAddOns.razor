@@ -1,0 +1,32 @@
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@rendermode InteractiveServer
+
+@namespace SO.Components.Projects
+
+@* @if(_addOns.Any()) {
+    <div class="flex flex-col">
+            <h3 class="text-lg font-semibold mb-2">Add Ons</h3>
+            <div class="grid grid-cols-2 gap-4">
+                @foreach(ProductAddOn addOn in _addOns) {
+
+                }
+            </div>
+    </div>
+}
+
+
+
+@code {
+    [Parameter]
+    public ProductType? ProductType { get; set; }
+
+    public Dictionary<ProductType, List<ProductAddOn>> TypeAddOns = new ProductTypeAddOns().TypeAddOns;
+    private List<ProductAddOn> _addOns = new List<ProductAddOn>();
+
+    protected override void OnParametersSet() {
+        if (ProductType.HasValue)
+        {
+            _addOns = TypeAddOns.GetValueOrDefault(ProductType.Value);
+        }
+    }
+} *@

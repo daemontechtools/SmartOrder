@@ -1,0 +1,106 @@
+@inject ShipLocationStore ShipLocationStore
+@inject ILogger<ShippingOptions> Logger
+
+@namespace SO.Components.Projects
+
+
+<ShippingOptions />
+
+@if(Project!.IsShipped) {
+  <div class="flex flex-col">
+    <div class="border-t border-gray-300 mb-3 mt-3"></div>
+
+    <div class="flex flex-col">
+        <DmnComboBox 
+          Data=@_shipLocations
+          Value=@Project?.ProjectShipLocation
+          ValueExpression=@(() => Project!.ProjectShipLocation)
+          ValueChanged=@(l => OnAddressChange(l))
+          TextFieldName=@nameof(ShipLocationView.LocationName)
+          Label="Shipping Location"
+          Class="pb-0"
+        />
+
+      @if(!_isAddingShipLocation) {
+        <span 
+          @onclick=@OnAddressClick
+          class="
+            text-sky-500
+            text-right
+            font-semibold
+            hover:text-sky-400
+            cursor-pointer
+            pt-0.5
+        ">
+          Add New Address
+        </span>
+      }
+    </div>
+    <div class="mb-4"></div>
+
+    @if(Project?.ProjectShipLocation is not null || _isAddingShipLocation) {
+      <ShipLocationForm 
+        ShipLocation=@Project?.ProjectShipLocation
+      />
+    } else {
+        <span>No Current Shipping Address</span>
+    }
+  </div>
+}
+
+
+@code {
+
+  [Parameter]
+  public ProjectView? Project { get; set; }
+
+  //private ProjectView? _project { get; set; }
+  //private ShipLocationView? _shipLocation { get; set; }
+
+  [CascadingParameter]
+  public EditContext? EditContext { get; set; }
+
+  private IQueryable<ShipLocationView>? _shipLocations;
+
+  private bool _isAddingShipLocation = false;
+    
+
+  protected override async Task OnInitializedAsync() {
+    _shipLocations = await ShipLocationStore.ReadableStore.Get(true);
+    EditContext!.OnFieldChanged += OnFieldChanged;
+  }
+
+  private void OnAddressChange(object obj) {
+    ShipLocationView? shipLocation = obj as ShipLocationView;
+    Logger.LogInformation($"OnAddressChange: {shipLocation?.LocationName}");
+    Project!.ProjectShipLocation = shipLocation!;
+    StateHasChanged();
+  }
+
+  void OnFieldChanged(object? sender, FieldChangedEventArgs e) {
+    StateHasChanged();
+  }
+
+  private void OnAddressClick(MouseEventArgs e) {
+    _isAddingShipLocation = true;
+    //StateHasChanged();
+  }
+  
+  @* private void OnShipLocationCancel() {
+    _isAddingShipLocation = false;
+    //StateHasChanged();
+  }
+
+  private void OnShipLocationCreate(ShipLocationView shipLocation) {
+    Project!.ProjectShipLocation = shipLocation;
+    _isAddingShipLocation = false;
+    StateHasChanged();
+  }      
+
+ private void OnShipLocationChanged(ChangeEventArgs e) {
+    Logger.LogInformation($"ShipLocationChanged??????????");
+    //_currentShipLocationLinkId = e.Value?.ToString();
+    
+    //StateHasChanged();
+  }  *@
+}

@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../daemon-dotnet/DataAccess"
+		},
+		{
+			"path": "../SMARTWebOrderApi"
+		}
+	]
+}

@@ -1,0 +1,152 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using Daemon.RazorUI.Input
+@using Daemon.RazorUI.Layout
+@using SO.Data
+
+@inject ShipLocationStore ShipLocationStore
+@inject ILogger<ShipLocationForm> Logger
+ 
+@namespace SO.Components.Projects
+
+
+<EditForm 
+    @ref=@_editForm
+    Model=@ShipLocation
+    FormName="ship-location-form"
+    class="flex flex-col"
+>
+    <ObjectGraphDataAnnotationsValidator />
+    
+    <DmnSectionHeader 
+        Title="New Shipping Location"
+        TitleClass="!text-xl"
+        SubmitButtonText=@((_isNewLocation ? "Add" : "Update"))
+        CancelButtonText=@((_isNewLocation ? "Cancel" : "Delete"))
+        IsLoading=@_isSubmitting
+        OnSubmitClick=@OnSubmitClick
+        OnCancelClick=@OnCancelClick
+    />
+
+    <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
+        <div class="sm:col-span-3">
+            <DmnInputText 
+                Label="Location Name"
+                @bind-Value=@ShipLocation!.LocationName
+            />
+        </div>
+        <div class="sm:col-span-3"></div>
+        <ContactForm />
+        <div class="sm:col-span-3">
+            <DmnInputText 
+                Label="Email Address" 
+                @bind-Value=@ShipLocation!.DefaultContact.DefaultEmail.DisplayAs
+            />
+        </div>
+        <div class="sm:col-span-3">
+            <DmnInputText 
+                Label="Phone Number" 
+                @bind-Value=@ShipLocation!.DefaultContact.DefaultPhone.DisplayAs
+            />
+        </div>
+        <div class="col-span-full">
+            <DmnInputText 
+                Label="Street Address" 
+                @bind-Value=@ShipLocation!.DefaultAddress.Street
+            />
+        </div>
+            <div class="col-span-full">
+            <DmnInputText 
+                Label="Address Line 2" 
+                @bind-Value=@ShipLocation!.DefaultAddress.StreetLine2
+            />
+        </div>
+        <div class="sm:col-span-2 sm:col-start-1">
+            <DmnInputText 
+                Label="City" 
+                @bind-Value=@ShipLocation!.DefaultAddress.City
+            />
+        </div>
+        <div class="sm:col-span-2">
+            <DmnInputText 
+                Label="Province" 
+                @bind-Value=@ShipLocation!.DefaultAddress.StateProvince
+            />
+        </div>
+        <div class="sm:col-span-2">
+            <DmnInputText 
+                Label="Postal Code" 
+                @bind-Value=@ShipLocation!.DefaultAddress.PostalCode
+            />
+        </div>
+    </div>
+</EditForm>
+
+
+@code {
+
+    [Parameter]
+    public ShipLocationView? ShipLocation { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    [Parameter]
+    public EventCallback<ShipLocationView> OnChange { get; set; }
+        
+ 
+    private EditForm _editForm;
+    private bool _isSubmitting = false;
+    private bool _isNewLocation = true;
+    private bool IsAddingShipLocation { get; set; } = false;
+    private IQueryable<ShipLocationView> ShipLocations { get; set; } = new List<ShipLocationView>().AsQueryable();
+
+    protected override void OnParametersSet() {
+        if(ShipLocation is null) {
+            _isNewLocation = true;
+        }
+        ShipLocation ??= new("");
+    }
+
+    protected override async Task OnInitializedAsync() {
+        ShipLocations = await ShipLocationStore.ReadableStore.Get(true);
+    }
+
+    private async Task OnSubmitClick() {
+        if (!_editForm!.EditContext!.Validate()) {
+            return;
+        }
+
+        if(_isNewLocation) {
+            await AddLocation();
+        } else {
+            await UpdateLocation();
+        }
+    }
+
+    private void OnCancelClick()
+    {
+        OnCancel.InvokeAsync();
+    }
+
+    private async Task AddLocation() {
+        _isSubmitting = true;
+        Logger.LogInformation($"Creating new project: {ShipLocation!.LocationName}");
+        ShipLocationView newLocation = await ShipLocationStore!
+            .WritableStore
+            .Create(ShipLocation!);
+        Logger.LogInformation($"Created new project: {newLocation.LocationName}");
+        await OnChange.InvokeAsync(newLocation);
+        _isSubmitting = false;
+    }
+    
+    private async Task UpdateLocation() {
+        _isSubmitting = true;
+        Logger.LogInformation($"Updating project: {ShipLocation!.LocationName}");
+        ShipLocationView updatedLocation = await ShipLocationStore!
+            .WritableStore
+            .Update(ShipLocation!);
+        Logger.LogInformation($"Updated project: {updatedLocation.LocationName}");
+        await OnChange.InvokeAsync(updatedLocation);
+        _isSubmitting = false;
+    }
+}

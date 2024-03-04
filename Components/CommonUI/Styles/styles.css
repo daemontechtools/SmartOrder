@@ -1,0 +1,30 @@
+﻿@import "form.css";
+@import "quickgrid.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@layer components {
+    .daemon-button {
+        @apply 
+            cursor-pointer
+            transition-hover
+            flex rounded-md bg-sky-500 px-3 py-2 justify-center
+            whitespace-nowrap
+            text-center text-sm font-semibold text-black shadow-sm
+            ring-1 ring-inset ring-gray-300
+            hover:bg-sky-300 w-fit min-w-[80px] focus-visible:outline 
+            focus-visible:outline-2 focus-visible:outline-offset-2 
+            focus-visible:outline-sky-500;
+    }
+
+    .container-wide {
+        @apply flex px-4 sm:px-6 lg:px-8;
+    }
+
+    .transition-hover {
+        @apply transition duration-200 ease-in;
+    }
+}

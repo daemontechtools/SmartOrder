@@ -1,0 +1,31 @@
+@namespace SO.Components.Projects
+
+
+<div class="flex flex-col">
+    <h3 class="text-lg font-semibold mb-2">Dimensions</h3>
+    <div class="grid grid-cols-3 gap-4">
+        @foreach(string dimension in _dimensions) {
+                <DmnInputText 
+                    Label="@dimension"
+                    @bind-Value="@DimensionValues[dimension]" 
+                />
+        }
+    </div>
+</div>
+
+
+@code {
+    private List<string> _dimensions { get; set; } = new List<string> { 
+        "Width",
+        "Height",
+        "Depth"
+    };
+
+    private Dictionary<string, string> DimensionValues { get; set; } = new Dictionary<string, string>();
+
+    protected override void OnInitialized()
+    {
+        DimensionValues = _dimensions.ToDictionary(dimension => dimension, dimension => "0");
+    }
+
+}

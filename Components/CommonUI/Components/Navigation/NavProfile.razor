@@ -1,0 +1,24 @@
+﻿@namespace Daemon.RazorUI.Navigation
+
+
+<div class="
+    flex flex-shrink-0 
+    justify-center lg:justify-start group-hover:justify-start
+    border-t border-stone-950 
+    py-4 lg:px-4 group-hover:px-4
+">
+    <div class="flex flex-col group-hover:flex-row lg:flex-row">
+        <img src="/images/user.png?width=40&quality=80" class="w-10 h-10 rounded-full inline-block" />
+        <div class="hidden lg:flex group-hover:flex flex-col ml-3 justify-center">
+            <p class="text-sm font-bold text-white mb-0">@Name</p>
+            <p class="text-xs font-bold text-stone-300 group-hover:text-white m-0 cursor-pointer">
+                View profile
+            </p>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Name { get; set; } = "Red";
+}
