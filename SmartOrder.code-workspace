@@ -4,7 +4,7 @@
 			"path": "."
 		},
 		{
-			"path": "../daemon-dotnet/DataAccess"
+			"path": "../daemon-dotnet"
 		},
 		{
 			"path": "../SMARTWebOrderApi"
