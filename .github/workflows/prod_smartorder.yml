@@ -37,7 +37,7 @@ jobs:
           NUGET_AUTH_TOKEN: ${{ secrets.AZURE_DEVOPS_TOKEN }}
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: dotnet build ./SmartOrder.csproj --configuration Release
 
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
