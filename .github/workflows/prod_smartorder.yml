@@ -6,8 +6,7 @@ name: Build and deploy ASP.Net Core app to Azure Web App - SmartOrderApp
 on:
   push:
     branches:
-#      - prod
-      - bugfix/fix-app-cicd
+      - prod
   workflow_dispatch:
 
 jobs:
@@ -16,7 +15,6 @@ jobs:
 
     env:
       TAILWINDCSS_PATH: ${{github.workspace}}/tailwindcss
-      BUILD_CONFIGURATION: 'Release'
 
     steps:
       - uses: actions/checkout@v4
