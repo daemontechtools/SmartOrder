@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMARTWebOrderApi", "..\SMARTWebOrderApi\SMARTWebOrderApi.csproj", "{D0FD5067-3F1C-4AE0-839C-FEDE75779FAB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "..\daemon-dotnet\DataAccess\DataAccess.csproj", "{B2AC01E2-6344-418F-AAFE-87B75EBA98F7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartOrder", "SmartOrder.csproj", "{30073425-DEB1-47A0-B473-4325EC559CF3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D0FD5067-3F1C-4AE0-839C-FEDE75779FAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0FD5067-3F1C-4AE0-839C-FEDE75779FAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0FD5067-3F1C-4AE0-839C-FEDE75779FAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0FD5067-3F1C-4AE0-839C-FEDE75779FAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2AC01E2-6344-418F-AAFE-87B75EBA98F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2AC01E2-6344-418F-AAFE-87B75EBA98F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2AC01E2-6344-418F-AAFE-87B75EBA98F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2AC01E2-6344-418F-AAFE-87B75EBA98F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30073425-DEB1-47A0-B473-4325EC559CF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30073425-DEB1-47A0-B473-4325EC559CF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30073425-DEB1-47A0-B473-4325EC559CF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30073425-DEB1-47A0-B473-4325EC559CF3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
