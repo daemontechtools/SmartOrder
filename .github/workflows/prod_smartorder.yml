@@ -16,6 +16,7 @@ jobs:
 
     env:
       TAILWINDCSS_PATH: ${{github.workspace}}/tailwindcss
+      BUILD_CONFIGURATION: "Release"
 
     steps:
       - uses: actions/checkout@v4
