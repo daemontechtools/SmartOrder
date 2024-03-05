@@ -10,7 +10,7 @@
     <NoWarn>$(NoWarn);NETSDK1057</NoWarn>
   </PropertyGroup>
 
-  <PropertyGroup>
+  <PropertyGroup Condition="$(CI) != 'true'">
     <TAILWINDCSS_PATH>/usr/local/bin/tailwindcss</TAILWINDCSS_PATH>
   </PropertyGroup>
 
