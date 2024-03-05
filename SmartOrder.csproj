@@ -10,6 +10,10 @@
     <NoWarn>$(NoWarn);NETSDK1057</NoWarn>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <TAILWINDCSS_PATH>/usr/local/bin/tailwindcss</TAILWINDCSS_PATH>
+  </PropertyGroup>
+
   <ItemGroup>
     <Watch Include="./Styles/**/*.css" />
   </ItemGroup>
@@ -21,16 +25,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.DataAnnotations.Validation" Version="3.*-*" />
     <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid" Version="8.*" />
     <PackageReference Include="System.Drawing.Common" Version="8.*" />
-  </ItemGroup>
-  
-  <!-- Internal Dependencies -->
-  <ItemGroup Condition="'$(Configuration)'!='Release'">
-    <ProjectReference Include="../daemon-dotnet/DataAccess/DataAccess.csproj" />
-    <ProjectReference Include="../SMARTWebOrderApi/SMARTWebOrderApi.csproj" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(Configuration)'=='Release'">
-    <PackageReference Include="Daemon.DataAccess" Version="1.*-*" />
-    <PackageReference Include="SMARTWebOrderApi" Version="1.*-*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,22 +38,49 @@
       <HintPath>lib/SMART.Utility.Globalization.dll</HintPath>
     </Reference>
   </ItemGroup>
+  
+  <!-- Internal Dependencies -->
+  <ItemGroup Condition="'$(Configuration)'!='Release'">
+    <ProjectReference Include="../daemon-dotnet/DataAccess/DataAccess.csproj" />
+    <ProjectReference Include="../SMARTWebOrderApi/SMARTWebOrderApi.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)'=='Release'">
+    <PackageReference Include="Daemon.DataAccess" Version="1.*-*" />
+    <PackageReference Include="SMARTWebOrderApi" Version="1.*-*" />
+  </ItemGroup>
+
 
   <!-- Integrate TailwindCSS -->
 
   <!-- Only do this when we actually have scoped css to process -->
-  <Target Name="ProcessScopedCssFilesWithTailwind" AfterTargets="_GenerateScopedCssFiles">
-    <MSBuild Projects="$(MSBuildProjectFile)" Properties="CurrentScopedCssFile=%(_ScopedCssOutputs.Identity)" Targets="ProcessScopedCssFileWithTailwind">
+  <Target
+    Name="ProcessScopedCssFilesWithTailwind" 
+    AfterTargets="_GenerateScopedCssFiles"
+  >
+    <MSBuild 
+      Projects="$(MSBuildProjectFile)" 
+      Properties="CurrentScopedCssFile=%(_ScopedCssOutputs.Identity)" 
+      Targets="ProcessScopedCssFileWithTailwind"
+    >
     </MSBuild>
   </Target>
 
   <Target Name="ProcessScopedCssFileWithTailwind">
-    <Message Importance="high" Text="Processing with Tailwind: $(CurrentScopedCssFile)" />
-    <Exec Command="$(TAILWINDCSS_PATH) -i $(CurrentScopedCssFile) -o $(CurrentScopedCssFile)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Message 
+      Importance="high" 
+      Text="Processing with Tailwind: $(CurrentScopedCssFile)" 
+    />
+    <Exec 
+      Command="$(TAILWINDCSS_PATH) -i $(CurrentScopedCssFile) -o $(CurrentScopedCssFile)" 
+      WorkingDirectory="$(MSBuildProjectDirectory)" 
+    />
   </Target>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Release'">
+  <Target
+    Name="PostBuild" 
+    AfterTargets="PostBuildEvent" 
+    Condition="'$(Configuration)'=='Release'"
+  >
     <Exec Command="$(ProjectDir)build-tailwind.sh" />
   </Target>
-
 </Project>
