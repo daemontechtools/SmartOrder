@@ -61,30 +61,35 @@ public class ProjectStore {
 
     public float GetProductPrice(
         ProductView productView,
-        string doorStyleName
+        double width,
+        double height,
+        double depth,
+        string doorStyleName,
+        string finishInterior,
+        string finishedLeftSide,
+        string finishedRightSide,
+        string slide,
+        string doorSwing,
+        ref string response
     ) {
-        //var libraryProduct = _mapper.Map<LibraryProduct>(productView);
         var libraryProduct = _orderApi
             .GetProducts()
             .FirstOrDefault(p => p.LinkID == productView.LinkID)
         ?? throw new Exception("Unable to find Library Product with LinkID: "+productView.LinkID);
-        
-        libraryProduct.Width = productView.Width;
-        libraryProduct.Height = productView.Height;
-        libraryProduct.Depth = productView.Depth;
-        libraryProduct.ProductFinishInterior = productView.ProductFinishInterior;
-        libraryProduct.ProductLeftSide = productView.ProductLeftSide;
-        libraryProduct.ProductRightSide = productView.ProductRightSide;
-        libraryProduct.ProductSlide = productView.ProductSlide;
-        libraryProduct.ProductDoorSwing = productView.ProductDoorSwing;
+
+        libraryProduct.ProductFinishInterior = finishInterior;
+        libraryProduct.ProductLeftSide = finishedLeftSide;
+        libraryProduct.ProductRightSide = finishedRightSide;
+        libraryProduct.ProductSlide = slide;
+        libraryProduct.ProductDoorSwing = doorSwing;
 
         return _orderApi.GetProductPrice(
             libraryProduct,
-            productView.Width,
-            productView.Height,
-            productView.Depth,
+            width,
+            height,
+            depth,
             doorStyleName,
-            productView.Comments
+            ref response
         );
     }
 

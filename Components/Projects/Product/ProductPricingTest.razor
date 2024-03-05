@@ -258,23 +258,22 @@
     private void GetProductPrice() {
         _isSubmitting = true;
         Logger.LogInformation("Get Product Price");
-        
-        var customProduct = new ProductView(_selectedProduct.LinkID);
-        customProduct.Width = _newProduct.Width;
-        customProduct.Height = _newProduct.Height;
-        customProduct.Depth = _newProduct.Depth;
-        customProduct.ProductFinishInterior = _selectedFinish;
-        customProduct.ProductLeftSide = _leftEndFinished ? "Finished" : "Unfinished";
-        customProduct.ProductRightSide = _rightEndFinished ? "Finished" : "Unfinished";
-        customProduct.ProductSlide = _selectedDoorHardware ?? "";
-        customProduct.ProductDoorSwing = "Left";
-        customProduct.Comments = "";
-
+        var response = "";
         _productPrice = ProjectStore.GetProductPrice(
-            customProduct,
-            _selectedStyleConfiguration.Name
+            _selectedProduct!,
+            _newProduct.Width,
+            _newProduct.Height,
+            _newProduct.Depth,
+            _selectedStyleConfiguration!.Name,
+            _selectedFinish!,
+            _leftEndFinished ? "Finished" : "Unfinished",
+            _rightEndFinished ? "Finished" : "Unfinished",
+            _selectedDoorHardware ?? "",
+            "Left",
+            ref response
         );
         Logger.LogInformation("Product Price: "+_productPrice);
+        Logger.LogInformation("Product Resporse: "+response);
         _isSubmitting = false;
     } 
 }
