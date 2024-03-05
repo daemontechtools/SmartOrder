@@ -1,0 +1,69 @@
+@rendermode InteractiveServer
+
+@namespace SO.Components.Projects
+
+@page "/product-pricing-run"
+
+@inject IMapper Mapper
+@inject OrderApi OrderApi
+@inject ProjectStore ProjectStore
+@inject ILogger<ProductPricingTest> Logger
+
+<div class="flex flex-col h-full">
+  <span class="text-2xl">Product Pricing Test</span>
+  <div class="flex flex-col mb-4">
+    <h2 class="text-lg">Product Properties</h2>
+    <span>Width: @_width</span>
+    <span>Height: @_height</span>
+    <span>Depth: @_depth</span>
+    <span>Door Style: @_doorStyle</span>
+    <span>Finish Interior: @_productFinishInterior</span>
+    <span>Left Side: @_productLeftSide</span>
+    <span>Right Side: @_productRightSide</span>
+    <span>Slide: @_productSlide</span>
+    <span>Door Swing: @_productDoorSwing</span>
+  </div>
+  <div class="flex flex-col">
+    <div>Product Price: @_productPrice</div>
+    <div class="text-lg">Response</div>
+    <p>@_priceResponse</p> 
+  </div>
+</div>
+
+
+@code {
+    private float _productPrice = 0;
+    private string _priceResponse = "";
+
+    private double _width = 30;
+    private double _height = 40;
+    private double _depth = 12.5;
+    private string _doorStyle = "SHAKER PAINTABLE-F1";
+    private string _productFinishInterior = "White TFL";
+    private string _productLeftSide = "Unfinished";
+    private string _productRightSide = "Unfinished";
+    private string _productSlide = "";
+    private string _productDoorSwing = "Left";
+      
+
+    protected override void OnInitialized() {
+        var product = ProjectStore
+            .GetAllCabinets()
+            .First(p => p.LinkID == "2314PD9GF83F")
+            ?? throw new Exception("W2D_40 test product not found");
+
+        _productPrice = ProjectStore.GetProductPrice(
+            product,
+            _width,
+            _height,
+            _depth,
+            _doorStyle,
+            _productFinishInterior,
+            _productLeftSide,
+            _productRightSide,
+            _productSlide,
+            _productDoorSwing,
+            ref _priceResponse
+        );
+    }
+}
