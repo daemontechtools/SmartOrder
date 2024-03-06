@@ -28,8 +28,7 @@ builder.Configuration
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-var mapperConfig = new MapperConfiguration(cfg =>
-{
+var mapperConfig = new MapperConfiguration(cfg => {
     cfg.AddProfile<SmartOrderMappingProfile>();
 });
 IMapper mapper = mapperConfig.CreateMapper();
@@ -37,7 +36,15 @@ builder.Services.AddSingleton(mapper);
 
 builder.Services.AddScoped<ModalService>();
 // TODO: This should work as Scoped
-builder.Services.AddSingleton<OrderApi>();
+builder.Services.AddSingleton(s => {
+    ApiCreds creds = new ApiCreds {
+        FactoryLinkId = builder.Configuration["SMART_FACTORY_ID"]!,
+        DealerName = builder.Configuration["SMART_DEALER_NAME"]!,
+        UserName = builder.Configuration["SMART_USER_NAME"]!
+    };
+    var logger = s.GetRequiredService<ILogger<OrderApi>>(); 
+    return new OrderApi(creds, logger);
+});
 builder.Services.AddSingleton<ProjectApi>();
 builder.Services.AddSingleton<ProjectStore>();
 builder.Services.AddSingleton<ShipLocationApi>();
@@ -85,24 +92,6 @@ app.UseAntiforgery();
 //   await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 // });
 
-// Connect to SMART
-app.Use(async (context, next) => {
-    var config = context.RequestServices.GetRequiredService<IConfiguration>();
-    var loggerFactory = context.RequestServices.GetRequiredService<ILoggerFactory>();
-    var logger = loggerFactory.CreateLogger<Program>();
-
-    var orderApi = context.RequestServices.GetRequiredService<OrderApi>();
-    if(!orderApi.IsConnected()) {
-        logger.LogInformation("Connecting to SMART");
-        await orderApi.Connect(new ApiCreds {
-            FactoryLinkId = config.GetValue<string>("SMART_FACTORY_ID")!,
-            DealerName = config.GetValue<string>("SMART_DEALER_NAME")!,
-            UserName = config.GetValue<string>("SMART_USER_NAME")!
-        });
-        await orderApi.LoadLibrary();
-    }
-    await next();
-});
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
