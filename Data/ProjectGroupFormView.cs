@@ -2,9 +2,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SO.Data;
 
-public class ProjectGroupView : SMARTBaseClassView {
+public class ProjectGroupFormView : SMARTBaseClassView {
 
-    public ProjectGroupView(string LinkID) : base(LinkID) { }
+    public ProjectGroupFormView(string LinkID) : base(LinkID) { }
 
     [Required]
     public string Name { get; set; }
@@ -15,5 +15,5 @@ public class ProjectGroupView : SMARTBaseClassView {
     public string ProductSlide { get; set; }
     public double PriceSubTotal { get; set; }
 
-    public IList<ProductView> ProjectGroupProducts { get; set; }
+    public IList<ProductFormView> ProjectGroupProducts { get; set; }
 }
