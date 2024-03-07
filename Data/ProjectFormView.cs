@@ -4,9 +4,9 @@ using SMART.Common.Base;
 namespace SO.Data;
 
 
-public class ProjectView : SMARTBaseClass { 
+public class ProjectFormView : SMARTBaseClass { 
 
-    public ProjectView(string LinkID) : base(LinkID) { }
+    public ProjectFormView(string LinkID) : base(LinkID) { }
 
     [Required]
     [StringLength(30, ErrorMessage = "Id too long (30 character limit).")]
@@ -23,9 +23,9 @@ public class ProjectView : SMARTBaseClass {
         true, 
         ErrorMessage = "Shipping Location is required when IsShipped is true."
     )]
-    public ShipLocationView ProjectShipLocation { get; set; }
+    public ShipLocationFormView ProjectShipLocation { get; set; }
 
-    public IList<ProjectGroupView> ProjectGroups { get; set; }
+    public IList<ProjectGroupFormView> ProjectGroups { get; set; }
 }
 
 

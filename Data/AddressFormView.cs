@@ -4,9 +4,9 @@ using SMART.Common.Base;
 namespace SO.Data;
 
 
-public class AddressView : SMARTBaseClass {
+public class AddressFormView : SMARTBaseClass {
 
-    public AddressView(string LinkID) : base(LinkID) { }
+    public AddressFormView(string LinkID) : base(LinkID) { }
 
     [Required]
     public string Street { get; set; }
