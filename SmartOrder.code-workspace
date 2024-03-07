@@ -7,7 +7,7 @@
 			"path": "../daemon-dotnet"
 		},
 		{
-			"path": "../SMARTWebOrderApi"
+			"path": "../SmartOrderApi"
 		}
 	]
 }
