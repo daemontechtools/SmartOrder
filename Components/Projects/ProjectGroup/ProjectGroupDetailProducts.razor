@@ -1,6 +1,5 @@
 @using static Microsoft.AspNetCore.Components.Web.RenderMode
-@rendermode InteractiveServer
-
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @namespace SO.Components.Projects
 
 @inject NavigationManager NavigationManager
@@ -105,10 +104,9 @@
     public string ProjectGroupLinkId { get; set; }
 
     [Parameter]
-    public IQueryable<ProductView> Products { get; set; } 
-        = new List<ProductView>().AsQueryable();
+    public IQueryable<LibraryProduct>? Products { get; set; } 
 
-    private GridSort<ProductView> _sortByName = GridSort<ProductView>
+    private GridSort<LibraryProduct> _sortByName = GridSort<LibraryProduct>
         .ByAscending(p => p.Name);
 
     private ModalContentProps _deleteConfirmationInput;
@@ -127,8 +125,7 @@
     }
 
 
-    private void OnClick()
-    {
+    private void OnClick() {
         NavigationManager
             .NavigateTo(
                 $"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}/products"

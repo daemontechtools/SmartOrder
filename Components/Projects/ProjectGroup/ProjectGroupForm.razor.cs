@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using SMART.Common.LibraryManagement;
+using SMART.Common.ProjectManagement;
+using SMART.Web.OrderApi;
 using SO.Data;
 
 namespace SO.Components.Projects;
@@ -10,7 +13,7 @@ public partial class ProjectGroupForm : ComponentBase {
     private NavigationManager? _navigationManager { get; set; }
 
     [Inject]
-    private ProjectStore? _projectStore { get; set; }
+    private SmartOrderApi? _orderApi { get; set; }
 
     [Inject]
     private ILogger<ProjectGroupForm>? _logger { get; set; }
@@ -24,38 +27,39 @@ public partial class ProjectGroupForm : ComponentBase {
 
 
     [SupplyParameterFromForm]
-    private ProjectGroupView? _room { get; set; }
+    private ProjectGroup? _room { get; set; }
     private EditForm _editForm = default!;
     private bool _isSubmitting = false;
     private bool _isNew = true;
 
-    private ProjectView? _project { get; set; }
-    private IQueryable<ProductView> _products = new List<ProductView>().AsQueryable();
+    private Project? _project { get; set; }
+    private IQueryable<LibraryProduct>? _products;
     private bool IsLoading = true;
 
     private List<RoomProfileProps> _roomProfileProps = new List<RoomProfileProps>();
 
     protected override async Task OnInitializedAsync() {
-        _project = await _projectStore!
-            .ReadableStore
-            .GetOne(p => p.LinkID == ProjectLinkId);
-
+        _project = await _orderApi!
+            .Project
+            .GetProjectById(ProjectLinkId!);
         if(ProjectGroupLinkId != null) {
-            _room = await _projectStore!
-                .GetRoomById(
-                    ProjectGroupLinkId!,
-                    ProjectLinkId!
+            _room = _orderApi!
+                .ProjectGroup
+                .GetProjectGroupById(
+                    _project,
+                    ProjectGroupLinkId!
                 );
-            _products = _room!
-                .ProjectGroupProducts
-                .AsQueryable();
+            var products = await _orderApi!
+                .Product
+                .GetProducts();
+            _products = products.AsQueryable();
             _isNew = false;
         } else {
             _room = new("");
         }
         IsLoading = false;
-
     }
+
     private async Task OnSubmitClick() {
         if (!_editForm!.EditContext!.Validate()) {
             return;
@@ -78,14 +82,14 @@ public partial class ProjectGroupForm : ComponentBase {
         }
     }
 
-    private async Task AddRoom()
-    {
+    private async Task AddRoom() {
         _isSubmitting = true;
         _logger!.LogInformation($"Creating new room: {_room!.Name}");
-        ProjectGroupView newRoom = await _projectStore!
-            .AddRoom(
-                ProjectLinkId!,
-                _room!
+        ProjectGroup newRoom = await _orderApi!
+            .ProjectGroup
+            .AddProjectGroup(
+                _project!,
+                _room.Name
                 
             );
         _logger!.LogInformation($"Created new room: {newRoom.Name}");
@@ -96,12 +100,10 @@ public partial class ProjectGroupForm : ComponentBase {
     private async Task UpdateRoom() {
         _isSubmitting = true;
         _logger!.LogInformation($"Updating room: {_room!.Name}");
-        ProjectGroupView updatedRoom = await _projectStore!
-            .UpdateRoom(
-                ProjectLinkId!,
-                _room!
-            );
-        _logger!.LogInformation($"Updated room: {updatedRoom.Name}");
+        await _orderApi!
+            .ProjectGroup
+            .UpdateRoom(_room);
+        _logger!.LogInformation($"Updated room: {_room.Name}");
         _navigationManager!.NavigateTo($"/quotes/{ProjectLinkId}");
         _isSubmitting = false;
     }

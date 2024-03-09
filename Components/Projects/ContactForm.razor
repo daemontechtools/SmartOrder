@@ -1,10 +1,6 @@
-@using Microsoft.AspNetCore.Components.Forms
-@using Daemon.RazorUI.Input
-@using Daemon.RazorUI.Layout
-@using SO.Data
-
-@inject ContactStore ContactStore
 @inject ILogger<ContactForm> Logger
+@inject IMapper Mapper
+@inject SmartOrderApi OrderApi
  
 @namespace SmartOrder.Shared.Components
 
@@ -54,30 +50,35 @@
 @code {
 
     [Parameter]
-    public ContactView? Contact { get; set; }
+    public Contact? Contact { get; set; }
+    private ContactFormView? ContactFormView { get; set; }
+    
+    [Parameter]
+    public ShipLocation? ShipLocation { get; set; }
 
     [Parameter]
     public EventCallback OnCancel { get; set; }
 
     [Parameter]
-    public EventCallback<ContactView> OnChange { get; set; }
+    public EventCallback<ContactFormView> OnChange { get; set; }
         
  
     private EditForm _editForm;
     private bool _isSubmitting = false;
     private bool _isNewContact = true;
     private bool IsAddingShipLocation { get; set; } = false;
-    private IQueryable<ContactView> Contacts { get; set; } = new List<ContactView>().AsQueryable();
+    private IList<Contact> Contacts { get; set; }
 
     protected override void OnParametersSet() {
-        if(Contact is null) {
-            _isNewContact = true;
+        if(Contact != null) {
+            
         }
         Contact ??= new("");
     }
 
     protected override async Task OnInitializedAsync() {
-        Contacts = await ContactStore.ReadableStore.Get(true);
+        
+        Contacts = await OrderApi.Contact.GetContacts();
     }
 
     private async Task OnSubmitClick() {
@@ -95,15 +96,22 @@
     private async Task UpsertLocation() {
         _isSubmitting = true;
         Logger.LogInformation($"Upserting new contact: {Contact!.DisplayName}");
-        ContactView newContact = (_isNewContact) 
-            ? await ContactStore!
-                .WritableStore
-                .Create(Contact!) 
-            : await ContactStore!
-                .WritableStore
-                .Update(Contact!);
+        if(_isNewContact) {
+            await OrderApi!
+                .Contact
+                .AddContact(
+                    Contact.DisplayName,
+                    Contact.DefaultPhone.DisplayAs,
+                    Contact.DefaultEmail.DisplayAs,
+                    ShipLocation!
+                );
+        } else {
+            await OrderApi!
+                .Contact
+                .UpdateContact(Contact!);
+        }
         Logger.LogInformation($"Upserted new contact: {Contact!.DisplayName}");
-        await OnChange.InvokeAsync(newContact);
+        //await OnChange.InvokeAsync(newContact);
         _isSubmitting = false;
     }
 }

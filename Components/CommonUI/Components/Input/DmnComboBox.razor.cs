@@ -6,24 +6,23 @@ using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 
 namespace Daemon.RazorUI.Input;
-
-public partial class DmnComboBox : InputBase<object> {
+public partial class DmnComboBox<T> : InputBase<T> {
 
     [Inject]
-    private ILogger<DmnComboBox> _logger { get; set; }
+    private ILogger<DmnComboBox<T>>? _logger { get; set; }
 
     [Parameter]
-    public IQueryable<object> Data { get; set; }
-    public IQueryable<object> _filteredData { get; set; }
+    public IQueryable<T>? Data { get; set; }
+    public IQueryable<T>? _filteredData { get; set; }
 
     [Parameter]
-    public string TextFieldName { get; set; }
+    public string? TextFieldName { get; set; }
 
     [Parameter]
-    public string Label { get; set; }
+    public string? Label { get; set; }
 
     [Parameter]
-    public string Class { get; set; }
+    public string? Class { get; set; }
 
 
     // [Parameter]
@@ -32,35 +31,36 @@ public partial class DmnComboBox : InputBase<object> {
     private string _searchValue = "";
     private bool _isActive = false;
 
-    protected override void OnInitialized()
-    {
+    protected override void OnInitialized() {
         _filteredData = Data;
         //ValidationValueExpression ??= ValueExpression;
     }
 
     protected override bool TryParseValueFromString(
-        string value, 
-        out object result, 
-        out string validationErrorMessage)
-    {
+        string? value, 
+        out T result, 
+        out string validationErrorMessage) {
         throw new NotImplementedException();
     }
 
-    public object GetPropertyValue(object obj, string propertyName)
-    {
-        var type = obj.GetType();
+    public object GetPropertyValue(T obj, string propertyName) {
+        if(obj == null) {
+            throw new ArgumentNullException(nameof(obj));
+        }
+        var type = (obj as object).GetType();
         var propertyInfo = type.GetProperty(propertyName);
-        if (propertyInfo == null)
-        {
+        if (propertyInfo == null) {
             throw new ArgumentException($"Property {propertyName} does not exist on type {type.FullName}");
         }
 
-        return propertyInfo.GetValue(obj);
+        return propertyInfo.GetValue(obj)
+            ?? throw new Exception($"Property {propertyName} is null");
     }
 
-    private string GetTextValue(object obj) {
-        if(obj is string) return obj as string;
-        return GetPropertyValue(obj, TextFieldName).ToString();
+    private string GetTextValue(T obj) {
+        if(obj == null || TextFieldName == null) return "";
+        if(obj is string) return obj as string ?? "";
+        return GetPropertyValue(obj, TextFieldName).ToString() ?? "";
     }
 
     // private string FormatValue(string value) {
@@ -71,12 +71,12 @@ public partial class DmnComboBox : InputBase<object> {
     // }
 
     private void HandleInput(ChangeEventArgs e) {
-        _searchValue = e.Value.ToString();
+        _searchValue = e.Value?.ToString() ?? "";
         if(String.IsNullOrEmpty(_searchValue)) {
             _filteredData = Data;
             return;
         }
-        _filteredData = Data
+        _filteredData = Data?
             .Where(x => 
                 GetTextValue(x)
                     .Contains(
@@ -97,7 +97,7 @@ public partial class DmnComboBox : InputBase<object> {
         _isActive = false;
     }
 
-    private void OnOptionClick(object value) {
+    private void OnOptionClick(T value) {
         
         Value = value;
         ValueChanged.InvokeAsync(value);

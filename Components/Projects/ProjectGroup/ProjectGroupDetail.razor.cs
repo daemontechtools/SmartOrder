@@ -1,18 +1,19 @@
 using Microsoft.AspNetCore.Components;
+using SMART.Common.ProjectManagement;
+using SMART.Common.LibraryManagement;
+using SMART.Web.OrderApi;
 using SO.Data;
 
 namespace SO.Components.Projects;
 
 
-public struct RoomProfileProps
-{
+public struct RoomProfileProps {
     public string Title { get; set; }
 }
 
-public partial class ProjectGroupDetail : ComponentBase
-{
+public partial class ProjectGroupDetail : ComponentBase {
     [Inject]
-    private ProjectStore? _projectStore { get; set; }
+    private SmartOrderApi? _orderApi { get; set; }
 
     [Parameter]
     public string? ProjectLinkId { get; set; }
@@ -20,29 +21,27 @@ public partial class ProjectGroupDetail : ComponentBase
     [Parameter]
     public string? ProjectGroupLinkId { get; set; }
 
-    private ProjectView? _project;
-    private ProjectGroupView? _projectGroup;
-    private IQueryable<ProductView> _products = new List<ProductView>().AsQueryable();
+    private Project? _project;
+    private ProjectGroup? _projectGroup;
+    private IList<LibraryProduct>? _products;
     private bool IsLoading = true;
 
     private List<RoomProfileProps> _roomProfileProps = new List<RoomProfileProps>();
 
-    protected override async Task OnInitializedAsync()
-    {
-        _project = await _projectStore!
-            .ReadableStore
-            .GetOne(p => p.LinkID == ProjectLinkId);
+    protected override async Task OnInitializedAsync() {
+        _project = await _orderApi!
+            .Project
+            .GetProjectById(ProjectLinkId!);
         if(_project == null) {
             throw new Exception("Project not found");
         }
-        _projectGroup = _project!.ProjectGroups
-            .FirstOrDefault(g => g.LinkID == ProjectGroupLinkId);
-        if(_projectGroup == null) {
-            throw new Exception("Project Group not found");
-        }
-        _products = _projectGroup
-            .ProjectGroupProducts
-            .AsQueryable();
+        _projectGroup = _orderApi.ProjectGroup.GetProjectGroupById(
+            _project,
+            ProjectGroupLinkId!
+        );
+        _products = await _orderApi!
+            .Product
+            .GetAllCabinets();
         IsLoading = false;
 
         _roomProfileProps.Add(new RoomProfileProps { Title = "Door Style" });

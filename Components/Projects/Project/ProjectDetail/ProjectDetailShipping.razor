@@ -1,9 +1,7 @@
 @page "/quotes/{projectLinkId}/shipping"
- 
+@using SMART.Common.ProjectManagement
 @namespace SO.Components.Projects
-
-@inject ProjectStore ProjectStore
-
+@inject SmartOrderApi OrderApi
 
 <ProjectDetailHeader Project=@_project/>
 
@@ -27,12 +25,11 @@
     [Parameter]
     public string? ProjectLinkId { get; set; }
 
-    private ProjectView? _project;
+    private Project? _project;
 
-    protected override async Task OnInitializedAsync()
-    {
-      _project = await ProjectStore!
-        .ReadableStore
-        .GetOne(p => p.LinkID == ProjectLinkId);
+    protected override async Task OnInitializedAsync() {
+      _project = await OrderApi!
+        .Project
+        .GetProjectById(ProjectLinkId!);
     }
 }

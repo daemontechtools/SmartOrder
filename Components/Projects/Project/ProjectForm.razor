@@ -1,12 +1,9 @@
 @page "/quotes/new"
-@rendermode InteractiveServer
-
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @namespace SO.Components.Projects
-
 @inject NavigationManager NavigationManager
-@inject ProjectStore ProjectStore
+@inject SmartOrderApi OrderApi
 @inject ILogger<ProjectForm> Logger
-
 
 <div class="flex flex-col bg-slate-100"
     <SEBreadcrumbNav
@@ -48,7 +45,19 @@
                 @bind-Value=@_newProject!.Name
             />
             <div class="m-3"></div>
-            <ShippingInput Project=@_newProject />
+            <h2 class="text-base font-semibold leading-7 text-gray-900 mb-1">Shipping Options</h2>
+
+            <InputRadioGroup @bind-Value=@_newProject!.IsShipped>
+                <div class="flex items-center">
+                    <InputRadio Value=false class="dmn-input-radio" />Pickup
+                    <div class="w-4" />
+                    <InputRadio Value=true class="dmn-input-radio" />Delivery
+                </div>
+            </InputRadioGroup>
+             
+             @if(_newProject.IsShipped) {
+                <ShipLocationInput @bind-Value=@_newProject.ProjectShipLocation />
+             }
         </EditForm>
     </div>
 </div>
@@ -56,7 +65,7 @@
 @code {
 
     [SupplyParameterFromForm]
-    private ProjectView? _newProject { get; set; }
+    private ProjectFormView? _newProject { get; set; }
 
     private EditForm _editForm = default!;
     private bool _isSubmitting = false;
@@ -81,13 +90,14 @@
         StateHasChanged();
     }
 
-    private async Task AddQuote()
-    {
+    private async Task AddQuote() {
         _isSubmitting = true;
         Logger.LogInformation($"Creating new project: {_newProject!.Name}");
-        ProjectView newProject = await ProjectStore!
-            .WritableStore
-            .Create(_newProject);
+        Project newProject = await OrderApi!
+            .Project
+            .AddProject(_newProject.Name);
+        // Add ShippingLocation
+        // Add Contact
 
         Logger.LogInformation($"Created new project: {newProject.Name}");
         NavigationManager.NavigateTo("/quotes");

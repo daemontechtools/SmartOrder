@@ -1,18 +1,11 @@
-@rendermode InteractiveServer
-
 @using SMART.Common.ProjectManagement
-
-@namespace SO.Components.Projects
-
 @using Microsoft.AspNetCore.Components.QuickGrid
-
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@namespace SO.Components.Projects
 @inject NavigationManager _navigationManager
-@inject PersistentComponentState? _applicationState
 @inject ModalService _modalService
 @inject ILogger<ProjectDetailGroups> _logger 
-
-@implements IDisposable
-
+@inject SmartOrderApi OrderApi
 
 <div class="container flex flex-col flex-1 bg-stone-100 pt-6 pb-3 justify-between">
     <div>
@@ -85,41 +78,23 @@
 
 
 @code {
-    [Inject]
-    private ProjectStore? _projectStore { get; set; }
-
-    private PersistingComponentStateSubscription? _stateSubscription;
 
     [Parameter]
-    public ProjectView? Project { get; set; }
-
+    public Project? Project { get; set; }
 
     //private bool IsLoading { get; set; } = true;
     private PaginationState _pagination = new PaginationState { ItemsPerPage = 10 };
 
-
-    private IQueryable<ProjectGroupView>? _projectGroups { get; set; }
-    private GridSort<ProjectGroupView> _sortByName = GridSort<ProjectGroupView>
+    private IQueryable<ProjectGroup>? _projectGroups { get; set; }
+    private GridSort<ProjectGroup> _sortByName = GridSort<ProjectGroup>
         .ByAscending(r => r.Name);
     private ModalContentProps _deleteConfirmationInput;
     private string? _itemIdToDelete;
     
 
-    protected override void OnInitialized()
-    {
-        _stateSubscription = _applicationState!.RegisterOnPersisting(PersistProjectGroups);
-        if(!_applicationState!.TryTakeFromJson(
-            "projectGroups", 
-            out List<ProjectGroupView>? restoredProjectGroups
-        )) {
-            _projectGroups = Project?.ProjectGroups.AsQueryable();
-        } else {
-            _logger.LogInformation("Restored project groups from state");
-            _projectGroups = restoredProjectGroups?.AsQueryable();
-        }
-        _projectStore!.Storage.OnStateChanged += OnStateChanged!;
-        _deleteConfirmationInput = new ModalContentProps 
-        {
+    protected override async Task OnInitializedAsync() {
+        _projectGroups = Project?.ProjectGroups.AsQueryable<ProjectGroup>();
+        _deleteConfirmationInput = new ModalContentProps {
             Title = "Delete Room",
             Description = "Are you sure you want to delete this room?",
             IconType = typeof(TrashIcon),
@@ -134,30 +109,16 @@
         await InvokeAsync(StateHasChanged);
     }
 
-    private Task PersistProjectGroups()
-    {
-        _applicationState?.PersistAsJson("projectGroups", _projectGroups);
-        return Task.CompletedTask;
-    }
-
-    private void AddRoom()
-    {
+    private void AddRoom() {
         _navigationManager.NavigateTo($"/quotes/{Project!.LinkID}/rooms/new");
     }
 
-    private void DeleteRoom(string roomId)
-    {
+    private void DeleteRoom(string roomId) {
         _itemIdToDelete = roomId;
         _modalService!.Show(_deleteConfirmationInput);
     }
 
-    private async Task OnDeleteConfirm(bool confirmed)
-    {
+    private async Task OnDeleteConfirm(bool confirmed) {
         _modalService!.Hide();
-    }
-
-    public void Dispose()
-    {
-        _stateSubscription?.Dispose();
     }
 }
