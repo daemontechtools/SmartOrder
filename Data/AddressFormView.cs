@@ -19,4 +19,6 @@ public class AddressFormView : SMARTBaseClass {
 
     [Required]
     public string PostalCode { get; set; } = default!;
+
+    public string AddressNotes { get; set; } = default!;
 }
