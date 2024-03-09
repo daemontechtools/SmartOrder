@@ -1,5 +1,5 @@
 @using static Microsoft.AspNetCore.Components.Web.RenderMode
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 @namespace SO.Components.Projects
 
