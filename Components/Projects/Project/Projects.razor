@@ -1,9 +1,9 @@
 @page "/"
 @page "/quotes"
-@rendermode InteractiveServer
 @using Microsoft.AspNetCore.Authorization
 @using SMART.Web.OrderApi
 @namespace SO.Components.Projects
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @* @attribute [Authorize] *@
   
 <div class="flex flex-col h-full">

@@ -1,11 +1,8 @@
 ﻿@using static Microsoft.AspNetCore.Components.Web.RenderMode
-@rendermode InteractiveServer
-
 @using Daemon.RazorUI.Animations
 @using Microsoft.Extensions.Logging
-
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @namespace Daemon.RazorUI.Modal
-
 @inject ModalService _modalService
 @inject ILogger<ModalContent> Logger
 
