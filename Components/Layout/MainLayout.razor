@@ -1,6 +1,5 @@
 ﻿@namespace SO.Components.Layouts
 
-@inject OrderApi OrderApi
 @inherits LayoutComponentBase
 
 <PageTitle>SmartOrder</PageTitle>
@@ -25,7 +24,6 @@
         }) >
             <OfficeBuildingIcon Props=@_iconProps />
         </SideNavOption>
-        @* <Login /> *@
     </SideNav>
     <ContentView>
         @Body
