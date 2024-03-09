@@ -1,10 +1,7 @@
-﻿using System.Drawing.Printing;
-using AutoMapper;
+﻿using AutoMapper;
 using SMART.Common.CompanyManagement;
 using SMART.Common.LibraryManagement;
 using SMART.Common.ProjectManagement;
-using SMART.Common.Utility;
-
 namespace SO.Data;
 
 public class SmartOrderMappingProfile : Profile {
