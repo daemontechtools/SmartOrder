@@ -1,8 +1,9 @@
+@using SMART.Common.ProjectManagement
 @page "/quotes/{projectLinkId}/documents"
 
 @namespace SO.Components.Projects
 
-@inject ProjectStore ProjectStore
+@inject SmartOrderApi SmartOrderApi
 
 <div class="flex flex-col h-full">
    <ProjectDetailHeader Project=@_project />
@@ -56,16 +57,15 @@
     [Parameter]
     public string? ProjectLinkId { get; set; }
 
-    private ProjectView? _project;
+    private Project? _project;
 
     @* private List<RowTemplateProps> ListItems { get; set; } = new List<RowTemplateProps>(); *@
 
-    protected override async Task OnInitializedAsync()
-    {
-        _project = await ProjectStore!
-            .ReadableStore
-            .GetOne(p => p.LinkID == ProjectLinkId);
-        @* ListItems = new List<RowTemplateProps>() {
+    protected override async Task OnInitializedAsync() {
+        _project = await SmartOrderApi
+            .Project
+            .GetProjectById(ProjectLinkId!);
+         @* ListItems = new List<RowTemplateProps>() {
             new RowTemplateProps() {
                 Title = "secret_plans.pdf",
                 Subtitle = "1.2MB",

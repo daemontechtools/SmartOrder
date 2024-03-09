@@ -1,3 +1,6 @@
+@page "/quotes/{projectLinkId}/rooms/{projectGroupLinkId}/products/{productLinkId}"
+@page "/quotes/{projectLinkId}/rooms/{projectGroupLinkId}/products/new"
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @using AutoMapper
 @using SMART.Web.OrderApi
 @using SMART.Common.LibraryManagement
@@ -6,18 +9,11 @@
 @using SMART.Common.Utility
 @using SMART.Common.CompanyManagement
 @using static Microsoft.AspNetCore.Components.Web.RenderMode
-@rendermode InteractiveServer
-
-@page "/quotes/{projectLinkId}/rooms/{projectGroupLinkId}/products/{productLinkId}"
-@page "/quotes/{projectLinkId}/rooms/{projectGroupLinkId}/products"
-
 @namespace SO.Components.Projects
 
 @inject IMapper Mapper
-@inject OrderApi OrderApi
-@inject ProjectStore ProjectStore
+@inject SmartOrderApi OrderApi
 @inject ILogger<ProductForm> Logger
-@inject PersistentComponentState ApplicationState
 
 <div class="flex flex-col h-full"
     <BreadcrumbNav
@@ -39,7 +35,7 @@
         } else {
             <EditForm 
                 @ref=@_editForm
-                Model=@_product     
+                Model=@_productFormView    
                 FormName="add-room"
                 OnValidSubmit=@AddProductToProjectGroup
             >
@@ -61,10 +57,8 @@
                                 /> *@
                                 <DmnComboBox 
                                     Data=@_allProducts
-                                    Value=@_selectedProduct
-                                    ValueExpression=@(() => _selectedProduct)
-                                    ValueChanged=@(p => OnProductSelected(p) )
-                                    TextFieldName=@nameof(ProductView.Name)
+                                    bind-Value=@_selectedProduct 
+                                    TextFieldName=@nameof(ProductFormView.Name)
                                     Label="Select a Product"
                                     Class="pb-0"
                                 />
@@ -72,9 +66,7 @@
                                 @if(_selectedProduct is not null) {
                                     <DmnComboBox
                                         Data=@_styleConfigurations
-                                        Value=@_selectedStyleConfiguration
-                                        ValueExpression=@(() => _selectedStyleConfiguration)
-                                        ValueChanged=@(p => OnStyleSelected(p))
+                                        bind-Value=@_selectedStyleConfiguration
                                         TextFieldName=@nameof(LibraryStyleConfiguration.Name)
                                         Label="Select a Door Style"
                                     />
@@ -83,8 +75,7 @@
                                 @if(_selectedStyleConfiguration is not null) {
                                     <DmnComboBox
                                         Data=@_finishes
-                                        Value=@_selectedFinish
-                                        ValueExpression=@(() => _selectedFinish)
+                                        bind-Value=@_selectedFinish
                                         Label="Select a Finish"
                                     />
                                 }
@@ -92,7 +83,7 @@
                                 @if(_selectedStyleConfiguration is not null) {
                                     <DmnComboBox
                                         Data=@_doorHardwares
-                                        Value=@_selectedDoorHardware
+                                        bind-Value=@_selectedDoorHardware
                                         ValueExpression=@(() => _selectedDoorHardware)
                                         Label="Select a Door Hardware"
                                     />
@@ -158,13 +149,14 @@
     private bool _isNew = true;
     private bool _isLoading = true;
 
-    private ProjectView? _project;
-    private ProjectGroupView? _projectGroup;
-    private ProductView? _product;
+    private Project? _project;
+    private ProjectGroup? _projectGroup;
+    private Product? _product;
+    private ProductFormView? _productFormView;
 
-    private IQueryable<ProductView>? _allProducts = new List<ProductView>().AsQueryable();
+    private IQueryable<LibraryProduct>? _allProducts;
     
-    private ProductView? _selectedProduct;
+    private LibraryProduct? _selectedProduct;
 
     private ProductCategoryTypes? _selectedProductType { get; set; }
 
@@ -178,65 +170,31 @@
     private string? _selectedDoorHardware;
     
 
-    private Dictionary<ProductCategoryTypes, List<ProductView>> _productTypeDictionary 
-        = new Dictionary<ProductCategoryTypes, List<ProductView>>();
+    private IDictionary<ProductCategoryTypes, List<ProductFormView>>? _productTypeDictionary;
 
     private PersistingComponentStateSubscription? _stateSubscription;
 
     protected override async Task OnInitializedAsync() {
-        _stateSubscription = ApplicationState?.RegisterOnPersisting(PersistFormState);
-        
-        if(!ApplicationState!.TryTakeFromJson(
-            "project", 
-            out ProjectView? restoredProject
-        )) {
-            _project = await ProjectStore.ReadableStore
-                .GetOne(p => p.LinkID == ProjectLinkId);
-            if(_project is null) {
-                throw new InvalidOperationException($"Project with LinkID {ProjectLinkId} not found");
-            }
-        } else {
-            _project = restoredProject!;
-        }
-
-        _projectGroup = _project.ProjectGroups
-            .FirstOrDefault(g => g.LinkID == ProjectGroupLinkId);
-        if(ProductLinkId is not null) {
-            _product = _projectGroup?
-                .ProjectGroupProducts
-                .FirstOrDefault(p => p.LinkID == ProjectLinkId);
+        _project = await OrderApi.Project.GetProjectById(ProjectLinkId);
+        _projectGroup = OrderApi.ProjectGroup.GetProjectGroupById(
+            _project,
+            ProjectGroupLinkId
+        );
+        IList<Product> groupProducts = _projectGroup?.ProjectGroupProducts;
+        var product = groupProducts?
+            .First(p => p.LinkID == ProjectLinkId);
+        if(_product != null) {
+            _productFormView = Mapper.Map<ProductFormView>(product);
             _isNew = false;
         } else {
-            _product = new("");
+            _productFormView = new("");
         }
-
-//        IEnumerable<LibraryProduct> btrList = productList.Where(p => OrderApi.GetCategoryById(p.LinkIDCategory)!.Type.ToString() == "10");
-        
-        if(!ApplicationState!.TryTakeFromJson(
-            "productTypeDictionary", 
-            out Dictionary<ProductCategoryTypes, List<ProductView>>? restoredProductTypeDictionary
-        )) {
-            _productTypeDictionary = ProjectStore.GetSortedCabinets();
-        } else {
-            _productTypeDictionary = restoredProductTypeDictionary!;
-        }
-
-        _allProducts = _productTypeDictionary.Values.SelectMany(list => list).AsQueryable();  
-        
+        var products = await OrderApi.Product.GetAllCabinets();
+        _allProducts = products.AsQueryable();
+        @* _productTypeDictionary = await OrderApi
+            .Product
+            .GetSortedProducts(products); *@
         _isLoading = false;
-    }
-
-    protected override void OnAfterRender(bool firstRender) {       
-        if(_selectedProductType is not null) {
-            ProductCategoryTypes productType = (ProductCategoryTypes)_selectedProductType;
-            _allProducts = _productTypeDictionary[productType].AsQueryable();
-        }
-    }
-    
-    private Task PersistFormState() {
-        ApplicationState?.PersistAsJson("productTypeDictionary", _productTypeDictionary);
-        ApplicationState?.PersistAsJson("project", _project);
-        return Task.CompletedTask;
     }
 
     @* private void OnProductTypeChanged(ChangeEventArgs e) {
@@ -244,14 +202,15 @@
         _selectedProductType = productType;
     } *@
     
-    private void OnProductSelected(object obj) {
-        ProductView? product = obj as ProductView;
+    private async void OnProductSelected(object obj) {
+        var product = obj as LibraryProduct;
         Logger.LogInformation($"Product Code selected: {product?.Name}");
         _selectedProduct = product;
 
         // Get StyleConfigurations for this product
-        _styleConfigurations = OrderApi
-            .GetDoorStylesForProduct(product!.LinkID)
+        _styleConfigurations = (await OrderApi
+            .Product
+            .GetDoorStylesForProduct(product))
             .AsQueryable();
 
         var filteredStyleConfigs = _styleConfigurations
@@ -281,9 +240,8 @@
         //Logger.LogInformation($"Style selected: {styleConfiguration?.Name}");
         _selectedStyleConfiguration = styleConfiguration;
 
-        
-
         _finishes = OrderApi
+            .Product
             .GetAllowedFinishes(styleConfiguration!)
             .AsQueryable();
         Logger.LogInformation($"Finishes: {_finishes.Count()}");
@@ -296,6 +254,7 @@
         } 
 
         _doorHardwares = OrderApi
+            .Product
             .GetAllowedDrawerHardware(styleConfiguration!)
             .AsQueryable();
     }

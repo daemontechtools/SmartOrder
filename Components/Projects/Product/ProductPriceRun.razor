@@ -1,12 +1,10 @@
-@rendermode InteractiveServer
-
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @namespace SO.Components.Projects
 
 @page "/product-pricing-run"
 
 @inject IMapper Mapper
-@inject OrderApi OrderApi
-@inject ProjectStore ProjectStore
+@inject SmartOrderApi OrderApi
 @inject ILogger<ProductPricingTest> Logger
 
 <div class="flex flex-col h-full">
@@ -30,7 +28,6 @@
   </div>
 </div>
 
-
 @code {
     private float _productPrice = 0;
     private string _priceResponse = "";
@@ -46,24 +43,30 @@
     private string _productDoorSwing = "Left";
       
 
-    protected override void OnInitialized() {
-        var product = ProjectStore
-            .GetAllCabinets()
+    protected async Task OnInitializedAsync() {
+        var products = await OrderApi
+            .Product
+            .GetAllCabinets();
+        var product = products
             .First(p => p.LinkID == "2314PD9GF83F")
             ?? throw new Exception("W2D_40 test product not found");
 
-        _productPrice = ProjectStore.GetProductPrice(
+        product.ProductFinishInterior = _productFinishInterior;
+        product.ProductLeftSide = _productLeftSide;
+        product.ProductRightSide = _productRightSide;
+        product.ProductSlide = _productSlide;
+        product.ProductDoorSwing = _productDoorSwing;
+            
+        var pricingRes = await OrderApi
+          .Product
+          .GetProductPrice(
             product,
             _width,
             _height,
             _depth,
-            _doorStyle,
-            _productFinishInterior,
-            _productLeftSide,
-            _productRightSide,
-            _productSlide,
-            _productDoorSwing,
-            ref _priceResponse
+            _doorStyle
         );
+        _productPrice = pricingRes.Item1;
+        _priceResponse = pricingRes.Item2;
     }
 }

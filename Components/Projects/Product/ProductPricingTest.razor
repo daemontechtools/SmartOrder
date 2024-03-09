@@ -1,13 +1,11 @@
-@rendermode InteractiveServer
-
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @namespace SO.Components.Projects
 
 @* @page "/" *@
 @page "/product-pricing-test"
 
 @inject IMapper Mapper
-@inject OrderApi OrderApi
-@inject ProjectStore ProjectStore
+@inject SmartOrderApi OrderApi
 @inject ILogger<ProductPricingTest> Logger
 
 <div class="flex flex-col h-full"
@@ -45,10 +43,8 @@
                                 />  *@
                                 <DmnComboBox 
                                     Data=@_allProducts
-                                    Value=@_selectedProduct
-                                    ValueExpression=@(() => _selectedProduct)
-                                    ValueChanged=@(p => OnProductSelected(p) )
-                                    TextFieldName=@nameof(ProductView.Name)
+                                    bind-Value=@_selectedProduct
+                                    TextFieldName=@nameof(ProductFormView.Name)
                                     Label="Select a Product"
                                     Class="pb-0"
                                 />
@@ -63,9 +59,7 @@
                                     <div class="mt-3" />
                                     <DmnComboBox
                                         Data=@_styleConfigurations
-                                        Value=@_selectedStyleConfiguration
-                                        ValueExpression=@(() => _selectedStyleConfiguration)
-                                        ValueChanged=@(p => OnStyleSelected(p))
+                                        bind-Value=@_selectedStyleConfiguration
                                         TextFieldName=@nameof(LibraryStyleConfiguration.Name)
                                         Label="Select a Door Style"
                                     />
@@ -75,9 +69,7 @@
                                     <div class="mt-3" />
                                     <DmnComboBox
                                         Data=@_finishes
-                                        Value=@_selectedFinish
-                                        ValueExpression=@(() => _selectedFinish)
-                                        ValueChanged=@(p => _selectedFinish = p as string)
+                                        bind-Value=@_selectedFinish
                                         Label="Select a Finish"
                                     />
                                 }
@@ -86,9 +78,7 @@
                                     <div class="mt-3" />
                                     <DmnComboBox
                                         Data=@_doorHardwares
-                                        Value=@_selectedDoorHardware
-                                        ValueExpression=@(() => _selectedDoorHardware)
-                                        ValueChanged=@(p => _selectedDoorHardware = p as string)
+                                        bind-Value=@_selectedDoorHardware
                                         Label="Select a Door Hardware"
                                     />
                                 }
@@ -155,11 +145,11 @@
     private EditForm? _editForm = default!;
     private bool _isSubmitting = false;
 
-    private ProductView _newProduct = new("");
+    private ProductFormView _newProduct = new("");
 
-    private IQueryable<ProductView>? _allProducts;
-    private Dictionary<ProductCategoryTypes, List<ProductView>> _sortedProducts;
-    private ProductView? _selectedProduct;
+    private IQueryable<LibraryProduct>? _allProducts;
+    private IDictionary<ProductCategoryTypes, List<LibraryProduct>> _sortedProducts;
+    private LibraryProduct? _selectedProduct;
 
     private ProductCategoryTypes? _selectedProductType { get; set; }
 
@@ -179,13 +169,17 @@
 
     
 
-    private Dictionary<ProductCategoryTypes, List<ProductView>> _productTypeDictionary 
-        = new Dictionary<ProductCategoryTypes, List<ProductView>>();
+    private Dictionary<ProductCategoryTypes, List<ProductFormView>> _productTypeDictionary;
 
 
-    protected override void OnInitialized() {
-        _allProducts = ProjectStore.GetAllCabinets(); 
-        _sortedProducts = ProjectStore.GetSortedCabinets();
+    protected override async Task OnInitializedAsync() {
+        var products = await OrderApi
+            .Product
+            .GetAllCabinets();
+        _allProducts = products.AsQueryable();
+        _sortedProducts = await OrderApi
+            .Product
+            .GetSortedProducts(products!);
         _isLoading = false;
     }
 
@@ -208,14 +202,15 @@
     }
     *@
 
-    private void OnProductSelected(object obj) {
-        ProductView? product = obj as ProductView;
+    private async void OnProductSelected(object obj) {
+        var product = obj as LibraryProduct;
         Logger.LogInformation($"Product Code selected: {product?.Name}");
         _selectedProduct = product;
 
         // Get StyleConfigurations for this product
-        _styleConfigurations = OrderApi
-            .GetDoorStylesForProduct(product!.LinkID)
+        _styleConfigurations = (await OrderApi
+            .Product
+            .GetDoorStylesForProduct(product))
             .AsQueryable();
         _selectedStyleConfiguration = null;
 
@@ -226,17 +221,19 @@
     }
     
     private void OnStyleSelected(object obj) {
-        LibraryStyleConfiguration? styleConfiguration = obj as LibraryStyleConfiguration;
+        var styleConfiguration = obj as LibraryStyleConfiguration;
         //Logger.LogInformation($"Style selected: {styleConfiguration?.Name}");
         _selectedStyleConfiguration = styleConfiguration;
 
         _finishes = OrderApi
+            .Product
             .GetAllowedFinishes(styleConfiguration!)
             .AsQueryable();
         Logger.LogInformation($"Finishes: {_finishes.Count()}");
         _selectedFinish = null;
 
         _doorHardwares = OrderApi
+            .Product
             .GetAllowedDrawerHardware(styleConfiguration!)
             .AsQueryable();
         Logger.LogInformation($"Door Hardwares: {_doorHardwares.Count()}");
@@ -255,25 +252,26 @@
         Logger.LogInformation("On Cancel Click");
     }
 
-    private void GetProductPrice() {
+    private async Task GetProductPrice() {
         _isSubmitting = true;
         Logger.LogInformation("Get Product Price");
-        var response = "";
-        _productPrice = ProjectStore.GetProductPrice(
-            _selectedProduct!,
-            _newProduct.Width,
-            _newProduct.Height,
-            _newProduct.Depth,
-            _selectedStyleConfiguration!.Name,
-            _selectedFinish!,
-            _leftEndFinished ? "Finished" : "Unfinished",
-            _rightEndFinished ? "Finished" : "Unfinished",
-            _selectedDoorHardware ?? "",
-            "Left",
-            ref response
-        );
+        _newProduct.ProductFinishInterior = _selectedFinish;
+        _newProduct.ProductLeftSide = _leftEndFinished ? "Finished" : "Unfinished";
+        _newProduct.ProductRightSide = _rightEndFinished ? "Finished" : "Unfinished";
+        _newProduct.ProductSlide = _selectedDoorHardware;
+        _newProduct.ProductDoorSwing = "Left";
+        var priceRes = await OrderApi
+            .Product
+            .GetProductPrice(
+                _selectedProduct!,
+                _newProduct.Width,
+                _newProduct.Height,
+                _newProduct.Depth,
+                _selectedStyleConfiguration!.Name
+            );
+        _productPrice = priceRes.Item1;
         Logger.LogInformation("Product Price: "+_productPrice);
-        Logger.LogInformation("Product Resporse: "+response);
+        Logger.LogInformation("Product Resporse: "+priceRes.Item2);
         _isSubmitting = false;
     } 
 }

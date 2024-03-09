@@ -1,12 +1,9 @@
 ﻿@using SMART.Common.ProjectManagement
-
 @page "/quotes/{projectLinkId}"
-
 @namespace SO.Components.Projects
 
 @inject ILogger<ProjectDetail> _logger
-@inject ProjectStore _projectStore
-
+@inject SmartOrderApi OrderApi
 
 <div class="flex flex-col h-full">
     @if(_isLoading) {
@@ -26,26 +23,24 @@
     [Parameter]
     public string? ProjectLinkId { get; set; }
 
-    private ProjectView? _project;
+    private Project? _project;
     private bool _isLoading = true;
 
     @* protected override void OnInitialized()
     { *@
 
-    protected override async Task OnInitializedAsync()
-    {
+    protected override async Task OnInitializedAsync() {
         //_logger.LogInformation("Load Project: {ProjectLinkId}", ProjectLinkId ?? "NULL");
-        _project = await _projectStore!
-            .ReadableStore
-            .GetOne(p => p.LinkID == ProjectLinkId);
-        _projectStore!.Storage.OnStateChanged += OnStateChanged!;
+        _project = await OrderApi
+            .Project
+            .GetProjectById(ProjectLinkId!);
         _isLoading = false;
     }
 
     private async void OnStateChanged(object sender, EventArgs e) {
-        _project = await _projectStore!
-            .ReadableStore
-            .GetOne(p => p.LinkID == ProjectLinkId);
+        _project = await OrderApi
+            .Project
+            .GetProjectById(ProjectLinkId!);
         await InvokeAsync(StateHasChanged);
     }
 }
