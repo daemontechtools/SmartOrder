@@ -9,5 +9,8 @@
 		{
 			"path": "../SmartOrderApi"
 		}
-	]
+	],
+	"settings": {
+		"dotnet.defaultSolution": "SmartOrder/SmartOrder.sln"
+	}
 }
