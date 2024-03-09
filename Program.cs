@@ -35,21 +35,7 @@ IMapper mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
 builder.Services.AddScoped<ModalService>();
-// TODO: This should work as Scoped
-builder.Services.AddSingleton(s => {
-    ApiCreds creds = new ApiCreds {
-        FactoryLinkId = builder.Configuration["SMART_FACTORY_ID"]!,
-        DealerName = builder.Configuration["SMART_DEALER_NAME"]!,
-        UserName = builder.Configuration["SMART_USER_NAME"]!
-    };
-    var logger = s.GetRequiredService<ILogger<OrderApi>>(); 
-    return new OrderApi(creds, logger);
-});
-builder.Services.AddSingleton<ProjectApi>();
-builder.Services.AddSingleton<ProjectStore>();
-builder.Services.AddSingleton<ShipLocationApi>();
-builder.Services.AddSingleton<ShipLocationStore>();
-
+builder.Services.AddSingleton<SmartOrderApi>();
 builder.WebHost.UseWebRoot("wwwroot");
 builder.WebHost.UseStaticWebAssets();
 
@@ -91,6 +77,19 @@ app.UseAntiforgery();
 //   await httpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
 //   await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 // });
+ 
+// Put this here temporarily for convenience
+// Move this this to the login flow
+app.Use(async (context, next) => { 
+    var config = context.RequestServices.GetRequiredService<IConfiguration>();
+    var orderApi = context.RequestServices.GetRequiredService<SmartOrderApi>();
+    await orderApi.Login(new ApiCreds(
+        config["SMART_FACTORY_ID"]!,
+        config["SMART_DEALER_NAME"]!,
+        config["SMART_USER_NAME"]!
+    ));
+    await next();
+});
 
 
 app.MapRazorComponents<App>()
