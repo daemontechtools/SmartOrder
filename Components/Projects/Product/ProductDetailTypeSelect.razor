@@ -22,17 +22,17 @@
 
 >
     <option value="" disabled selected>Select Product Type</option>
-    @foreach(ProductCategoryTypes type in Enum.GetValues(typeof(ProductCategoryTypes)))
+    @foreach(ProductCategoryType type in Enum.GetValues(typeof(ProductCategoryType)))
     {
         <option>@type</option>
     }
 </InputSelect>
 
 @code {
-    private ProductCategoryTypes? _selectedProductType;
+    private ProductCategoryType? _selectedProductType;
 
     [Parameter]
-    public ProductCategoryTypes? SelectedProductType
+    public ProductCategoryType? SelectedProductType
     {
         get => _selectedProductType;
         set
@@ -46,5 +46,5 @@
     }
 
     [Parameter]
-    public EventCallback<ProductCategoryTypes?> OnProductTypeChanged { get; set; }
+    public EventCallback<ProductCategoryType?> OnProductTypeChanged { get; set; }
 }

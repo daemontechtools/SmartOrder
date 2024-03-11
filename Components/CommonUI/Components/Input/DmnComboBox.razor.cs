@@ -58,8 +58,9 @@ public partial class DmnComboBox<T> : InputBase<T> {
     }
 
     private string GetTextValue(T obj) {
-        if(obj == null || TextFieldName == null) return "";
+        if(obj == null) throw new Exception("Can't get text value from null object");
         if(obj is string) return obj as string ?? "";
+        if(TextFieldName == null) throw new Exception("If object is not string, TextFieldName must be set");
         return GetPropertyValue(obj, TextFieldName).ToString() ?? "";
     }
 

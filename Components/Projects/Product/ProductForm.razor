@@ -96,7 +96,7 @@
                                     class="mt-4"
                                 >
                                     <option value="">Select a Product Type</option>
-                                    @foreach(ProductCategoryTypes type in Enum.GetValues<ProductCategoryTypes>()) {
+                                    @foreach(ProductCategoryType type in Enum.GetValues<ProductCategoryType>()) {
                                             <option value=@type>@type</option>
                                     }
                                 </InputSelect> *@
@@ -158,7 +158,7 @@
     
     private LibraryProduct? _selectedProduct;
 
-    private ProductCategoryTypes? _selectedProductType { get; set; }
+    private ProductCategoryType? _selectedProductType { get; set; }
 
     private IQueryable<LibraryStyleConfiguration>? _styleConfigurations;
     private LibraryStyleConfiguration? _selectedStyleConfiguration;
@@ -170,7 +170,7 @@
     private string? _selectedDoorHardware;
     
 
-    private IDictionary<ProductCategoryTypes, List<ProductFormView>>? _productTypeDictionary;
+    private IDictionary<ProductCategoryType, List<ProductFormView>>? _productTypeDictionary;
 
     private PersistingComponentStateSubscription? _stateSubscription;
 
@@ -198,7 +198,7 @@
     }
 
     @* private void OnProductTypeChanged(ChangeEventArgs e) {
-        ProductCategoryTypes productType = (ProductCategoryTypes)Enum.Parse(typeof(ProductCategoryTypes), e.Value.ToString());
+        ProductCategoryType productType = (ProductCategoryType)Enum.Parse(typeof(ProductCategoryType), e.Value.ToString());
         _selectedProductType = productType;
     } *@
     

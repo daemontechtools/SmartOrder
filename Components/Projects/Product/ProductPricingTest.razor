@@ -1,9 +1,7 @@
-@rendermode @(new InteractiveServerRenderMode(prerender: false))
-@namespace SO.Components.Projects
-
-@* @page "/" *@
 @page "/product-pricing-test"
-
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@attribute [StreamRendering(true)]
+@namespace SO.Components.Projects
 @inject IMapper Mapper
 @inject SmartOrderApi OrderApi
 @inject ILogger<ProductPricingTest> Logger
@@ -28,110 +26,90 @@
             /> 
             <EditForm 
                 @ref=@_editForm
-                Model=@_newProduct     
+                Model=@_productFormView    
                 FormName="test-product-pricing"
                 OnValidSubmit=@GetProductPrice
             >
                 <ObjectGraphDataAnnotationsValidator />
                 <div class="grid grid-cols-6 gap-8 mt-8">
-                    <div class="col-span-3">
-                        <div class="h-full flex items-center w-2/3">
-                            <div class="center-self w-full">
-                                @* <ProductDetailTypeSelect 
-                                    SelectedProductType=@SelectedProductType
-                                    OnProductTypeChanged="OnProductTypeChanged"
-                                />  *@
-                                <DmnComboBox 
-                                    Data=@_allProducts
-                                    @bind-Value=@_selectedProduct
-                                    TextFieldName=@nameof(ProductFormView.Name)
-                                    Label="Select a Product"
-                                    Class="pb-0"
-                                />
-@* 
-                                <div class="flex flex-col">
-                                    @foreach(var product in _allProducts) {
-                                        <span>@product.Name</span>
-                                    }
-                                </div> *@
+                    <div class="col-span-6">
+                        <DmnComboBox 
+                            Data=@_allCabinets
+                            @bind-Value:get=@_selectedCabinet
+                            @bind-Value:set=@(c => OnProductSelected(c))
+                            TextFieldName=@nameof(LibraryProduct.Name)
+                            Label="Select a Product"
+                            Class="pb-4"
+                        />
 
-                                @if(_selectedProduct is not null) {
-                                    <div class="mt-3" />
-                                    <DmnComboBox
-                                        Data=@_styleConfigurations
-                                        @bind-Value=@_selectedStyleConfiguration
-                                        TextFieldName=@nameof(LibraryStyleConfiguration.Name)
-                                        Label="Select a Door Style"
-                                    />
-                                }
+                        @if(_selectedCabinet != null) {
+                            <DmnComboBox 
+                                Data=@_doorStyles
+                                @bind-Value:get=@_selectedDoorStyle
+                                @bind-Value:set=@(s => OnStyleSelected(s))
+                                TextFieldName=@nameof(LibraryStyleConfiguration.Name)
+                                Label="Select a Door Style"
+                                Class="pb-4"
+                            />
+                        }
 
-                                @if(_selectedStyleConfiguration is not null) {
-                                    <div class="mt-3" />
-                                    <DmnComboBox
+                        @if(_selectedDoorStyle != null) {
+                            <div class="col-span-6">
+                                <div class="col-span-3">
+                                    <DmnComboBox 
                                         Data=@_finishes
                                         @bind-Value=@_selectedFinish
                                         Label="Select a Finish"
+                                        Class="pb-4"
                                     />
-                                }
-                                
-                                @if(_selectedStyleConfiguration is not null) {
+                                    <DmnComboBox 
+                                        Data=@_drawerHardwares
+                                        @bind-Value=@_selectedDrawerHardware
+                                        Label="Select a Drawer Hardware"
+                                        Class="pb-4"
+                                    />
+                                </div>
+                                <div class="col-span-3">
+                                    <div class="flex flex-col">
+                                        <label>
+                                            Width:
+                                            <InputNumber @bind-Value=@_productFormView.Width />
+                                        </label>
+                                        <div class="mt-3" />
+                                        <label>
+                                            Height:
+                                            <InputNumber @bind-Value=@_productFormView.Height />
+                                        </label>
+                                        <div class="mt-3" />
+                                        <label>
+                                            Depth:
+                                            <InputNumber @bind-Value=@_productFormView.Depth />
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        </div>
+                    </div> 
+                    @if(_productPrice != null 
+                        || !string.IsNullOrEmpty(_priceError)
+                    ) {
+                        <div class="col-span-6 mt-6">
+                            <div class="flex flex-col">
+                                <label>
+                                    Product Price:
+                                    @_productPrice
+                                </label>
+                                @if(!string.IsNullOrEmpty(_priceError)) {
                                     <div class="mt-3" />
-                                    <DmnComboBox
-                                        Data=@_doorHardwares
-                                        @bind-Value=@_selectedDoorHardware
-                                        Label="Select a Door Hardware"
-                                    />
+                                    <label>
+                                        Product Error:
+                                        @_priceError
+                                    </label>
                                 }
-
-                                
-
-                                @* <InputSelect 
-                                    @bind-Value=_selectedProductType
-                                    class="mt-4"
-                                >
-                                    <option value="">Select a Product Type</option>
-                                    @foreach(ProductCategoryTypes type in Enum.GetValues<ProductCategoryTypes>()) {
-                                            <option value=@type>@type</option>
-                                    }
-                                </InputSelect> *@
-
                             </div>
                         </div>
-                    </div>
-                    <div class="col-span-3">
-                        <div class="flex flex-col">
-                            <label>
-                                Width:
-                               <InputNumber @bind-Value=@_newProduct.Width />
-                            </label>
-                            <div class="mt-3" />
-                            <label>
-                                Height:
-                               <InputNumber @bind-Value=@_newProduct.Height />
-                            </label>
-                            <div class="mt-3" />
-                            <label>
-                                Depth:
-                               <InputNumber @bind-Value=@_newProduct.Depth />
-                            </label>
-
-
-                            <div class="mt-5" />
-                            <label>
-                                Left End Finished:
-                                <InputCheckbox @bind-Value=@_leftEndFinished />
-                            </label>
-                            <label>
-                                Right End Finished:
-                                <InputCheckbox @bind-Value=@_rightEndFinished />
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-span-6 border-solid border-2 border-stone-700 flex mt-8 p-3 text-xl">
-                   <h2 class="mr-2">Product Price:</h2> 
-                   <span>@_productPrice</span>
-                </div>
+                    }
             </EditForm>
         }
     </div>
@@ -139,53 +117,54 @@
 
 
 @code {
-    
     private bool _isLoading = true;
-
-    private EditForm? _editForm = default!;
+    private EditForm? _editForm;
     private bool _isSubmitting = false;
 
-    private ProductFormView _newProduct = new("");
+    private ProductFormView _productFormView = new("");
 
-    private IQueryable<LibraryProduct>? _allProducts;
-    private IDictionary<ProductCategoryTypes, List<LibraryProduct>> _sortedProducts;
-    private LibraryProduct? _selectedProduct;
+    private IQueryable<LibraryProduct>? _allCabinets;
+    private IDictionary<ProductCategoryType, List<LibraryProduct>> _sortedCabinets;
+    private LibraryProduct? _selectedCabinet;
 
-    private ProductCategoryTypes? _selectedProductType { get; set; }
+    private ProductCategoryType? _selectedProductType { get; set; }
+    private IQueryable<ProductCategoryType>? _productTypes;
 
-    private IQueryable<LibraryStyleConfiguration>? _styleConfigurations;
-    private LibraryStyleConfiguration? _selectedStyleConfiguration;
+    private IQueryable<LibraryStyleConfiguration>? _doorStyles;
+    private LibraryStyleConfiguration? _selectedDoorStyle;
 
     private IQueryable<string>? _finishes;
     private string? _selectedFinish;
 
-    private IQueryable<string>? _doorHardwares;
-    private string? _selectedDoorHardware;
+    private IQueryable<string>? _drawerHardwares;
+    private string? _selectedDrawerHardware;
 
     private bool _leftEndFinished = false;
     private bool _rightEndFinished = false;
 
-    private float _productPrice = 0;
+    private float? _productPrice;
+    private string _priceError = "";
 
     
 
-    private Dictionary<ProductCategoryTypes, List<ProductFormView>> _productTypeDictionary;
+    private Dictionary<ProductCategoryType, List<ProductFormView>> _productTypeDictionary;
 
 
     protected override async Task OnInitializedAsync() {
-        var products = await OrderApi
+        //_productTypes test = Enum.GetValues<ProductCategoryType>().AsQueryable();
+        var cabinets = await OrderApi
             .Product
             .GetAllCabinets();
-        _allProducts = products.AsQueryable();
-        _sortedProducts = await OrderApi
+        _allCabinets = cabinets.AsQueryable();
+        _sortedCabinets = await OrderApi
             .Product
-            .GetSortedProducts(products!);
+            .GetSortedProducts(cabinets);
         _isLoading = false;
     }
 
     @* protected override void OnAfterRender(bool firstRender) {       
         if(_selectedProductType is not null) {
-            ProductCategoryTypes productType = (ProductCategoryTypes)_selectedProductType;
+            ProductCategoryType productType = (ProductCategoryType)_selectedProductType;
             _allProducts = _productTypeDictionary[productType].AsQueryable();
         }
     } *@
@@ -197,52 +176,54 @@
     } *@
 
     @* private void OnProductTypeChanged(ChangeEventArgs e) {
-        ProductCategoryTypes productType = (ProductCategoryTypes)Enum.Parse(typeof(ProductCategoryTypes), e.Value.ToString());
+        ProductCategoryType productType = (ProductCategoryType)Enum.Parse(typeof(ProductCategoryType), e.Value.ToString());
         _selectedProductType = productType;
     }
     *@
 
-    private async void OnProductSelected(object obj) {
-        var product = obj as LibraryProduct;
+    private async void OnProductSelected(LibraryProduct product) {
         Logger.LogInformation($"Product Code selected: {product?.Name}");
-        _selectedProduct = product;
+        _selectedCabinet = product;
 
         // Get StyleConfigurations for this product
-        _styleConfigurations = (await OrderApi
+        _doorStyles = (await OrderApi
             .Product
             .GetDoorStylesForProduct(product))
             .AsQueryable();
-        _selectedStyleConfiguration = null;
+        _selectedDoorStyle = null;
 
         _finishes = null;
         _selectedFinish = null;
-        _doorHardwares = null;
-        _selectedDoorHardware = null;
+        _drawerHardwares = null;
+        _selectedDrawerHardware = null;
+    }
+
+    private void OnProductTypeChanged(ProductCategoryType e) {
+        Logger.LogInformation($"Product Type selected: {e}");
+        _selectedProductType = e;
     }
     
-    private void OnStyleSelected(object obj) {
-        var styleConfiguration = obj as LibraryStyleConfiguration;
-        //Logger.LogInformation($"Style selected: {styleConfiguration?.Name}");
-        _selectedStyleConfiguration = styleConfiguration;
+    private void OnStyleSelected(LibraryStyleConfiguration doorStyle) {
+        _selectedDoorStyle = doorStyle;
 
         _finishes = OrderApi
             .Product
-            .GetAllowedFinishes(styleConfiguration!)
+            .GetAllowedFinishes(doorStyle!)
             .AsQueryable();
         Logger.LogInformation($"Finishes: {_finishes.Count()}");
         _selectedFinish = null;
 
-        _doorHardwares = OrderApi
+        _drawerHardwares = OrderApi
             .Product
-            .GetAllowedDrawerHardware(styleConfiguration!)
+            .GetAllowedDrawerHardware(doorStyle!)
             .AsQueryable();
-        Logger.LogInformation($"Door Hardwares: {_doorHardwares.Count()}");
-        _selectedDoorHardware = null;
+        Logger.LogInformation($"Drawer Hardwares: {_drawerHardwares.Count()}");
+        _selectedDrawerHardware = null;
     }
 
-    private void OnSubmitClick(){
+    private async Task OnSubmitClick(){
         if (_editForm!.EditContext!.Validate()) {
-            GetProductPrice();
+            await GetProductPrice();
         } else {
             Logger.LogInformation("Validation failed!!!!");
         }
@@ -253,25 +234,28 @@
     }
 
     private async Task GetProductPrice() {
-        _isSubmitting = true;
         Logger.LogInformation("Get Product Price");
-        _newProduct.ProductFinishInterior = _selectedFinish;
-        _newProduct.ProductLeftSide = _leftEndFinished ? "Finished" : "Unfinished";
-        _newProduct.ProductRightSide = _rightEndFinished ? "Finished" : "Unfinished";
-        _newProduct.ProductSlide = _selectedDoorHardware;
-        _newProduct.ProductDoorSwing = "Left";
+        _isSubmitting = true;
+        _selectedCabinet.ProductFinishInterior = _selectedFinish;
+        _selectedCabinet.ProductLeftSide = _leftEndFinished ? "Finished" : "Unfinished";
+        _selectedCabinet.ProductRightSide = _rightEndFinished ? "Finished" : "Unfinished";
+        _selectedCabinet.ProductSlide = _selectedDrawerHardware;
+        _selectedCabinet.ProductDoorSwing = "Left";
+        Logger.LogInformation("Product Finish: "+_selectedFinish);
+        Logger.LogInformation("Product Drawer Hardware: "+_selectedDrawerHardware);
         var priceRes = await OrderApi
             .Product
             .GetProductPrice(
-                _selectedProduct!,
-                _newProduct.Width,
-                _newProduct.Height,
-                _newProduct.Depth,
-                _selectedStyleConfiguration!.Name
+                _selectedCabinet!,
+                _productFormView.Width,
+                _productFormView.Height,
+                _productFormView.Depth,
+                _selectedDoorStyle!.Name
             );
         _productPrice = priceRes.Item1;
+        _priceError = priceRes.Item2;
+        _isSubmitting = false;
         Logger.LogInformation("Product Price: "+_productPrice);
         Logger.LogInformation("Product Resporse: "+priceRes.Item2);
-        _isSubmitting = false;
     } 
 }
