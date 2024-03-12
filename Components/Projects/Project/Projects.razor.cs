@@ -2,10 +2,8 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.QuickGrid;
 using SMART.Common.ProjectManagement;
 using SMART.Web.OrderApi;
-using Daemon.RazorUI.Modal;
 using Daemon.RazorUI.Icons;
-using SO.Data;
-
+using Daemon.RazorUI.Modal;
 namespace SO.Components.Projects;
 
 public partial class Projects : ComponentBase {
@@ -33,10 +31,10 @@ public partial class Projects : ComponentBase {
     private GridSort<Project> _sortByName = GridSort<Project>
         .ByAscending(p => p.Name);
 
-
     protected override async Task OnInitializedAsync() {
-        var projects = await _orderApi!.Project.GetProjects();
-        _projects = projects.AsQueryable();
+        _projects = await _orderApi!
+            .Project
+            .GetProjectsAsQueryable();
         _deleteConfirmationInput = new ModalContentProps {
             Title = "Delete Quote",
             Description = "Are you sure you want to delete this quote?",
@@ -46,14 +44,17 @@ public partial class Projects : ComponentBase {
             ButtonClass = "bg-red-500 hover:bg-red-400",
             OnConfirm = OnDeleteConfirm 
         };
-    
         IsLoading = false;
     }
 
     private async Task OnDeleteConfirm(bool confirmed) {
        if (confirmed && _projectToDelete != null) {
             await _orderApi!.Project.DeleteProject(_projectToDelete);
+            _projects = await _orderApi!
+                .Project
+                .GetProjectsAsQueryable(true);
             _projectToDelete = null;
+            StateHasChanged();
         }
         _modalService!.Hide();
     }

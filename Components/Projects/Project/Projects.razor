@@ -1,11 +1,8 @@
 @page "/"
 @page "/quotes"
-@using Microsoft.AspNetCore.Authorization
-@using SMART.Web.OrderApi
-@namespace SO.Components.Projects
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
-@* @attribute [Authorize] *@
-  
+@namespace SO.Components.Projects
+ 
 <div class="flex flex-col h-full">
     <Search OnInput=OnSearchInput />
     <div class="container flex flex-col flex-1 justify-between bg-gray-100 h-full pt-8 pb-3">
