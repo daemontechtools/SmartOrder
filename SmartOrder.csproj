@@ -52,7 +52,6 @@
 
   <!-- Integrate TailwindCSS -->
 
-  <!-- Only do this when we actually have scoped css to process -->
   <Target
     Name="ProcessScopedCssFilesWithTailwind" 
     AfterTargets="_GenerateScopedCssFiles"
@@ -77,10 +76,11 @@
   </Target>
 
   <Target
-    Name="PostBuild" 
-    AfterTargets="PostBuildEvent" 
-    Condition="'$(Configuration)'=='Release'"
+    Name="Build TailwindCSS" 
+    AfterTargets="Build"
   >
-    <Exec Command="$(ProjectDir)build-tailwind.sh" />
+    <Exec 
+      Command="$(ProjectDir)build-tailwind.sh" 
+    />
   </Target>
 </Project>
