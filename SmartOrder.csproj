@@ -10,9 +10,6 @@
     <NoWarn>$(NoWarn);NETSDK1057</NoWarn>
   </PropertyGroup>
 
-  <PropertyGroup Condition="$(CI) != 'true'">
-    <TAILWINDCSS_PATH>/usr/local/bin/tailwindcss</TAILWINDCSS_PATH>
-  </PropertyGroup>
 
   <ItemGroup>
     <Watch Include="./Styles/**/*.css" />
@@ -51,7 +48,17 @@
 
 
   <!-- Integrate TailwindCSS -->
-
+  <PropertyGroup Condition="$(CI) != 'true'">
+    <TailwindCssPath>/usr/local/bin/tailwindcss</TailwindCssPath>
+  </PropertyGroup>
+  <Target Name="FindTailwindCss">
+      <Exec Command="where tailwindcss" ConsoleToMSBuild="true" Condition="'$(OS)' == 'Windows_NT'">
+          <Output TaskParameter="ConsoleOutput" PropertyName="TailwindCssPath" />
+      </Exec>
+      <Exec Command="command -v tailwindcss" ConsoleToMSBuild="true" Condition="'$(OS)' != 'Windows_NT'">
+          <Output TaskParameter="ConsoleOutput" PropertyName="TailwindCssPath" />
+      </Exec>
+  </Target>
   <Target
     Name="ProcessScopedCssFilesWithTailwind" 
     AfterTargets="_GenerateScopedCssFiles"
@@ -74,13 +81,24 @@
       WorkingDirectory="$(MSBuildProjectDirectory)" 
     />
   </Target>
-
+  
+  <!-- Normal build process -->
   <Target
-    Name="Build TailwindCSS" 
-    AfterTargets="Build"
+    Name="Build TailwindCss"
+    BeforeTargets="PreBuildEvent"
+    DependsOnTargets="FindTailwindCss"
+    Condition="'$(DotNetWatchBuild)' != 'true'"
   >
-    <Exec 
-      Command="$(ProjectDir)build-tailwind.sh" 
-    />
+    <Exec Command="$(TailwindCssPath) build -i ./Styles/site.css -o ./wwwroot/css/site.css" />
+  </Target>
+  
+  <!-- run tailwindcss watch process by using `dotnet watch run` (or just `dotnet watch`)-->
+  <Target
+    Name="Watch TailwindCss"
+    BeforeTargets="PreBuildEvent"
+    DependsOnTargets="FindTailwindCss"
+    Condition="'$(DotNetWatchBuild)' == 'true'"
+  >
+    <Exec Command="$(TailwindCssPath) build -i ./Styles/site.css -o ./wwwroot/css/site.css --watch" />
   </Target>
 </Project>
