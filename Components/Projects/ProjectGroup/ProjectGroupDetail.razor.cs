@@ -41,7 +41,7 @@ public partial class ProjectGroupDetail : ComponentBase {
         );
         _products = await _orderApi!
             .Product
-            .GetAllCabinets();
+            .GetCabinets();
         IsLoading = false;
 
         _roomProfileProps.Add(new RoomProfileProps { Title = "Door Style" });

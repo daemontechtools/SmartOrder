@@ -52,7 +52,7 @@
     protected override async Task OnInitializedAsync() {
         var products = await OrderApi
             .Product
-            .GetAllCabinets();
+            .GetCabinets();
         var product = products
             .First(p => p.LinkID == "2314PD9GF83F")
             ?? throw new Exception("W2D_40 test product not found");

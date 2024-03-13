@@ -189,7 +189,7 @@
         } else {
             _productFormView = new("");
         }
-        var products = await OrderApi.Product.GetAllCabinets();
+        var products = await OrderApi.Product.GetCabinets();
         _allProducts = products.AsQueryable();
         @* _productTypeDictionary = await OrderApi
             .Product
