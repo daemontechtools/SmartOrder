@@ -11,7 +11,7 @@ RUN apt-get update && \
 
 # Install zsh, python, perl, nodejs, and .NET Core
 RUN apt-get update && apt-get install -y \
-    curl gnupg2 lsb-release \
+    curl wget gnupg2 lsb-release \
     git git-flow
 
 ## Setup NodeJS via Volta
