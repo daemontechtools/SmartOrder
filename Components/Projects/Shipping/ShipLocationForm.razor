@@ -1,14 +1,8 @@
-@using Microsoft.AspNetCore.Components.Forms
-@using Daemon.RazorUI.Input
-@using Daemon.RazorUI.Layout
-@using SO.Data
-
 @inject IMapper Mapper
 @inject ILogger<ShipLocationForm> Logger
 @inject SmartOrderApi OrderApi
- 
 @namespace SO.Components.Projects
-
+@inherits InputBase<ShipLocation>
 
 <EditForm 
     @ref=@_editForm
@@ -21,8 +15,8 @@
     <DmnSectionHeader 
         Title="New Shipping Location"
         TitleClass="!text-xl"
-        SubmitButtonText=@((ShipLocation == null ? "Add" : "Update"))
-        CancelButtonText=@((ShipLocation == null ? "Cancel" : "Delete"))
+        SubmitButtonText=@((string.IsNullOrEmpty(Value.LocationName) ? "Add" : "Update"))
+        CancelButtonText=@((string.IsNullOrEmpty(Value.LocationName) ? "Cancel" : "Delete"))
         IsLoading=@_isSubmitting
         OnSubmitClick=@OnSubmitClick
         OnCancelClick=@OnCancelClick
@@ -32,51 +26,51 @@
         <div class="sm:col-span-3">
             <DmnInputText 
                 Label="Location Name"
-                @bind-Value=@ShipLocation!.LocationName
+                @bind-Value=@_shipLocationFormView!.LocationName
             />
         </div>
         <div class="sm:col-span-3"></div>
-        <ContactForm />
+        @* <ContactForm /> *@
         <div class="sm:col-span-3">
             <DmnInputText 
                 Label="Email Address" 
-                @bind-Value=@ShipLocation!.DefaultContact.DefaultEmail.DisplayAs
+                @bind-Value=@_shipLocationFormView!.DefaultContact.DefaultEmail.DisplayAs
             />
         </div>
         <div class="sm:col-span-3">
             <DmnInputText 
                 Label="Phone Number" 
-                @bind-Value=@ShipLocation!.DefaultContact.DefaultPhone.DisplayAs
+                @bind-Value=@_shipLocationFormView!.DefaultContact.DefaultPhone.DisplayAs
             />
         </div>
         <div class="col-span-full">
             <DmnInputText 
                 Label="Street Address" 
-                @bind-Value=@ShipLocation!.DefaultAddress.Street
+                @bind-Value=@_shipLocationFormView!.DefaultAddress.Street
             />
         </div>
             <div class="col-span-full">
             <DmnInputText 
                 Label="Address Line 2" 
-                @bind-Value=@ShipLocation!.DefaultAddress.StreetLine2
+                @bind-Value=@_shipLocationFormView!.DefaultAddress.StreetLine2
             />
         </div>
         <div class="sm:col-span-2 sm:col-start-1">
             <DmnInputText 
                 Label="City" 
-                @bind-Value=@ShipLocation!.DefaultAddress.City
+                @bind-Value=@_shipLocationFormView!.DefaultAddress.City
             />
         </div>
         <div class="sm:col-span-2">
             <DmnInputText 
                 Label="Province" 
-                @bind-Value=@ShipLocation!.DefaultAddress.StateProvince
+                @bind-Value=@_shipLocationFormView!.DefaultAddress.StateProvince
             />
         </div>
         <div class="sm:col-span-2">
             <DmnInputText 
                 Label="Postal Code" 
-                @bind-Value=@ShipLocation!.DefaultAddress.PostalCode
+                @bind-Value=@_shipLocationFormView!.DefaultAddress.PostalCode
             />
         </div>
     </div>
@@ -85,34 +79,32 @@
 
 @code {
 
-    [Parameter]
-    public ShipLocation? ShipLocation { get; set; }
     private  ShipLocationFormView? _shipLocationFormView;
-
-    [Parameter]
-    public EventCallback OnCancel { get; set; }
-
-    [Parameter]
-    public EventCallback<ShipLocation> OnChange { get; set; }
-        
- 
-    private EditForm _editForm;
+    private EditForm _editForm = default!;
     private bool _isSubmitting = false;
-    private bool IsAddingShipLocation { get; set; } = false;
-    private IQueryable<ShipLocation> ShipLocations { get; set; }
+    private bool _isAddingShipLocation = false;
+    //private IQueryable<ShipLocation>? _shipLocations;
 
-    protected override void OnParametersSet() {
-        if(ShipLocation != null) {
-            _shipLocationFormView = Mapper.Map<ShipLocationFormView>(ShipLocation);
-        }
-        _shipLocationFormView = new("");
-    }
+    @* public override async Task SetParametersAsync(ParameterView parameters) {
+        await base.SetParametersAsync(parameters);
+        Value ??= new ShipLocation("");
+        _shipLocationFormView = Mapper.Map<ShipLocationFormView>(Value);
+    } *@
 
-    protected override async Task OnInitializedAsync() {
-        var locations = await OrderApi
+    protected override void OnInitialized() {
+        _shipLocationFormView = Mapper.Map<ShipLocationFormView>(Value);
+        _shipLocationFormView.DefaultAddress ??= new AddressFormView("");
+        _shipLocationFormView.DefaultContact ??= new ContactFormView("");
+        @* _shipLocations = await OrderApi
             .ShipLocation
-            .GetShipLocations();
-        ShipLocations = locations.AsQueryable();
+            .GetShipLocationsAsQueryable(); *@
+    }
+    
+    protected override bool TryParseValueFromString(
+        string? value, 
+        out ShipLocation shipLocation,
+        out string validationErrorMessage) {
+        throw new NotImplementedException();
     }
 
     private async Task OnSubmitClick() {
@@ -120,7 +112,7 @@
             return;
         }
 
-        if(ShipLocation == null) {
+        if(Value == null) {
             await AddLocation();
         } else {
             await UpdateLocation();
@@ -128,13 +120,12 @@
     }
 
     private void OnCancelClick() {
-        OnCancel.InvokeAsync();
     }
 
     private async Task AddLocation() {
         _isSubmitting = true;
         Logger.LogInformation($"Creating new project: {_shipLocationFormView!.LocationName}");
-        ShipLocation = await OrderApi
+        Value = await OrderApi
             .ShipLocation
             .AddShipLocation(
                 _shipLocationFormView.LocationName,
