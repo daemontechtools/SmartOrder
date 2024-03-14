@@ -21,9 +21,9 @@ public class ProjectFormView : SMARTBaseClass {
         true, 
         ErrorMessage = "Shipping Location is required when IsShipped is true."
     )]
-    public ShipLocation ProjectShipLocation { get; set; } = default!;
+    public ShipLocation ProjectShipLocation { get; set; } = new("");
 
-    public IList<ProjectGroup> ProjectGroups { get; set; } = default!;
+    public IList<ProjectGroup> ProjectGroups { get; set; } = new List<ProjectGroup>();
 }
 
 public class RequiredIfAttribute : ValidationAttribute {

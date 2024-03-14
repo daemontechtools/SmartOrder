@@ -1,12 +1,13 @@
 @page "/quotes/new"
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
+@attribute [StreamRendering(true)]
 @namespace SO.Components.Projects
 @inject NavigationManager NavigationManager
 @inject SmartOrderApi OrderApi
 @inject ILogger<ProjectForm> Logger
 
 <div class="flex flex-col bg-slate-100"
-    <SEBreadcrumbNav
+    <BreadcrumbNav
         Options=@(new List<NavOptionProps> {
             new NavOptionProps { Path = "/quotes" },
             new NavOptionProps { Path = $"/quotes/add", Label = "New Quote" },
