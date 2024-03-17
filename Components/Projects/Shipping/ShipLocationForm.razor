@@ -30,18 +30,9 @@
             />
         </div>
         <div class="sm:col-span-3"></div>
-        @* <ContactForm /> *@
-        <div class="sm:col-span-3">
-            <DmnInputText 
-                Label="Email Address" 
-                @bind-Value=@_shipLocationFormView!.DefaultContact.DefaultEmail.DisplayAs
-            />
-        </div>
-        <div class="sm:col-span-3">
-            <DmnInputText 
-                Label="Phone Number" 
-                @bind-Value=@_shipLocationFormView!.DefaultContact.DefaultPhone.DisplayAs
-            />
+        <div class="col-span-full">
+            <h3 class="text-lg font-semibold">Select Contact</h3>
+            <ContactForm />
         </div>
         <div class="col-span-full">
             <DmnInputText 
