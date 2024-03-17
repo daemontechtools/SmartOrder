@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
+    <Version>0.1.0</Version>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -9,14 +10,6 @@
     <NoWarn>1591</NoWarn>
     <NoWarn>$(NoWarn);NETSDK1057</NoWarn>
   </PropertyGroup>
-
-  <PropertyGroup Condition="$(CI) != 'true'">
-    <TAILWINDCSS_PATH>/usr/local/bin/tailwindcss</TAILWINDCSS_PATH>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <Watch Include="./Styles/**/*.css" />
-  </ItemGroup>
 
   <!-- Third Party Dependencies -->
   <ItemGroup>
@@ -38,7 +31,7 @@
       <HintPath>lib/SMART.Utility.Globalization.dll</HintPath>
     </Reference>
   </ItemGroup>
-  
+
   <!-- Internal Dependencies -->
   <ItemGroup Condition="'$(Configuration)'!='Release'">
     <ProjectReference Include="../daemon-dotnet/DataAccess/DataAccess.csproj" />
@@ -49,38 +42,94 @@
     <PackageReference Include="SmartOrderApi" Version="1.*-*" />
   </ItemGroup>
 
+  <!--
+    Use local node_modules binaries if they exist.
+
+    If there is another directory, say in the CI/CD environment, that tailwindcss
+    is stored, then we should add another <Exec> to this block with the condition
+    that it only run when `'$(CI)' == 'true'`.  That will ensure that this can find
+    the bin anytime
+   -->
+  <Target Name="UseLocalNodeModules" Condition="Exists('node_modules/.bin')">
+    <Exec Command="export PATH=&quot;$(MSBuildProjectDirectory)/node_modules/.bin:$PATH&quot;"  />
+  </Target>
 
   <!-- Integrate TailwindCSS -->
+  <ItemGroup>
+    <!--
+      This gives us a list of files we can process in a loop later
+      Ultimately, we get an `IItemList[]` collection of files that are
+      found under `./Styles` with a `.css` extension.  For each item in the list, a
+      property, `OutputPath`, will be attached, using `RecursiveDir` to maintain the
+      directory structure that was found below `./Styles`
+    -->
+    <CssStyles Include="./Styles/**/*.css">
+      <!-- %(RecursiveDir): The directory traversed during wildcard expansion -->
+      <!-- The other two are probably self-explanatory -->
+      <OutputPath>./wwwroot/css/%(RecursiveDir)%(Filename)%(Extension)</OutputPath>
+    </CssStyles>
+  </ItemGroup>
 
-  <!-- Only do this when we actually have scoped css to process -->
+  <PropertyGroup>
+    <TailwindCssPath>/usr/local/bin/tailwindcss</TailwindCssPath>
+  </PropertyGroup>
+
+  <Target Name="FindTailwindCss" DependsOnTargets="UseLocalNodeModules">
+      <Exec Command="where tailwindcss" ConsoleToMSBuild="true" Condition="'$(OS)' == 'Windows_NT'">
+        <Output TaskParameter="ConsoleOutput" PropertyName="TailwindCssPath" />
+      </Exec>
+      <Exec Command="command -v tailwindcss" ConsoleToMSBuild="true" Condition="'$(OS)' != 'Windows_NT'">
+        <Output TaskParameter="ConsoleOutput" PropertyName="TailwindCssPath" />
+      </Exec>
+  </Target>
+
   <Target
-    Name="ProcessScopedCssFilesWithTailwind" 
+    Name="ProcessScopedCssFilesWithTailwind"
     AfterTargets="_GenerateScopedCssFiles"
   >
-    <MSBuild 
-      Projects="$(MSBuildProjectFile)" 
-      Properties="CurrentScopedCssFile=%(_ScopedCssOutputs.Identity)" 
+    <MSBuild
+      Projects="$(MSBuildProjectFile)"
+      Properties="CurrentScopedCssFile=%(_ScopedCssOutputs.Identity)"
       Targets="ProcessScopedCssFileWithTailwind"
     >
     </MSBuild>
   </Target>
 
-  <Target Name="ProcessScopedCssFileWithTailwind">
-    <Message 
-      Importance="high" 
-      Text="Processing with Tailwind: $(CurrentScopedCssFile)" 
+  <Target
+    Name="ProcessScopedCssFileWithTailwind"
+    DependsOnTargets="FindTailwindCss"
+  >
+    <Message
+      Importance="high"
+      Text="Processing with Tailwind: $(CurrentScopedCssFile)"
     />
-    <Exec 
-      Command="$(TAILWINDCSS_PATH) -i $(CurrentScopedCssFile) -o $(CurrentScopedCssFile)" 
-      WorkingDirectory="$(MSBuildProjectDirectory)" 
+    <Exec
+      Command="$(TailwindCssPath) -i $(CurrentScopedCssfile) -o $(CurrentScopedCssFile)"
+      WorkingDirectory="$(MSBuildProjectDirectory)"
     />
   </Target>
 
+  <!-- Normal build process -->
   <Target
-    Name="PostBuild" 
-    AfterTargets="PostBuildEvent" 
-    Condition="'$(Configuration)'=='Release'"
+    Name="Build TailwindCss"
+    BeforeTargets="PreBuildEvent"
+    DependsOnTargets="FindTailwindCss"
+    Inputs="@(CssStyles)"
+    Outputs="%(CssStyles.OutputPath)"
   >
-    <Exec Command="$(ProjectDir)build-tailwind.sh" />
+    <Exec
+      Command="$(TailwindCssPath) build -i %(CssStyles.Identity) -o %(CssStyles.OutputPath)"
+      WorkingDirectory="$(MSBuildProjectDirectory)"
+    />
   </Target>
+
+  <!-- run tailwindcss watch process by using `dotnet watch run` (or just `dotnet watch`)-->
+  <!-- <Target
+    Name="Watch TailwindCss"
+    BeforeTargets="PreBuildEvent"
+    DependsOnTargets="FindTailwindCss"
+    Condition="'$(DotNetWatchBuild)' == 'true'"
+  >
+    <Exec Command="$(TailwindCssPath) build -i ./Styles/site.css -o ./wwwroot/css/site.css -w" />
+  </Target> -->
 </Project>

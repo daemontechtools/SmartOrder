@@ -154,7 +154,7 @@
         //_productTypes test = Enum.GetValues<ProductCategoryType>().AsQueryable();
         var cabinets = await OrderApi
             .Product
-            .GetAllCabinets();
+            .GetCabinets();
         _allCabinets = cabinets.AsQueryable();
         _sortedCabinets = await OrderApi
             .Product
