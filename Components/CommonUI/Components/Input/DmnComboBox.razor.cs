@@ -19,21 +19,19 @@ public partial class DmnComboBox<T> : InputBase<T> {
     public string? TextFieldName { get; set; }
 
     [Parameter]
+    public string? Placeholder { get; set; }
+
+    [Parameter]
     public string? Label { get; set; }
 
     [Parameter]
     public string? Class { get; set; }
-
-
-    // [Parameter]
-    // public Expression<Func<ValidationTValue>> ValidationValueExpression { get; set; }
 
     private string _searchValue = "";
     private bool _isActive = false;
 
     protected override void OnInitialized() {
         _filteredData = Data;
-        //ValidationValueExpression ??= ValueExpression;
     }
 
     protected override bool TryParseValueFromString(
