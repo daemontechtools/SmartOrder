@@ -12,8 +12,8 @@ public partial class DmnComboBox<T> : InputBase<T> {
     private ILogger<DmnComboBox<T>>? _logger { get; set; }
 
     [Parameter]
-    public IQueryable<T>? Data { get; set; }
-    public IQueryable<T>? _filteredData { get; set; }
+    public IQueryable<T> Data { get; set; } = default!;
+    public IQueryable<T> _filteredData { get; set; } = default!;
 
     [Parameter]
     public string? TextFieldName { get; set; }
@@ -75,7 +75,7 @@ public partial class DmnComboBox<T> : InputBase<T> {
             _filteredData = Data;
             return;
         }
-        _filteredData = Data?
+        _filteredData = Data
             .Where(x => 
                 GetTextValue(x)
                     .Contains(
