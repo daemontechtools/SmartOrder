@@ -13,5 +13,6 @@ public class SmartOrderMappingProfile : Profile {
         CreateMap<ShipLocation, ShipLocationFormView>().ReverseMap();
         CreateMap<Address, AddressFormView>().ReverseMap();
         CreateMap<Contact, ContactFormView>().ReverseMap();
+        CreateMap<CommunicationLink, CommunicationLinkFormView>().ReverseMap();
     }
 }
