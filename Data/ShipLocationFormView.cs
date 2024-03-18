@@ -9,7 +9,7 @@ public class ShipLocationFormView : SMARTBaseClass {
     public ShipLocationFormView(string LinkID) : base(LinkID) {}
 
     [Required]
-    public string LocationName { get; set; } = default!;
+    public string LocationName { get; set; } = "";
 
     public ContactFormView DefaultContact { get; set; } = new ContactFormView("");
     
