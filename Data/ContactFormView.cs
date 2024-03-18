@@ -1,15 +1,11 @@
 using System.ComponentModel.DataAnnotations;
-using SMART.Common.CompanyManagement;
 namespace SO.Data;
 
 public class ContactFormView : SMARTBaseClassView {
-    public ContactFormView(string LinkID) : base(LinkID) { 
-        DefaultEmail = new CommunicationLink("");
-        DefaultPhone = new CommunicationLink("");
-    }
+    public ContactFormView(string LinkID) : base(LinkID) {}
 
     [Required]
-    public string DisplayName { get; set; } = default!;
-    public CommunicationLink DefaultEmail { get; set; } = default!;
-    public CommunicationLink DefaultPhone { get; set; } = default!;
+    public string DisplayName { get; set; } = "";
+    public CommunicationLinkFormView DefaultEmail { get; set; } = new("");
+    public CommunicationLinkFormView DefaultPhone { get; set; } = new("");
 }

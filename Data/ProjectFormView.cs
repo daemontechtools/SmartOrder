@@ -9,21 +9,22 @@ public class ProjectFormView : SMARTBaseClass {
     public ProjectFormView(string LinkID) : base(LinkID) { }
 
     [Required]
-    [StringLength(30, ErrorMessage = "Id too long (30 character limit).")]
-    public string Name { get; set; } = default!;
+    [StringLength(50, ErrorMessage = "Id too long (50 character limit).")]
+    public string Name { get; set; } = "";
    
     [Required]
     public bool IsShipped { get; set; } = false;
-    public string LinkIDEmployeeSoldBy { get; set; } = default!;
+    public string LinkIDEmployeeSoldBy { get; set; } = "";
     
     [RequiredIf(
         "IsShipped", 
         true, 
         ErrorMessage = "Shipping Location is required when IsShipped is true."
     )]
-    public ShipLocation ProjectShipLocation { get; set; } = default!;
+    [ValidateComplexType]
+    public ShipLocationFormView ProjectShipLocation { get; set; } = new("");
 
-    public IList<ProjectGroup> ProjectGroups { get; set; } = default!;
+    public IList<ProjectGroup> ProjectGroups { get; set; } = new List<ProjectGroup>();
 }
 
 public class RequiredIfAttribute : ValidationAttribute {
