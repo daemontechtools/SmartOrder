@@ -31,7 +31,7 @@ Displays a combobox of contacts
     protected override async Task OnInitializedAsync() {
         _contacts = await OrderApi
             .Contact
-            .GetContactsQueryable();
+            .GetContactsAsQueryable();
     }
 
     protected override bool TryParseValueFromString(
