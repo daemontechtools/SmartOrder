@@ -2,11 +2,11 @@
 @inject ILogger<ShipLocationForm> Logger
 @inject SmartOrderApi OrderApi
 @namespace SO.Components.Projects
-@inherits InputBase<ShipLocation>
+@inherits InputBase<ShipLocationFormView>
 
 <EditForm 
     @ref=@_editForm
-    Model=@_shipLocationFormView
+    Model=@Value
     FormName="ship-location-form"
     class="flex flex-col"
 >
@@ -26,42 +26,42 @@
         <div class="sm:col-span-3">
             <DmnInputText 
                 Label="Location Name"
-                @bind-Value=@_shipLocationFormView!.LocationName
+                @bind-Value=@Value.LocationName
             />
         </div>
         <div class="sm:col-span-3"></div>
         <div class="col-span-full">
             <h3 class="text-lg font-semibold">Select Contact</h3>
-            <ContactForm />
+            <ContactEditableComboBox @bind-Value=@Value.DefaultContact/>
         </div>
         <div class="col-span-full">
             <DmnInputText 
                 Label="Street Address" 
-                @bind-Value=@_shipLocationFormView!.DefaultAddress.Street
+                @bind-Value=@Value.DefaultAddress.Street
             />
         </div>
             <div class="col-span-full">
             <DmnInputText 
                 Label="Address Line 2" 
-                @bind-Value=@_shipLocationFormView!.DefaultAddress.StreetLine2
+                @bind-Value=@Value.DefaultAddress.StreetLine2
             />
         </div>
         <div class="sm:col-span-2 sm:col-start-1">
             <DmnInputText 
                 Label="City" 
-                @bind-Value=@_shipLocationFormView!.DefaultAddress.City
+                @bind-Value=@Value.DefaultAddress.City
             />
         </div>
         <div class="sm:col-span-2">
             <DmnInputText 
                 Label="Province" 
-                @bind-Value=@_shipLocationFormView!.DefaultAddress.StateProvince
+                @bind-Value=@Value.DefaultAddress.StateProvince
             />
         </div>
         <div class="sm:col-span-2">
             <DmnInputText 
                 Label="Postal Code" 
-                @bind-Value=@_shipLocationFormView!.DefaultAddress.PostalCode
+                @bind-Value=@Value.DefaultAddress.PostalCode
             />
         </div>
     </div>
@@ -69,8 +69,6 @@
 
 
 @code {
-
-    private  ShipLocationFormView? _shipLocationFormView;
     private EditForm _editForm = default!;
     private bool _isSubmitting = false;
     private bool _isAddingShipLocation = false;
@@ -82,18 +80,16 @@
         _shipLocationFormView = Mapper.Map<ShipLocationFormView>(Value);
     } *@
 
-    protected override void OnInitialized() {
-        _shipLocationFormView = Mapper.Map<ShipLocationFormView>(Value);
-        _shipLocationFormView.DefaultAddress ??= new AddressFormView("");
-        _shipLocationFormView.DefaultContact ??= new ContactFormView("");
-        @* _shipLocations = await OrderApi
-            .ShipLocation
-            .GetShipLocationsAsQueryable(); *@
-    }
+    //protected override void OnInitialized() {
+        //_shipLocationFormView = Mapper.Map<ShipLocationFormView>(Value);
+        //_shipLocations = await OrderApi
+            //.ShipLocation
+            //.GetShipLocationsAsQueryable();
+    //}
     
     protected override bool TryParseValueFromString(
         string? value, 
-        out ShipLocation shipLocation,
+        out ShipLocationFormView shipLocation,
         out string validationErrorMessage) {
         throw new NotImplementedException();
     }
@@ -115,25 +111,25 @@
 
     private async Task AddLocation() {
         _isSubmitting = true;
-        Logger.LogInformation($"Creating new project: {_shipLocationFormView!.LocationName}");
-        Value = await OrderApi
+        Logger.LogInformation($"Creating new project: {Value.LocationName}");
+        var newShipLocationFormView = await OrderApi
             .ShipLocation
             .AddShipLocation(
-                _shipLocationFormView.LocationName,
-                _shipLocationFormView.DefaultAddress.Street,
-                _shipLocationFormView.DefaultAddress.StreetLine2,
-                _shipLocationFormView.DefaultAddress.City,
-                _shipLocationFormView.DefaultAddress.StateProvince,
-                _shipLocationFormView.DefaultAddress.PostalCode,
-                _shipLocationFormView.DefaultAddress.AddressNotes
+                Value.LocationName,
+                Value.DefaultAddress.Street,
+                Value.DefaultAddress.StreetLine2,
+                Value.DefaultAddress.City,
+                Value.DefaultAddress.StateProvince,
+                Value.DefaultAddress.PostalCode,
+                Value.DefaultAddress.AddressNotes
             );
-        Logger.LogInformation($"Created new project: {_shipLocationFormView!.LocationName}");
+        Logger.LogInformation($"Created new project: {Value.LocationName}");
         _isSubmitting = false;
     }
     
     private async Task UpdateLocation() {
         _isSubmitting = true;
-        Logger.LogInformation($"Updating project: {_shipLocationFormView!.LocationName}");
+        Logger.LogInformation($"Updating project: {Value.LocationName}");
         @* ShipLocationView updatedLocation = await OrderApi!
             .ShipLocation
             .UpdateShipLocation(ShipLocation!);

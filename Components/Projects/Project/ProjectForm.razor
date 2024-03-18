@@ -57,7 +57,7 @@
             </InputRadioGroup>
              
              @if(_newProject.IsShipped) {
-                <ShipLocationInput @bind-Value=@_newProject.ProjectShipLocation />
+                <ShipLocationEditableComboBox @bind-Value=@_newProject.ProjectShipLocation />
              }
         </EditForm>
     </div>
