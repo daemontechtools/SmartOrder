@@ -1,0 +1,49 @@
+@namespace SO.Components.Projects 
+@inherits InputBase<ContactFormView>
+@inject IMapper Mapper
+@inject SmartOrderApi OrderApi 
+
+@* Takes and sets a Contact object
+Displays a combobox of contacts
+    If a valid contact was passed, set combobox to that contact
+    Display properties of contact in a form below the combobox
+        Form will display Save if the Contact already exists
+        Form will display Create if the Contact does't exists
+    If a property is changed, enable the save button *@
+
+<div class="flex flex-col border-2 radius-2 border-solid border-gray-300">
+    <DmnComboBox
+        Data=@_contacts
+        @bind-Value:get=@_currentContact
+        @bind-Value:set=@OnContactSelected 
+        TextFieldName=@nameof(Contact.DisplayName)
+    />
+</div>
+
+@code {
+    private IQueryable<Contact> _contacts = default!;
+    private Contact _currentContact = default!;
+
+    protected override void OnParametersSet() {
+        _currentContact = Mapper.Map<Contact>(Value);
+    }
+    
+    protected override async Task OnInitializedAsync() {
+        _contacts = await OrderApi
+            .Contact
+            .GetContactsQueryable();
+    }
+
+    protected override bool TryParseValueFromString(
+        string? value, 
+        out ContactFormView result, 
+        out string? validationErrorMessage
+    ) {
+        throw new NotImplementedException();
+    }
+
+    private void OnContactSelected(Contact contact) {
+        _currentContact = contact;
+        Value = Mapper.Map<ContactFormView>(_currentContact);
+    }
+}
