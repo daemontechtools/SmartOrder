@@ -34,11 +34,9 @@
 
   <!-- Internal Dependencies -->
   <ItemGroup Condition="'$(Configuration)'!='Release'">
-    <ProjectReference Include="../daemon-dotnet/DataAccess/DataAccess.csproj" />
     <ProjectReference Include="../SmartOrderApi/SmartOrderApi.csproj" />
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)'=='Release'">
-    <PackageReference Include="Daemon.DataAccess" Version="1.*-*" />
     <PackageReference Include="SmartOrderApi" Version="1.*-*" />
   </ItemGroup>
 
