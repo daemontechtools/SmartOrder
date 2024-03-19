@@ -7,7 +7,7 @@
 
 
 @layer components {
-    .daemon-button {
+    .dmn-btn {
         @apply 
             cursor-pointer
             transition-hover
@@ -19,6 +19,12 @@
             focus-visible:outline-2 focus-visible:outline-offset-2 
             focus-visible:outline-sky-500;
     }
+    
+    .dmn-btn-sm {
+        @apply
+            dmn-btn
+            px-2 py-1 text-xs
+    }
 
     .container-wide {
         @apply flex px-4 sm:px-6 lg:px-8;
@@ -26,5 +32,13 @@
 
     .transition-hover {
         @apply transition duration-200 ease-in;
+    }
+
+    .dmn-link {
+        @apply
+            text-sky-500
+            font-semibold
+            hover:text-sky-400
+            cursor-pointer
     }
 }
