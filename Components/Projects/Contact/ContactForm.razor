@@ -1,84 +1,65 @@
+@inherits InputBase<ContactFormView>
 @inject ILogger<ContactForm> Logger
 @inject IMapper Mapper
 @inject SmartOrderApi OrderApi
- 
 @namespace SO.Components.Projects
-
 
 <EditForm 
     @ref=@_editForm
-    Model=@Contact
+    Model=@Value
     FormName="contact-form"
     class="flex flex-col"
 >
     <ObjectGraphDataAnnotationsValidator />
-    
     <DmnSectionHeader 
         Title="New Contact"
         TitleClass="!text-xl"
         SubmitButtonText=@((_isNewContact ? "Add" : "Update"))
         CancelButtonText=@((_isNewContact ? "Cancel" : "Delete"))
+        Size="sm"
         IsLoading=@_isSubmitting
         OnSubmitClick=@OnSubmitClick
         OnCancelClick=@OnCancelClick
     />
-
     <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
         <div class="sm:col-span-3">
             <DmnInputText 
                 Label="Contact Name"
-                @bind-Value=@Contact!.DisplayName
+                @bind-Value=@Value.DisplayName
             />
         </div>
         <div class="sm:col-span-3"></div>
         <div class="sm:col-span-3">
             <DmnInputText 
                 Label="Email Address" 
-                @bind-Value=@Contact!.DefaultEmail.DisplayAs
+                @bind-Value=@Value.DefaultEmail.DisplayAs
             />
         </div>
         <div class="sm:col-span-3">
             <DmnInputText 
                 Label="Phone Number" 
-                @bind-Value=@Contact!.DefaultPhone.DisplayAs
+                @bind-Value=@Value.DefaultPhone.DisplayAs
             />
         </div>
     </div>
 </EditForm>
 
-
 @code {
-
-    [Parameter]
-    public Contact? Contact { get; set; }
-    private ContactFormView? ContactFormView { get; set; }
-    
-    [Parameter]
-    public ShipLocation? ShipLocation { get; set; }
-
-    [Parameter]
-    public EventCallback OnCancel { get; set; }
-
-    [Parameter]
-    public EventCallback<ContactFormView> OnChange { get; set; }
-        
- 
-    private EditForm _editForm;
+    private EditForm _editForm = default!;
     private bool _isSubmitting = false;
     private bool _isNewContact = true;
-    private bool IsAddingShipLocation { get; set; } = false;
-    private IList<Contact> Contacts { get; set; }
 
     protected override void OnParametersSet() {
-        if(Contact != null) {
-            
+        if(!string.IsNullOrWhiteSpace(Value.DisplayName)) {
+            _isNewContact = false;
         }
-        Contact ??= new("");
     }
 
-    protected override async Task OnInitializedAsync() {
-        
-        Contacts = await OrderApi.Contact.GetContacts();
+    protected override bool TryParseValueFromString(
+        string? value, 
+        out ContactFormView contactFormView,
+        out string validationErrorMessage) {
+        throw new NotImplementedException();
     }
 
     private async Task OnSubmitClick() {
@@ -88,29 +69,27 @@
         await UpsertLocation();
     }
 
-    private void OnCancelClick()
-    {
-        OnCancel.InvokeAsync();
+    private void OnCancelClick() {
     }
 
     private async Task UpsertLocation() {
         _isSubmitting = true;
-        Logger.LogInformation($"Upserting new contact: {Contact!.DisplayName}");
+        Logger.LogInformation($"Upserting new contact: {Value.DisplayName}");
         if(_isNewContact) {
-            await OrderApi!
+            @* await OrderApi!
                 .Contact
                 .AddContact(
-                    Contact.DisplayName,
-                    Contact.DefaultPhone.DisplayAs,
-                    Contact.DefaultEmail.DisplayAs,
+                    Value.DisplayName,
+                    Value.DefaultPhone.DisplayAs,
+                    Value.DefaultEmail.DisplayAs,
                     ShipLocation!
-                );
+                ); *@
         } else {
-            await OrderApi!
+            @* await OrderApi!
                 .Contact
-                .UpdateContact(Contact!);
+                .UpdateContact(Contact!); *@
         }
-        Logger.LogInformation($"Upserted new contact: {Contact!.DisplayName}");
+        Logger.LogInformation($"Upserted new contact: {Value.DisplayName}");
         //await OnChange.InvokeAsync(newContact);
         _isSubmitting = false;
     }

@@ -14,9 +14,10 @@
     
     <DmnSectionHeader 
         Title="New Shipping Location"
-        TitleClass="!text-xl"
+        TitleClass="!text-xl2"
         SubmitButtonText=@((string.IsNullOrEmpty(Value.LocationName) ? "Add" : "Update"))
         CancelButtonText=@((string.IsNullOrEmpty(Value.LocationName) ? "Cancel" : "Delete"))
+        Size="sm"
         IsLoading=@_isSubmitting
         OnSubmitClick=@OnSubmitClick
         OnCancelClick=@OnCancelClick
@@ -30,8 +31,12 @@
             />
         </div>
         <div class="sm:col-span-3"></div>
-        <div class="col-span-full">
-            <h3 class="text-lg font-semibold">Select Contact</h3>
+        <div class="
+            col-span-full 
+            border-2 rounded-lg border-solid border-gray-300
+            p-4
+        ">
+            <h3 class="text-xl font-semibold">Shipping Contact</h3>
             <ContactEditableComboBox @bind-Value=@Value.DefaultContact/>
         </div>
         <div class="col-span-full">

@@ -57,6 +57,7 @@
             </InputRadioGroup>
              
              @if(_newProject.IsShipped) {
+                <div class="border-t border-gray-300 mb-3 mt-3"></div>
                 <ShipLocationEditableComboBox @bind-Value=@_newProject.ProjectShipLocation />
              }
         </EditForm>

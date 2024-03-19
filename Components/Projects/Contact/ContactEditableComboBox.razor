@@ -11,18 +11,37 @@ Displays a combobox of contacts
         Form will display Create if the Contact does't exists
     If a property is changed, enable the save button *@
 
-<div class="flex flex-col border-2 radius-2 border-solid border-gray-300">
-    <DmnComboBox
-        Data=@_contacts
-        @bind-Value:get=@_currentContact
-        @bind-Value:set=@OnContactSelected 
-        TextFieldName=@nameof(Contact.DisplayName)
-    />
+<div class="
+    flex flex-col
+    grid grid-cols-2 gap-4 
+">
+    <div class="col-span-1">
+        <DmnComboBox
+            Data=@_contacts
+            @bind-Value:get=@_currentContact
+            @bind-Value:set=@OnContactSelected 
+            TextFieldName=@nameof(Contact.DisplayName)
+            Placeholder="Select a Contact"
+        />
+    </div>
+    <div class="col-span-full">
+        @if(!_isAdding) {
+            <a 
+                class="dmn-link mt-2"
+                @onclick=@(() => _isAdding = true)
+            >
+                Add New Contact
+            </a>
+        } else {
+            <ContactForm @bind-Value=@Value/>
+        }
+    </div>
 </div>
 
 @code {
     private IQueryable<Contact> _contacts = default!;
     private Contact _currentContact = default!;
+    private bool _isAdding = false;
 
     protected override void OnParametersSet() {
         _currentContact = Mapper.Map<Contact>(Value);
