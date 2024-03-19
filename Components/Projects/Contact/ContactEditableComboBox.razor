@@ -33,7 +33,10 @@ Displays a combobox of contacts
                 Add New Contact
             </a>
         } else {
-            <ContactForm @bind-Value=@Value/>
+            <ContactForm 
+                @bind-Value:get=@Value
+                @bind-Value:set=@OnContactChanged
+            />
         }
     </div>
 </div>
@@ -64,5 +67,17 @@ Displays a combobox of contacts
     private void OnContactSelected(Contact contact) {
         _currentContact = contact;
         Value = Mapper.Map<ContactFormView>(_currentContact);
+    }
+
+    private async Task OnContactChanged(ContactFormView contact) {
+        Value = contact;
+        // refresh the contacta and set the current contact
+        _contacts = await OrderApi
+            .Contact
+            .GetContactsAsQueryable(true);
+        _currentContact = _contacts
+            .FirstOrDefault(c => c.LinkID == contact.LinkID)
+            ?? throw new InvalidOperationException("Contact not found");
+        _isAdding = false;
     }
 }

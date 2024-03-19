@@ -45,6 +45,8 @@
 </EditForm>
 
 @code {
+    [Parameter]
+    public ShipLocation ShipLocation { get; set; } = default!;
     private EditForm _editForm = default!;
     private bool _isSubmitting = false;
     private bool _isNewContact = true;
@@ -66,30 +68,38 @@
         if (!_editForm!.EditContext!.Validate()) {
             return;
         }
-        await UpsertLocation();
+        await UpsertContact();
     }
 
     private void OnCancelClick() {
     }
 
-    private async Task UpsertLocation() {
+    private async Task UpsertContact() {
         _isSubmitting = true;
         Logger.LogInformation($"Upserting new contact: {Value.DisplayName}");
+        Contact contact = default!;
         if(_isNewContact) {
-            @* await OrderApi!
+            contact = await OrderApi!
                 .Contact
                 .AddContact(
                     Value.DisplayName,
                     Value.DefaultPhone.DisplayAs,
                     Value.DefaultEmail.DisplayAs,
-                    ShipLocation!
-                ); *@
+                    ShipLocation
+                );
+            _isNewContact = false;
         } else {
-            @* await OrderApi!
+            contact = await OrderApi
                 .Contact
-                .UpdateContact(Contact!); *@
+                .GetContactById(Value.LinkID)
+                ?? throw new InvalidOperationException("Contact not found");
+            await OrderApi!
+                .Contact
+                .UpdateContact(contact);
         }
-        Logger.LogInformation($"Upserted new contact: {Value.DisplayName}");
+        Logger.LogInformation($"Upserted contact: {contact.DisplayName}");
+        var newView = Mapper.Map<ContactFormView>(contact);
+        Value = newView;
         //await OnChange.InvokeAsync(newContact);
         _isSubmitting = false;
     }
