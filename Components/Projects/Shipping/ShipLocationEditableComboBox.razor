@@ -27,21 +27,21 @@
   } else {
     <span class="text-lg font-semibold">No available shipping addresses</span>
   }
+    @if(!_isAddingShipLocation) {
+      <a 
+        @onclick=@OnAddressClick
+        class="
+          dmn-link
+          text-right
+          my-2
+      ">
+        Add New Address
+      </a>
+    } else {
+      <div class="mt-6"></div>
+      <ShipLocationForm @bind-Value=@Value />
+    }
 </div>
-@if(!_isAddingShipLocation) {
-  <a 
-    @onclick=@OnAddressClick
-    class="
-      dmn-link
-      text-right
-      my-2
-  ">
-    Add New Address
-  </a>
-} else {
-  <div class="mt-6"></div>
-  <ShipLocationForm @bind-Value=@Value />
-}
 
 
 @code {
