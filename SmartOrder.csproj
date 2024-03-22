@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <Version>0.2.1</Version>
+    <Version>0.2.2</Version>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -37,7 +37,7 @@
     <ProjectReference Include="../SmartOrderApi/SmartOrderApi.csproj" />
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)'=='Release'">
-    <PackageReference Include="SmartOrderApi" Version="1.*-*" />
+    <PackageReference Include="SmartOrderApi" Version="*" />
   </ItemGroup>
 
   <!--
