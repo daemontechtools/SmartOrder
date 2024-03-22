@@ -187,7 +187,7 @@
             _productFormView = Mapper.Map<ProductFormView>(product);
             _isNew = false;
         } else {
-            _productFormView = new("");
+            _productFormView = new();
         }
         var products = await OrderApi.Product.GetCabinets();
         _allProducts = products.AsQueryable();

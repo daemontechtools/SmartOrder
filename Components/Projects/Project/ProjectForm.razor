@@ -74,7 +74,7 @@
 
     protected override void OnInitialized()
     {
-        _newProject ??= new("");
+        _newProject ??= new();
     }
 
     private async Task OnSubmitClick()
@@ -88,7 +88,7 @@
 
     private void OnCancelClick()
     {
-        _newProject = new("");
+        _newProject = new();
         StateHasChanged();
     }
 

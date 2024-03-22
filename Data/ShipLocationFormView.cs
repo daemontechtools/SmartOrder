@@ -1,13 +1,10 @@
 using System.ComponentModel.DataAnnotations;
-using SMART.Common.Base;
-using SMART.Common.CompanyManagement;
-
 namespace SO.Data;
 
+public class ShipLocationFormView : SmartBaseClass {
 
-public class ShipLocationFormView : SMARTBaseClass {
-
-    public ShipLocationFormView(string LinkID) : base(LinkID) {}
+    public ShipLocationFormView() : base("") { }
+    public ShipLocationFormView(string LinkID) : base(LinkID) { }
 
     [Required]
     public string LocationName { get; set; } = "";

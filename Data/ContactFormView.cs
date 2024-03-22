@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 namespace SO.Data;
 
-public class ContactFormView : SMARTBaseClassView {
-    public ContactFormView(string LinkID) : base(LinkID) {}
+public class ContactFormView : SmartBaseClass {
+    public ContactFormView() : base("") { }
+    public ContactFormView(string LinkID) : base(LinkID) { }
 
     [Required]
     public string DisplayName { get; set; } = "";
@@ -13,7 +14,6 @@ public class ContactFormView : SMARTBaseClassView {
     [RequiredIfNoContact(ErrorMessage = "At least one contact method is required")]
     public string Phone { get; set; } = "";
 }
-
 
 public class RequiredIfNoContact : ValidationAttribute {
     protected override ValidationResult? IsValid(

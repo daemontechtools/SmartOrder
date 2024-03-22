@@ -1,11 +1,9 @@
 using System.ComponentModel.DataAnnotations;
-using SMART.Common.CompanyManagement;
 using SMART.Common.ProjectManagement;
-using SMART.Common.Base;
 namespace SO.Data;
 
-public class ProjectFormView : SMARTBaseClass { 
-
+public class ProjectFormView : SmartBaseClass { 
+    public ProjectFormView() : base("") { }
     public ProjectFormView(string LinkID) : base(LinkID) { }
 
     [Required]
@@ -22,7 +20,7 @@ public class ProjectFormView : SMARTBaseClass {
         ErrorMessage = "Shipping Location is required when IsShipped is true."
     )]
     [ValidateComplexType]
-    public ShipLocationFormView ProjectShipLocation { get; set; } = new("");
+    public ShipLocationFormView ProjectShipLocation { get; set; } = new();
 
     public IList<ProjectGroup> ProjectGroups { get; set; } = new List<ProjectGroup>();
 }
