@@ -12,9 +12,9 @@
 >
     <ObjectGraphDataAnnotationsValidator />
     <DmnSectionHeader 
-        Title="New Contact"
+        Title=@_title
         TitleClass="!text-xl"
-        SubmitButtonText=@((_isNewContact ? "Add" : "Update"))
+        SubmitButtonText=@_submitButtonText
         CancelButtonText="Cancel"
         Size="sm"
         IsLoading=@_isSubmitting
@@ -41,19 +41,21 @@
                 @bind-Value=@Value.Phone
             />
         </div>
-        <div class="col-span-1">
-            <button 
-                type="button" 
-                class="dmn-btn-sm"
-                @onclick=@OnDeleteClick
-            >
-                @if(_isDeleting) {
-                    <Spinner Class="text-stone-400 dark:text-stone-400 fill-orange-600" />
-                } else {
-                    <span>Delete</span>
-                }
-            </button>
-        </div>
+        @if(Value.IsPersisted) {
+            <div class="col-span-1">
+                <button 
+                    type="button" 
+                    class="dmn-btn text-white bg-red-300 hover:bg-red-600"
+                    @onclick=@OnDeleteClick
+                >
+                    @if(_isDeleting) {
+                        <Spinner Class="text-stone-400 dark:text-stone-400 fill-orange-600" />
+                    } else {
+                        <span>Delete</span>
+                    }
+                </button>
+            </div>
+        }
     </div>
 </EditForm>
 
@@ -63,12 +65,17 @@
 
     private EditForm _editForm = default!;
     private bool _isSubmitting = false;
-    private bool _isNewContact = true;
     private bool _isDeleting = false;
 
-    protected override void OnParametersSet() {
-        _isNewContact = string.IsNullOrEmpty(Value.DisplayName);
-    }
+    private string _title =>
+        Value.IsPersisted
+            ? "Edit Contact"
+            : "New Contact";
+
+    private string _submitButtonText =>
+        Value.IsPersisted
+            ? "Update"
+            : "Create";
 
     protected override bool TryParseValueFromString(
         string? value, 
@@ -88,7 +95,7 @@
         _isSubmitting = true;
         Logger.LogInformation($"Upserting new contact: {Value.DisplayName}");
         Contact contact = default!;
-        if(_isNewContact) {
+        if(!Value.IsPersisted) {
             contact = await OrderApi!
                 .Contact
                 .AddContact(
@@ -96,7 +103,6 @@
                     Value.Phone,
                     Value.Email
                 );
-            _isNewContact = false;
         } else {
             contact = await OrderApi
                 .Contact
@@ -110,7 +116,7 @@
         Logger.LogInformation($"Upserted contact: {contact.DisplayName}");
         var newView = Mapper.Map<ContactFormView>(contact);
         Value = newView;
-        //await OnChange.InvokeAsync(newContact);
+        ValueChanged.InvokeAsync(Value);
         _isSubmitting = false;
     }
 
@@ -123,7 +129,7 @@
         await OrderApi
             .Contact
             .DeleteContact(contact);
-        Value = new ContactFormView("");
+        Value = new ContactFormView();
         ValueChanged.InvokeAsync(Value);
         OnCancelClicked.InvokeAsync();
         _isDeleting = false;

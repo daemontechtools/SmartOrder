@@ -146,7 +146,6 @@
     private EditForm? _editForm = default!;
     private bool _isSubmitting = false;
 
-    private bool _isNew = true;
     private bool _isLoading = true;
 
     private Project? _project;
@@ -185,7 +184,6 @@
             .First(p => p.LinkID == ProjectLinkId);
         if(_product != null) {
             _productFormView = Mapper.Map<ProductFormView>(product);
-            _isNew = false;
         } else {
             _productFormView = new();
         }
