@@ -4,9 +4,6 @@
 			"path": "."
 		},
 		{
-			"path": "../daemon-dotnet"
-		},
-		{
 			"path": "../SmartOrderApi"
 		}
 	],

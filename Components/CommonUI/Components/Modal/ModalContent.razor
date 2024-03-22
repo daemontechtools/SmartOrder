@@ -40,7 +40,7 @@
 <div class="mt-8 sm:mt-4 sm:flex sm:flex-row-reverse">
     <button 
         type="button" 
-        class=@($"daemon-button {_buttonClass}")
+        class=@($"dmn-btn {_buttonClass}")
         @onclick=@(() => HandleConfirmation(true))
         disabled=@_isLoading
     >
@@ -54,7 +54,7 @@
     </button>
     <button 
         type="button"
-        class="daemon-button mr-4"
+        class="dmn-btn mr-4"
         @onclick=@(() => HandleConfirmation(false))
         disabled=@_isLoading
     >

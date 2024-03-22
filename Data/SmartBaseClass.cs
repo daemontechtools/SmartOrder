@@ -3,15 +3,23 @@ using SMART.Common.Base;
 namespace SO.Data;
 
 
-public class SMARTBaseClassView : SMARTBaseClass {
-    public SMARTBaseClassView(string LinkID) : base(LinkID) { }
+public class SmartBaseClass : SMARTBaseClass {
+
+    public SmartBaseClass() : base("") { }
+    public SmartBaseClass(string LinkID) : base(LinkID) { }
+
+    public bool IsPersisted { 
+        get { 
+            return !string.IsNullOrEmpty(LinkIDFactory); 
+        }
+    }
 
     public override bool Equals(object? obj) {
         if (obj == null || GetType() != obj.GetType()) {
             return false;
         }
 
-        SMARTBaseClassView other = (SMARTBaseClassView) obj;
+        var other = (SmartBaseClass) obj;
         return LinkID == other.LinkID;
     }
     

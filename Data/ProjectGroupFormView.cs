@@ -2,7 +2,9 @@ using System.ComponentModel.DataAnnotations;
 using SMART.Common.LibraryManagement;
 namespace SO.Data;
 
-public class ProjectGroupFormView : SMARTBaseClassView {
+public class ProjectGroupFormView : SmartBaseClass {
+
+    public ProjectGroupFormView() : base("") { }
     public ProjectGroupFormView(string LinkID) : base(LinkID) { }
 
     [Required]

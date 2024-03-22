@@ -1,16 +1,12 @@
-﻿@using Microsoft.Extensions.Logging
-@using Daemon.RazorUI.Animations
-
-@namespace Daemon.RazorUI.Layout
-
+﻿@namespace Daemon.RazorUI.Layout
 @inject ILogger<DmnSectionHeader> Logger
 
 <div class=@($"flex w-full justify-between {Class}")>
     <div class="flex flex-col pr-10">
-        @if(Title is not null)
-        {
+        @if(Title != null) {
             <h1 class=@($@"
-                text-2xl font-semibold 
+                {TitleSize}
+                font-semibold 
                 leading-6 text-gray-900 
                 outline-none
                 {TitleClass}
@@ -18,8 +14,7 @@
                 @Title
             </h1>
         }
-        @if(Subtitle is not null)
-        {
+        @if(Subtitle != null) {
           <p class="mt-3 text-sm text-gray-700">@Subtitle</p>  
         }
     </div>
@@ -27,13 +22,13 @@
     <div class="flex self-start gap-x-4">
         @if(CancelButtonText is not null) {
             <div 
-                class="
-                    daemon-button 
+                class=@($@"
+                    {ButtonSize}
                     bg-transparent 
                     text-gray-600
                     hover:bg-red-500
                     hover:text-white
-                "
+                ")
                 @onclick=@HandleCancelClick
             >
                 @CancelButtonText
@@ -41,7 +36,11 @@
         }
         @if(SubmitButtonText is not null) {
             <div 
-                class="daemon-button bg-sky-500 text-white"
+                class=@($@"
+                    {ButtonSize}
+                    bg-sky-500
+                    text-white
+                ")
                 @onclick=@HandleSubmitClick
             >
                 @if(IsLoading) {
@@ -70,8 +69,7 @@
 
     [Parameter]
     public EventCallback OnSubmitClick { get; set; }
-    private async Task HandleSubmitClick()
-    {
+    private async Task HandleSubmitClick() {
         await OnSubmitClick.InvokeAsync();
     }
 
@@ -79,8 +77,7 @@
     public string? CancelButtonText { get; set; }
     [Parameter]
     public EventCallback OnCancelClick { get; set; }
-    private async Task HandleCancelClick()
-    {
+    private async Task HandleCancelClick() {
         await OnCancelClick.InvokeAsync();
     }
 
@@ -90,4 +87,10 @@
 
     [Parameter]
     public bool IsLoading { get; set; } = false;
+
+    [Parameter]
+    public string Size { get; set; } = "md";
+    
+    private string TitleSize => Size == "md" ? "text-2xl" : "text-xl";
+    private string ButtonSize => Size == "md" ? "dmn-btn" : "dmn-btn-sm";
 }

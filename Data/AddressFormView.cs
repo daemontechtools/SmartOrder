@@ -1,24 +1,23 @@
 using System.ComponentModel.DataAnnotations;
-using SMART.Common.Base;
 namespace SO.Data;
 
-public class AddressFormView : SMARTBaseClass {
-
+public class AddressFormView : SmartBaseClass {
+    public AddressFormView() : base("") { }
     public AddressFormView(string LinkID) : base(LinkID) { }
 
     [Required]
-    public string Street { get; set; } = default!;
+    public string Street { get; set; } = "";
 
-    public string StreetLine2 { get; set; } = default!;
-
-    [Required]
-    public string City { get; set; } = default!;
+    public string StreetLine2 { get; set; } = "";
 
     [Required]
-    public string StateProvince { get; set; } = default!;
+    public string City { get; set; } = "";
 
     [Required]
-    public string PostalCode { get; set; } = default!;
+    public string StateProvince { get; set; } = "";
 
-    public string AddressNotes { get; set; } = default!;
+    [Required]
+    public string PostalCode { get; set; } = "";
+
+    public string AddressNotes { get; set; } = "";
 }

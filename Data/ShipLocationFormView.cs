@@ -1,22 +1,22 @@
 using System.ComponentModel.DataAnnotations;
-using SMART.Common.Base;
-
 namespace SO.Data;
 
+public class ShipLocationFormView : SmartBaseClass {
 
-public class ShipLocationFormView : SMARTBaseClass {
-
-    public ShipLocationFormView(string LinkID) : base(LinkID) { 
-        DefaultContact = new ContactFormView("");
-        DefaultAddress = new AddressFormView("");
+    public ShipLocationFormView() : this("") { }
+    public ShipLocationFormView(string LinkID) : base(LinkID) {
+        Contacts = new List<ContactFormView>();
+        Contacts.Add(new ContactFormView());
+        Addresses = new List<AddressFormView>();
+        Addresses.Add(new AddressFormView());
     }
 
     [Required]
-    public string LocationName { get; set; } = default!;
+    public string LocationName { get; set; } = "";
 
-    public ContactFormView DefaultContact { get; set; }
+    public IList<ContactFormView> Contacts { get; set; }
     
     [Required]
     [ValidateComplexType]
-    public AddressFormView DefaultAddress { get; set; }
+    public IList<AddressFormView> Addresses { get; set; }
 }

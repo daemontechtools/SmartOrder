@@ -1,12 +1,13 @@
 @page "/quotes/new"
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
+@attribute [StreamRendering(true)]
 @namespace SO.Components.Projects
 @inject NavigationManager NavigationManager
 @inject SmartOrderApi OrderApi
 @inject ILogger<ProjectForm> Logger
 
 <div class="flex flex-col bg-slate-100"
-    <SEBreadcrumbNav
+    <BreadcrumbNav
         Options=@(new List<NavOptionProps> {
             new NavOptionProps { Path = "/quotes" },
             new NavOptionProps { Path = $"/quotes/add", Label = "New Quote" },
@@ -56,7 +57,8 @@
             </InputRadioGroup>
              
              @if(_newProject.IsShipped) {
-                <ShipLocationInput @bind-Value=@_newProject.ProjectShipLocation />
+                <div class="border-t border-gray-300 mb-3 mt-3"></div>
+                <ShipLocationEditableComboBox @bind-Value=@_newProject.ProjectShipLocation />
              }
         </EditForm>
     </div>
@@ -72,7 +74,7 @@
 
     protected override void OnInitialized()
     {
-        _newProject ??= new("");
+        _newProject ??= new();
     }
 
     private async Task OnSubmitClick()
@@ -86,7 +88,7 @@
 
     private void OnCancelClick()
     {
-        _newProject = new("");
+        _newProject = new();
         StateHasChanged();
     }
 

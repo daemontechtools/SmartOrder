@@ -1,0 +1,109 @@
+@namespace SO.Components.Projects
+@inject SmartOrderApi OrderApi
+@inject ILogger<ShipLocationEditableComboBox> Logger
+@inject IMapper Mapper
+@inherits InputBase<ShipLocationFormView>
+
+<div class="flex flex-col">
+  @if(_isLoading) {
+    <div class="flex justify-center">
+        <Spinner Class="w-4 h-4" />
+        <span>Loading available shipping locations...</span>
+    </div>
+  } else {
+    <div class="flex flex-col">
+      @if(_shipLocations.Any()) {
+        <DmnComboBox 
+          Data=@_shipLocations
+          @bind-Value:get=@_currentShipLocation
+          @bind-Value:set=OnShipLocationChanged
+          TextFieldName=@nameof(ShipLocation.LocationName)
+          Label="Shipping Location"
+          Class="pb-0"
+        />
+      } else {
+        <span class="text-lg font-semibold">No available shipping addresses</span>
+      }
+      @if(!_isAddingShipLocation) {
+        <a 
+          @onclick=@OnAddressClick
+          class="
+            dmn-link
+            text-left
+            my-2
+        ">
+          Add New Address
+        </a>
+      } else {
+        <div class="mt-6"></div>
+        <ShipLocationForm @bind-Value=@Value />
+      }
+    </div>
+    <div class="mb-4"></div>
+  } 
+</div>
+
+
+@code {
+
+  private bool _isLoading = true;
+
+  private IQueryable<ShipLocation> _shipLocations = default!;
+  private ShipLocation? _currentShipLocation;
+
+  private bool _isAddingShipLocation = false;
+    
+  protected override void OnParametersSet() {
+    _currentShipLocation = Mapper.Map<ShipLocation>(Value);     
+  }
+
+  protected override async Task OnInitializedAsync() {
+    _shipLocations = await OrderApi
+      .ShipLocation
+      .GetShipLocationsAsQueryable();
+    _isLoading = false;
+  }
+  
+  protected override bool TryParseValueFromString(
+      string? value, 
+      out ShipLocationFormView shipLocation,
+      out string? validationErrorMessage) {
+      throw new NotImplementedException();
+  }
+
+  @* private void OnAddressChange(object obj) {
+    ShipLocation? shipLocation = obj as ShipLocation;
+    Logger.LogInformation($"OnAddressChange: {shipLocation?.LocationName}");
+    Value = shipLocation!;
+    StateHasChanged();
+  }
+
+  void OnFieldChanged(object? sender, FieldChangedEventArgs e) {
+    StateHasChanged();
+  } *@
+
+  private void OnAddressClick(MouseEventArgs e) {
+    _isAddingShipLocation = true;
+    //StateHasChanged();
+  }
+  
+  @* private void OnShipLocationCancel() {
+    _isAddingShipLocation = false;
+    //StateHasChanged();
+  }
+
+  private void OnShipLocationCreate(ShipLocationView shipLocation) {
+    Project!.ProjectShipLocation = shipLocation;
+    _isAddingShipLocation = false;
+    StateHasChanged();
+  }      
+*@
+ private void OnShipLocationChanged(ShipLocation shipLocation) {
+    Logger.LogInformation($"ShipLocationChanged??????????");
+    _currentShipLocation = shipLocation;
+    Value = Mapper.Map<ShipLocationFormView>(shipLocation);
+    //_currentShipLocationLinkId = e.Value?.ToString();
+    
+    //StateHasChanged();
+  }
+}

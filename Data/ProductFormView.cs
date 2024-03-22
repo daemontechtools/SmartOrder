@@ -2,8 +2,9 @@
 using SMART.Common.ProductionManagement;
 namespace SO.Data;
 
-public class ProductFormView : SMARTBaseClassView {
-    public ProductFormView(string LinkID) : base(LinkID) {}
+public class ProductFormView : SmartBaseClass {
+    public ProductFormView() : base("") { }
+    public ProductFormView(string LinkID) : base(LinkID) { }
     public ProductTypes Type { get; set; } = default!;
     public string CategoryName { get; set; } = default!;
     public string LinkIDCategory { get; set; } = default!;
