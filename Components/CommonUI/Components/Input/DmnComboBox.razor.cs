@@ -34,6 +34,12 @@ public partial class DmnComboBox<T> : InputBase<T> {
         _filteredData = Data;
     }
 
+    protected override void OnParametersSet() {
+        if(Value is not null) {
+            _searchValue = GetTextValue(Value);
+        }
+    }
+
     protected override bool TryParseValueFromString(
         string? value, 
         out T result, 

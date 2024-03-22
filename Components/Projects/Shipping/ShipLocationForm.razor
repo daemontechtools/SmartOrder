@@ -36,7 +36,7 @@
             border-2 rounded-lg border-solid border-gray-300
             p-4
         ">
-            <h3 class="text-xl font-semibold">Shipping Contact</h3>
+            <h3 class="text-2xl font-semibold mb-4">Shipping Contact</h3>
             <ContactEditableComboBox @bind-Value=@Value.Contacts[0]/>
         </div>
         <div class="col-span-full">
@@ -76,19 +76,8 @@
 @code {
     private EditForm _editForm = default!;
     private bool _isSubmitting = false;
-    private bool _isNewLocation = true;
-    private string _submitButtonText => _isNewLocation ? "Add" : "Update";
-    private string _cancelButtonText => _isNewLocation ? "Cancel" : "Delete";
-
-
-    protected override void OnParametersSet() {
-        _isNewLocation = string.IsNullOrEmpty(Value.LocationName);
-        if (_isNewLocation) {
-            Value = new ShipLocationFormView("");
-            Value.Contacts.Add(new ContactFormView(""));
-            Value.Addresses.Add(new AddressFormView(""));
-        }
-    }
+    private string _submitButtonText => !Value.IsPersisted ? "Create" : "Update";
+    private string _cancelButtonText => !Value.IsPersisted ? "Cancel" : "Delete";
     
     protected override bool TryParseValueFromString(
         string? value, 
@@ -102,7 +91,7 @@
             return;
         }
 
-        if(_isNewLocation) {
+        if(!Value.IsPersisted) {
             await AddLocation();
         } else {
             await UpdateLocation();
@@ -129,7 +118,6 @@
         Value = Mapper.Map<ShipLocationFormView>(newLocation);
         await ValueChanged.InvokeAsync(Value);
         Logger.LogInformation($"Created new project: {Value.LocationName}");
-        _isNewLocation = false;
         _isSubmitting = false;
     }
     

@@ -3,14 +3,6 @@
 @inject IMapper Mapper
 @inject SmartOrderApi OrderApi 
 
-@* Takes and sets a Contact object
-Displays a combobox of contacts
-    If a valid contact was passed, set combobox to that contact
-    Display properties of contact in a form below the combobox
-        Form will display Save if the Contact already exists
-        Form will display Create if the Contact does't exists
-    If a property is changed, enable the save button *@
-
 <div class="
     flex flex-col
     grid grid-cols-2 gap-4 
@@ -24,21 +16,19 @@ Displays a combobox of contacts
                 TextFieldName=@nameof(Contact.DisplayName)
                 Placeholder="Select a Contact"
             />
-            @if(!_isNew) {
-                <button 
-                    class="dmn-link mt-2"
-                    @onclick=@OnCreateNewContactClicked
-                >
-                    Create New Contact
-                </button>
-            }
+            <button 
+                class="dmn-link mt-2 text-left"
+                @onclick=@OnCreateNewContactClicked
+            >
+                Create New Contact
+            </button>
         </div>
         <div class="col-span-2"></div>
     </div>
     @if(_isEditing) {
-        <div class="col-span-full">
+        <div class="col-span-full pt-4 border-t-2 border-gray-300">
             <ContactForm 
-                @bind-Value:get=@Value
+                @bind-Value:get=@_currentFormView
                 @bind-Value:set=@OnContactChanged
                 OnCancelClicked=@(() => _isEditing = false)
             />
@@ -49,11 +39,11 @@ Displays a combobox of contacts
 @code {
     private IQueryable<Contact> _contacts = default!;
     private Contact _currentContact = default!;
+    private ContactFormView _currentFormView = default!;
     private bool _isEditing = false;
-    private bool _isNew = false;
 
-    protected override void OnParametersSet() {
-        _isNew = string.IsNullOrEmpty(Value.DisplayName);
+    protected override void OnInitialized() {
+        //_currentFormView = Value;
         _currentContact = Mapper.Map<Contact>(Value);
     }
     
@@ -74,14 +64,14 @@ Displays a combobox of contacts
     private void OnContactSelected(Contact contact) {
         _currentContact = contact;
         Value = Mapper.Map<ContactFormView>(_currentContact);
-        _isNew = string.IsNullOrEmpty(Value.DisplayName);
+        _currentFormView = Value;
         _isEditing = true;
     }
 
     private async Task OnContactChanged(ContactFormView contact) {
+        _currentFormView = contact;
         Value = contact;
-        // refresh the contacta and set the current contact
-        if(string.IsNullOrEmpty(contact.DisplayName)) {
+        if(!Value.IsPersisted) {
             _currentContact = new Contact();
             _isEditing = false;
             return;
@@ -95,7 +85,10 @@ Displays a combobox of contacts
     }
 
     private void OnCreateNewContactClicked() {
-        Value = new ContactFormView("");
         _isEditing = true;
+        if(_currentFormView != null && !_currentFormView.IsPersisted) {
+            return;
+        }
+        _currentFormView = new ContactFormView();
     }
 }

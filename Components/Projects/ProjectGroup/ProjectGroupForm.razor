@@ -61,13 +61,13 @@
                 <div class="m-3"></div>
             </EditForm> 
 
-            @if(!_isNew) {
+            @* @if(!_room.IsPersisted) {
                 <ProjectGroupDetailProducts 
                     Products=@_products 
                     ProjectLinkId=@ProjectLinkId
                     ProjectGroupLinkId=@ProjectGroupLinkId
                 /> 
-            }
+            } *@
         }
     </div>
 </div>

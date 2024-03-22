@@ -7,40 +7,40 @@
 <div class="flex flex-col">
   @if(_isLoading) {
     <div class="flex justify-center">
-      <div class="spinner-border text-primary" role="status">
+        <Spinner Class="w-4 h-4" />
         <span>Loading available shipping locations...</span>
-      </div>
     </div>
-  } else if(_shipLocations.Any()) {
+  } else {
     <div class="flex flex-col">
-      <DmnComboBox 
-        Data=@_shipLocations
-        @bind-Value:get=@_currentShipLocation
-        @bind-Value:set=OnShipLocationChanged
-        TextFieldName=@nameof(ShipLocation.LocationName)
-        Label="Shipping Location"
-        Class="pb-0"
-      />
-
+      @if(_shipLocations.Any()) {
+        <DmnComboBox 
+          Data=@_shipLocations
+          @bind-Value:get=@_currentShipLocation
+          @bind-Value:set=OnShipLocationChanged
+          TextFieldName=@nameof(ShipLocation.LocationName)
+          Label="Shipping Location"
+          Class="pb-0"
+        />
+      } else {
+        <span class="text-lg font-semibold">No available shipping addresses</span>
+      }
+      @if(!_isAddingShipLocation) {
+        <a 
+          @onclick=@OnAddressClick
+          class="
+            dmn-link
+            text-left
+            my-2
+        ">
+          Add New Address
+        </a>
+      } else {
+        <div class="mt-6"></div>
+        <ShipLocationForm @bind-Value=@Value />
+      }
     </div>
     <div class="mb-4"></div>
-  } else {
-    <span class="text-lg font-semibold">No available shipping addresses</span>
-  }
-    @if(!_isAddingShipLocation) {
-      <a 
-        @onclick=@OnAddressClick
-        class="
-          dmn-link
-          text-right
-          my-2
-      ">
-        Add New Address
-      </a>
-    } else {
-      <div class="mt-6"></div>
-      <ShipLocationForm @bind-Value=@Value />
-    }
+  } 
 </div>
 
 

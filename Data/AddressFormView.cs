@@ -1,9 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using SMART.Common.Base;
 namespace SO.Data;
 
-public class AddressFormView : SMARTBaseClass {
-
+public class AddressFormView : SmartBaseClass {
+    public AddressFormView() : base("") { }
     public AddressFormView(string LinkID) : base(LinkID) { }
 
     [Required]

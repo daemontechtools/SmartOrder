@@ -55,7 +55,7 @@ public partial class ProjectGroupForm : ComponentBase {
             _products = products.AsQueryable();
             _isNew = false;
         } else {
-            _room = new("");
+            _room = new();
         }
         IsLoading = false;
     }
@@ -74,7 +74,7 @@ public partial class ProjectGroupForm : ComponentBase {
 
     private void OnCancelClick() {
         if(_isNew) {
-            _room = new("");
+            _room = new();
             StateHasChanged();
         } else {
             _navigationManager!
