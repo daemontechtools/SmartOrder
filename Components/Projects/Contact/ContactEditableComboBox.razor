@@ -15,38 +15,45 @@ Displays a combobox of contacts
     flex flex-col
     grid grid-cols-2 gap-4 
 ">
-    <div class="col-span-1">
-        <DmnComboBox
-            Data=@_contacts
-            @bind-Value:get=@_currentContact
-            @bind-Value:set=@OnContactSelected 
-            TextFieldName=@nameof(Contact.DisplayName)
-            Placeholder="Select a Contact"
-        />
+    <div class="flex col-span-full">
+        <div class="flex flex-col col-span-2">
+            <DmnComboBox
+                Data=@_contacts
+                @bind-Value:get=@_currentContact
+                @bind-Value:set=@OnContactSelected 
+                TextFieldName=@nameof(Contact.DisplayName)
+                Placeholder="Select a Contact"
+            />
+            @if(!_isNew) {
+                <button 
+                    class="dmn-link mt-2"
+                    @onclick=@OnCreateNewContactClicked
+                >
+                    Create New Contact
+                </button>
+            }
+        </div>
+        <div class="col-span-2"></div>
     </div>
-    <div class="col-span-full">
-        @if(!_isAdding) {
-            <a 
-                class="dmn-link mt-2"
-                @onclick=@(() => _isAdding = true)
-            >
-                Add New Contact
-            </a>
-        } else {
+    @if(_isEditing) {
+        <div class="col-span-full">
             <ContactForm 
                 @bind-Value:get=@Value
                 @bind-Value:set=@OnContactChanged
+                OnCancelClicked=@(() => _isEditing = false)
             />
-        }
-    </div>
+        </div>
+    }
 </div>
 
 @code {
     private IQueryable<Contact> _contacts = default!;
     private Contact _currentContact = default!;
-    private bool _isAdding = false;
+    private bool _isEditing = false;
+    private bool _isNew = false;
 
     protected override void OnParametersSet() {
+        _isNew = string.IsNullOrEmpty(Value.DisplayName);
         _currentContact = Mapper.Map<Contact>(Value);
     }
     
@@ -67,17 +74,28 @@ Displays a combobox of contacts
     private void OnContactSelected(Contact contact) {
         _currentContact = contact;
         Value = Mapper.Map<ContactFormView>(_currentContact);
+        _isNew = string.IsNullOrEmpty(Value.DisplayName);
+        _isEditing = true;
     }
 
     private async Task OnContactChanged(ContactFormView contact) {
         Value = contact;
         // refresh the contacta and set the current contact
+        if(string.IsNullOrEmpty(contact.DisplayName)) {
+            _currentContact = new Contact();
+            _isEditing = false;
+            return;
+        }
         _contacts = await OrderApi
             .Contact
-            .GetContactsAsQueryable(true);
+            .GetContactsAsQueryable();
         _currentContact = _contacts
             .FirstOrDefault(c => c.LinkID == contact.LinkID)
             ?? throw new InvalidOperationException("Contact not found");
-        _isAdding = false;
+    }
+
+    private void OnCreateNewContactClicked() {
+        Value = new ContactFormView("");
+        _isEditing = true;
     }
 }

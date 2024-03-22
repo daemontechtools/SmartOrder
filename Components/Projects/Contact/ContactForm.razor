@@ -15,11 +15,11 @@
         Title="New Contact"
         TitleClass="!text-xl"
         SubmitButtonText=@((_isNewContact ? "Add" : "Update"))
-        CancelButtonText=@((_isNewContact ? "Cancel" : "Delete"))
+        CancelButtonText="Cancel"
         Size="sm"
         IsLoading=@_isSubmitting
         OnSubmitClick=@OnSubmitClick
-        OnCancelClick=@OnCancelClick
+        OnCancelClick=@(() => OnCancelClicked.InvokeAsync())
     />
     <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
         <div class="sm:col-span-3">
@@ -32,29 +32,42 @@
         <div class="sm:col-span-3">
             <DmnInputText 
                 Label="Email Address" 
-                @bind-Value=@Value.DefaultEmail.DisplayAs
+                @bind-Value=@Value.Email
             />
         </div>
         <div class="sm:col-span-3">
             <DmnInputText 
                 Label="Phone Number" 
-                @bind-Value=@Value.DefaultPhone.DisplayAs
+                @bind-Value=@Value.Phone
             />
+        </div>
+        <div class="col-span-1">
+            <button 
+                type="button" 
+                class="dmn-btn-sm"
+                @onclick=@OnDeleteClick
+            >
+                @if(_isDeleting) {
+                    <Spinner Class="text-stone-400 dark:text-stone-400 fill-orange-600" />
+                } else {
+                    <span>Delete</span>
+                }
+            </button>
         </div>
     </div>
 </EditForm>
 
 @code {
     [Parameter]
-    public ShipLocation ShipLocation { get; set; } = default!;
+    public EventCallback OnCancelClicked { get; set; }
+
     private EditForm _editForm = default!;
     private bool _isSubmitting = false;
     private bool _isNewContact = true;
+    private bool _isDeleting = false;
 
     protected override void OnParametersSet() {
-        if(!string.IsNullOrWhiteSpace(Value.DisplayName)) {
-            _isNewContact = false;
-        }
+        _isNewContact = string.IsNullOrEmpty(Value.DisplayName);
     }
 
     protected override bool TryParseValueFromString(
@@ -71,9 +84,6 @@
         await UpsertContact();
     }
 
-    private void OnCancelClick() {
-    }
-
     private async Task UpsertContact() {
         _isSubmitting = true;
         Logger.LogInformation($"Upserting new contact: {Value.DisplayName}");
@@ -83,9 +93,8 @@
                 .Contact
                 .AddContact(
                     Value.DisplayName,
-                    Value.DefaultPhone.DisplayAs,
-                    Value.DefaultEmail.DisplayAs,
-                    ShipLocation
+                    Value.Phone,
+                    Value.Email
                 );
             _isNewContact = false;
         } else {
@@ -93,6 +102,7 @@
                 .Contact
                 .GetContactById(Value.LinkID)
                 ?? throw new InvalidOperationException("Contact not found");
+            Mapper.Map(Value, contact);
             await OrderApi!
                 .Contact
                 .UpdateContact(contact);
@@ -102,5 +112,20 @@
         Value = newView;
         //await OnChange.InvokeAsync(newContact);
         _isSubmitting = false;
+    }
+
+    private async Task OnDeleteClick() {
+        _isDeleting = true;
+        var contact = await OrderApi
+            .Contact
+            .GetContactById(Value.LinkID)
+            ?? throw new InvalidOperationException("Unable to find contact");
+        await OrderApi
+            .Contact
+            .DeleteContact(contact);
+        Value = new ContactFormView("");
+        ValueChanged.InvokeAsync(Value);
+        OnCancelClicked.InvokeAsync();
+        _isDeleting = false;
     }
 }
