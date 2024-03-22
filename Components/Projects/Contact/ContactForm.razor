@@ -1,117 +1,131 @@
+@inherits InputBase<ContactFormView>
 @inject ILogger<ContactForm> Logger
 @inject IMapper Mapper
 @inject SmartOrderApi OrderApi
- 
 @namespace SO.Components.Projects
-
 
 <EditForm 
     @ref=@_editForm
-    Model=@Contact
+    Model=@Value
     FormName="contact-form"
     class="flex flex-col"
 >
     <ObjectGraphDataAnnotationsValidator />
-    
     <DmnSectionHeader 
         Title="New Contact"
         TitleClass="!text-xl"
         SubmitButtonText=@((_isNewContact ? "Add" : "Update"))
-        CancelButtonText=@((_isNewContact ? "Cancel" : "Delete"))
+        CancelButtonText="Cancel"
+        Size="sm"
         IsLoading=@_isSubmitting
         OnSubmitClick=@OnSubmitClick
-        OnCancelClick=@OnCancelClick
+        OnCancelClick=@(() => OnCancelClicked.InvokeAsync())
     />
-
     <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
         <div class="sm:col-span-3">
             <DmnInputText 
                 Label="Contact Name"
-                @bind-Value=@Contact!.DisplayName
+                @bind-Value=@Value.DisplayName
             />
         </div>
         <div class="sm:col-span-3"></div>
         <div class="sm:col-span-3">
             <DmnInputText 
                 Label="Email Address" 
-                @bind-Value=@Contact!.DefaultEmail.DisplayAs
+                @bind-Value=@Value.Email
             />
         </div>
         <div class="sm:col-span-3">
             <DmnInputText 
                 Label="Phone Number" 
-                @bind-Value=@Contact!.DefaultPhone.DisplayAs
+                @bind-Value=@Value.Phone
             />
+        </div>
+        <div class="col-span-1">
+            <button 
+                type="button" 
+                class="dmn-btn-sm"
+                @onclick=@OnDeleteClick
+            >
+                @if(_isDeleting) {
+                    <Spinner Class="text-stone-400 dark:text-stone-400 fill-orange-600" />
+                } else {
+                    <span>Delete</span>
+                }
+            </button>
         </div>
     </div>
 </EditForm>
 
-
 @code {
+    [Parameter]
+    public EventCallback OnCancelClicked { get; set; }
 
-    [Parameter]
-    public Contact? Contact { get; set; }
-    private ContactFormView? ContactFormView { get; set; }
-    
-    [Parameter]
-    public ShipLocation? ShipLocation { get; set; }
-
-    [Parameter]
-    public EventCallback OnCancel { get; set; }
-
-    [Parameter]
-    public EventCallback<ContactFormView> OnChange { get; set; }
-        
- 
-    private EditForm _editForm;
+    private EditForm _editForm = default!;
     private bool _isSubmitting = false;
     private bool _isNewContact = true;
-    private bool IsAddingShipLocation { get; set; } = false;
-    private IList<Contact> Contacts { get; set; }
+    private bool _isDeleting = false;
 
     protected override void OnParametersSet() {
-        if(Contact != null) {
-            
-        }
-        Contact ??= new("");
+        _isNewContact = string.IsNullOrEmpty(Value.DisplayName);
     }
 
-    protected override async Task OnInitializedAsync() {
-        
-        Contacts = await OrderApi.Contact.GetContacts();
+    protected override bool TryParseValueFromString(
+        string? value, 
+        out ContactFormView contactFormView,
+        out string validationErrorMessage) {
+        throw new NotImplementedException();
     }
 
     private async Task OnSubmitClick() {
         if (!_editForm!.EditContext!.Validate()) {
             return;
         }
-        await UpsertLocation();
+        await UpsertContact();
     }
 
-    private void OnCancelClick()
-    {
-        OnCancel.InvokeAsync();
-    }
-
-    private async Task UpsertLocation() {
+    private async Task UpsertContact() {
         _isSubmitting = true;
-        Logger.LogInformation($"Upserting new contact: {Contact!.DisplayName}");
+        Logger.LogInformation($"Upserting new contact: {Value.DisplayName}");
+        Contact contact = default!;
         if(_isNewContact) {
-            await OrderApi!
+            contact = await OrderApi!
                 .Contact
                 .AddContact(
-                    Contact.DisplayName,
-                    Contact.DefaultPhone.DisplayAs,
-                    Contact.DefaultEmail.DisplayAs,
-                    ShipLocation!
+                    Value.DisplayName,
+                    Value.Phone,
+                    Value.Email
                 );
+            _isNewContact = false;
         } else {
+            contact = await OrderApi
+                .Contact
+                .GetContactById(Value.LinkID)
+                ?? throw new InvalidOperationException("Contact not found");
+            Mapper.Map(Value, contact);
             await OrderApi!
                 .Contact
-                .UpdateContact(Contact!);
+                .UpdateContact(contact);
         }
-        Logger.LogInformation($"Upserted new contact: {Contact!.DisplayName}");
+        Logger.LogInformation($"Upserted contact: {contact.DisplayName}");
+        var newView = Mapper.Map<ContactFormView>(contact);
+        Value = newView;
         //await OnChange.InvokeAsync(newContact);
         _isSubmitting = false;
+    }
+
+    private async Task OnDeleteClick() {
+        _isDeleting = true;
+        var contact = await OrderApi
+            .Contact
+            .GetContactById(Value.LinkID)
+            ?? throw new InvalidOperationException("Unable to find contact");
+        await OrderApi
+            .Contact
+            .DeleteContact(contact);
+        Value = new ContactFormView("");
+        ValueChanged.InvokeAsync(Value);
+        OnCancelClicked.InvokeAsync();
+        _isDeleting = false;
     }
 }

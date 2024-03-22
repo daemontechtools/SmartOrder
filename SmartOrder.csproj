@@ -34,11 +34,9 @@
 
   <!-- Internal Dependencies -->
   <ItemGroup Condition="'$(Configuration)'!='Release'">
-    <ProjectReference Include="../daemon-dotnet/DataAccess/DataAccess.csproj" />
     <ProjectReference Include="../SmartOrderApi/SmartOrderApi.csproj" />
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)'=='Release'">
-    <PackageReference Include="Daemon.DataAccess" Version="1.*-*" />
     <PackageReference Include="SmartOrderApi" Version="1.*-*" />
   </ItemGroup>
 
@@ -111,9 +109,19 @@
 
   <!-- Normal build process -->
   <Target
-    Name="Build TailwindCss"
+    Name="CleanTailwindCss"
     BeforeTargets="PreBuildEvent"
-    DependsOnTargets="FindTailwindCss"
+  >
+    <Exec
+      Command="rm -f ./wwwroot/css/*.css"
+      WorkingDirectory="$(MSBuildProjectDirectory)"
+    />
+  </Target>
+
+  <Target
+    Name="BuildTailwindCss"
+    BeforeTargets="PreBuildEvent"
+    DependsOnTargets="CleanTailwindCss;FindTailwindCss;"
     Inputs="@(CssStyles)"
     Outputs="%(CssStyles.OutputPath)"
   >

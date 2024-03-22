@@ -20,6 +20,7 @@
             @bind=@_searchValue
             @oninput=@HandleInput
             @onfocus=@HandleFocus
+            placeholder=@Placeholder
             autocomplete="off"
             @attributes="AdditionalAttributes" 
         />
@@ -40,6 +41,7 @@
             <ul 
                 class="
                     absolute z-20
+                    cursor-pointer
                     top-10
                     mt-1 max-h-60 
                     w-full 

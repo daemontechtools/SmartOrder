@@ -12,6 +12,7 @@
     .dmn-input-text {
         @apply
             block w-full 
+            cursor-text
             rounded-md border-0 
             mt-2
             pl-2

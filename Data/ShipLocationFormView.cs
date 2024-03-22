@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using SMART.Common.Base;
+using SMART.Common.CompanyManagement;
 
 namespace SO.Data;
 
@@ -11,9 +12,9 @@ public class ShipLocationFormView : SMARTBaseClass {
     [Required]
     public string LocationName { get; set; } = "";
 
-    public ContactFormView DefaultContact { get; set; } = new ContactFormView("");
+    public IList<ContactFormView> Contacts { get; set; } = new List<ContactFormView>();
     
     [Required]
     [ValidateComplexType]
-    public AddressFormView DefaultAddress { get; set; } = new AddressFormView("");
+    public IList<AddressFormView> Addresses { get; set; } = new List<AddressFormView>();
 }

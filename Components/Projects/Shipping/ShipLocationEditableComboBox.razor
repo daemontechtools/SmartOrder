@@ -5,8 +5,6 @@
 @inherits InputBase<ShipLocationFormView>
 
 <div class="flex flex-col">
-  <div class="border-t border-gray-300 mb-3 mt-3"></div>
-
   @if(_isLoading) {
     <div class="flex justify-center">
       <div class="spinner-border text-primary" role="status">
@@ -27,25 +25,23 @@
     </div>
     <div class="mb-4"></div>
   } else {
-    <span>No available shipping addresses</span>
+    <span class="text-lg font-semibold">No available shipping addresses</span>
   }
+    @if(!_isAddingShipLocation) {
+      <a 
+        @onclick=@OnAddressClick
+        class="
+          dmn-link
+          text-right
+          my-2
+      ">
+        Add New Address
+      </a>
+    } else {
+      <div class="mt-6"></div>
+      <ShipLocationForm @bind-Value=@Value />
+    }
 </div>
-@if(!_isAddingShipLocation) {
-  <span 
-    @onclick=@OnAddressClick
-    class="
-      text-sky-500
-      text-right
-      font-semibold
-      hover:text-sky-400
-      cursor-pointer
-      pt-0.5
-  ">
-    Add New Address
-  </span>
-} else {
-  <ShipLocationForm @bind-Value=@Value />
-}
 
 
 @code {

@@ -12,11 +12,14 @@ public partial class DmnComboBox<T> : InputBase<T> {
     private ILogger<DmnComboBox<T>>? _logger { get; set; }
 
     [Parameter]
-    public IQueryable<T>? Data { get; set; }
-    public IQueryable<T>? _filteredData { get; set; }
+    public IQueryable<T> Data { get; set; } = default!;
+    public IQueryable<T> _filteredData { get; set; } = default!;
 
     [Parameter]
     public string? TextFieldName { get; set; }
+
+    [Parameter]
+    public string? Placeholder { get; set; }
 
     [Parameter]
     public string? Label { get; set; }
@@ -24,16 +27,11 @@ public partial class DmnComboBox<T> : InputBase<T> {
     [Parameter]
     public string? Class { get; set; }
 
-
-    // [Parameter]
-    // public Expression<Func<ValidationTValue>> ValidationValueExpression { get; set; }
-
     private string _searchValue = "";
     private bool _isActive = false;
 
     protected override void OnInitialized() {
         _filteredData = Data;
-        //ValidationValueExpression ??= ValueExpression;
     }
 
     protected override bool TryParseValueFromString(
@@ -77,7 +75,7 @@ public partial class DmnComboBox<T> : InputBase<T> {
             _filteredData = Data;
             return;
         }
-        _filteredData = Data?
+        _filteredData = Data
             .Where(x => 
                 GetTextValue(x)
                     .Contains(
