@@ -109,9 +109,19 @@
 
   <!-- Normal build process -->
   <Target
-    Name="Build TailwindCss"
+    Name="CleanTailwindCss"
     BeforeTargets="PreBuildEvent"
-    DependsOnTargets="FindTailwindCss"
+  >
+    <Exec
+      Command="rm -f ./wwwroot/css/*.css"
+      WorkingDirectory="$(MSBuildProjectDirectory)"
+    />
+  </Target>
+
+  <Target
+    Name="BuildTailwindCss"
+    BeforeTargets="PreBuildEvent"
+    DependsOnTargets="CleanTailwindCss;FindTailwindCss;"
     Inputs="@(CssStyles)"
     Outputs="%(CssStyles.OutputPath)"
   >
