@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "../SmartOrderApi"
+		},
+		{
+			"path": "../SmartOrderApiTests"
 		}
 	],
 	"settings": {
