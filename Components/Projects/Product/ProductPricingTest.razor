@@ -3,7 +3,7 @@
 @attribute [StreamRendering(true)]
 @namespace SO.Components.Projects
 @inject IMapper Mapper
-@inject SmartOrderApi OrderApi
+@inject SmartService SmartService
 @inject ILogger<ProductPricingTest> Logger
 
 <div class="flex flex-col h-full"
@@ -124,7 +124,7 @@
     private ProductFormView _productFormView = new();
 
     private IQueryable<LibraryProduct>? _allCabinets;
-    private IDictionary<ProductCategoryType, List<LibraryProduct>> _sortedCabinets;
+    //private IDictionary<ProductCategoryType, List<LibraryProduct>> _sortedCabinets;
     private LibraryProduct? _selectedCabinet;
 
     private ProductCategoryType? _selectedProductType { get; set; }
@@ -152,13 +152,13 @@
 
     protected override async Task OnInitializedAsync() {
         //_productTypes test = Enum.GetValues<ProductCategoryType>().AsQueryable();
-        var cabinets = await OrderApi
+        var cabinets = await SmartService.GetClient()
             .Product
             .GetCabinets();
         _allCabinets = cabinets.AsQueryable();
-        _sortedCabinets = await OrderApi
+        @* _sortedCabinets = await SmartService.GetClient()
             .Product
-            .GetSortedProducts(cabinets);
+            .GetSortedProducts(cabinets); *@
         _isLoading = false;
     }
 
@@ -186,9 +186,9 @@
         _selectedCabinet = product;
 
         // Get StyleConfigurations for this product
-        _doorStyles = (await OrderApi
+        _doorStyles = SmartService.GetClient()
             .Product
-            .GetDoorStylesForProduct(product))
+            .GetDoorStylesForProduct(product)
             .AsQueryable();
         _selectedDoorStyle = null;
 
@@ -206,14 +206,14 @@
     private void OnStyleSelected(LibraryStyleConfiguration doorStyle) {
         _selectedDoorStyle = doorStyle;
 
-        _finishes = OrderApi
+        _finishes = SmartService.GetClient()
             .Product
             .GetAllowedFinishes(doorStyle!)
             .AsQueryable();
         Logger.LogInformation($"Finishes: {_finishes.Count()}");
         _selectedFinish = null;
 
-        _drawerHardwares = OrderApi
+        _drawerHardwares = SmartService.GetClient()
             .Product
             .GetAllowedDrawerHardware(doorStyle!)
             .AsQueryable();
@@ -243,7 +243,7 @@
         _selectedCabinet.ProductDoorSwing = "Left";
         Logger.LogInformation("Product Finish: "+_selectedFinish);
         Logger.LogInformation("Product Drawer Hardware: "+_selectedDrawerHardware);
-        var priceRes = await OrderApi
+        var priceRes = await SmartService.GetClient()
             .Product
             .GetProductPrice(
                 _selectedCabinet!,

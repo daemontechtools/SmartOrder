@@ -1,11 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using SMART.Common.ProjectManagement;
 using SMART.Common.LibraryManagement;
-using SMART.Web.OrderApi;
-using SO.Data;
-
 namespace SO.Components.Projects;
-
 
 public struct RoomProfileProps {
     public string Title { get; set; }
@@ -13,7 +9,7 @@ public struct RoomProfileProps {
 
 public partial class ProjectGroupDetail : ComponentBase {
     [Inject]
-    private SmartOrderApi? _orderApi { get; set; }
+    private SmartService? _smartClient { get; set; }
 
     [Parameter]
     public string? ProjectLinkId { get; set; }
@@ -29,17 +25,19 @@ public partial class ProjectGroupDetail : ComponentBase {
     private List<RoomProfileProps> _roomProfileProps = new List<RoomProfileProps>();
 
     protected override async Task OnInitializedAsync() {
-        _project = await _orderApi!
+        _project = await _smartClient!.GetClient()
             .Project
             .GetProjectById(ProjectLinkId!);
         if(_project == null) {
             throw new Exception("Project not found");
         }
-        _projectGroup = _orderApi.ProjectGroup.GetProjectGroupById(
-            _project,
-            ProjectGroupLinkId!
-        );
-        _products = await _orderApi!
+        _projectGroup = _smartClient!.GetClient()
+            .ProjectGroup
+            .GetProjectGroupById(
+                ProjectGroupLinkId!,
+                _project
+            );
+        _products = await _smartClient!.GetClient()
             .Product
             .GetCabinets();
         IsLoading = false;

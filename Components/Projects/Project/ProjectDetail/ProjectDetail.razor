@@ -3,7 +3,7 @@
 @namespace SO.Components.Projects
 
 @inject ILogger<ProjectDetail> _logger
-@inject SmartOrderApi OrderApi
+@inject SmartService SmartService
 
 <div class="flex flex-col h-full">
     @if(_isLoading) {
@@ -31,14 +31,14 @@
 
     protected override async Task OnInitializedAsync() {
         //_logger.LogInformation("Load Project: {ProjectLinkId}", ProjectLinkId ?? "NULL");
-        _project = await OrderApi
+        _project = await SmartService.GetClient()
             .Project
             .GetProjectById(ProjectLinkId!);
         _isLoading = false;
     }
 
     private async void OnStateChanged(object sender, EventArgs e) {
-        _project = await OrderApi
+        _project = await SmartService.GetClient()
             .Project
             .GetProjectById(ProjectLinkId!);
         await InvokeAsync(StateHasChanged);

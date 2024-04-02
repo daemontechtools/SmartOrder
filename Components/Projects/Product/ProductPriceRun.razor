@@ -3,7 +3,7 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @namespace SO.Components.Projects
 @inject IMapper Mapper
-@inject SmartOrderApi OrderApi
+@inject SmartService SmartService
 @inject ILogger<ProductPricingTest> Logger
 
 <div class="flex flex-col h-full">
@@ -50,7 +50,7 @@
     private bool _isLoaded = false;
 
     protected override async Task OnInitializedAsync() {
-        var products = await OrderApi
+        var products = await SmartService.GetClient()
             .Product
             .GetCabinets();
         var product = products
@@ -63,7 +63,7 @@
         product.ProductSlide = _productSlide;
         product.ProductDoorSwing = _productDoorSwing;
             
-        var pricingRes = await OrderApi
+        var pricingRes = await SmartService.GetClient()
           .Product
           .GetProductPrice(
             product,

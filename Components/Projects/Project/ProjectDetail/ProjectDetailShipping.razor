@@ -1,7 +1,7 @@
 @page "/quotes/{projectLinkId}/shipping"
 @using SMART.Common.ProjectManagement
 @namespace SO.Components.Projects
-@inject SmartOrderApi OrderApi
+@inject SmartService SmartService
 
 <ProjectDetailHeader Project=@_project/>
 
@@ -28,7 +28,7 @@
     private Project? _project;
 
     protected override async Task OnInitializedAsync() {
-      _project = await OrderApi!
+      _project = await SmartService.GetClient()
         .Project
         .GetProjectById(ProjectLinkId!);
     }

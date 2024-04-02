@@ -36,6 +36,7 @@ builder.Services.AddSingleton(mapper);
 
 builder.Services.AddScoped<ModalService>();
 builder.Services.AddSingleton<SmartOrderApi>();
+builder.Services.AddSingleton<SmartService>();
 builder.WebHost.UseWebRoot("wwwroot");
 builder.WebHost.UseStaticWebAssets();
 
@@ -83,11 +84,12 @@ app.UseAntiforgery();
 app.Use(async (context, next) => { 
     var config = context.RequestServices.GetRequiredService<IConfiguration>();
     var orderApi = context.RequestServices.GetRequiredService<SmartOrderApi>();
-    await orderApi.Login(new ApiCreds(
+    var smartService = context.RequestServices.GetRequiredService<SmartService>();
+    await smartService.Login(
         config["SMART_FACTORY_ID"]!,
-        config["SMART_DEALER_NAME"]!,
+        config["SMART_DEALER_ID"]!,
         config["SMART_USER_NAME"]!
-    ));
+    );
     await next();
 });
 

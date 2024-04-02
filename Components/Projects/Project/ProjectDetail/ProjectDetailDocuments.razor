@@ -3,7 +3,7 @@
 
 @namespace SO.Components.Projects
 
-@inject SmartOrderApi SmartOrderApi
+@inject SmartService SmartService
 
 <div class="flex flex-col h-full">
    <ProjectDetailHeader Project=@_project />
@@ -62,7 +62,7 @@
     @* private List<RowTemplateProps> ListItems { get; set; } = new List<RowTemplateProps>(); *@
 
     protected override async Task OnInitializedAsync() {
-        _project = await SmartOrderApi
+        _project = await SmartService.GetClient()
             .Project
             .GetProjectById(ProjectLinkId!);
          @* ListItems = new List<RowTemplateProps>() {

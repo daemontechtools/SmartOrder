@@ -1,7 +1,7 @@
 @namespace SO.Components.Projects 
 @inherits InputBase<ContactFormView>
 @inject IMapper Mapper
-@inject SmartOrderApi OrderApi 
+@inject SmartService SmartService 
 
 <div class="
     flex flex-col
@@ -48,7 +48,7 @@
     }
     
     protected override async Task OnInitializedAsync() {
-        _contacts = await OrderApi
+        _contacts = await SmartService.GetClient()
             .Contact
             .GetContactsAsQueryable();
     }
@@ -76,7 +76,7 @@
             _isEditing = false;
             return;
         }
-        _contacts = await OrderApi
+        _contacts = await SmartService.GetClient()
             .Contact
             .GetContactsAsQueryable();
         _currentContact = _contacts
