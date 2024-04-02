@@ -24,17 +24,11 @@
     <Reference Include="SMART.Common">
       <HintPath>lib/SMART.Common.dll</HintPath>
     </Reference>
-    <Reference Include="SMART.Common.Functions">
-      <HintPath>lib/SMART.Common.Functions.dll</HintPath>
-    </Reference>
-    <Reference Include="SMART.Utility.Globalization">
-      <HintPath>lib/SMART.Utility.Globalization.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <!-- Internal Dependencies -->
   <ItemGroup Condition="'$(Configuration)'!='Release'">
-    <ProjectReference Include="../SmartOrderApi/SmartOrderApi.csproj" />
+    <ProjectReference Include="../SmartOrderApi/SmartOrderApi/SmartOrderApi.csproj" />
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)'=='Release'">
     <PackageReference Include="SmartOrderApi" Version="*" />
