@@ -1,5 +1,5 @@
 @namespace SO.Components.Projects
-@inject SmartOrderApi OrderApi
+@inject SmartService SmartService
 @inject ILogger<ShipLocationEditableComboBox> Logger
 @inject IMapper Mapper
 @inherits InputBase<ShipLocationFormView>
@@ -58,7 +58,7 @@
   }
 
   protected override async Task OnInitializedAsync() {
-    _shipLocations = await OrderApi
+    _shipLocations = await SmartService.GetClient()
       .ShipLocation
       .GetShipLocationsAsQueryable();
     _isLoading = false;

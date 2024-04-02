@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.QuickGrid;
 using SMART.Common.ProjectManagement;
-using SMART.Web.OrderApi;
 using Daemon.RazorUI.Icons;
 using Daemon.RazorUI.Modal;
 namespace SO.Components.Projects;
@@ -11,7 +10,7 @@ public partial class Projects : ComponentBase {
     private ModalService? _modalService { get; set; }
 
     [Inject]
-    private SmartOrderApi? _orderApi { get; set; }
+    private SmartService? _smartService { get; set; }
 
     [Inject]
     private ILogger<Projects>? _logger { get; set; }
@@ -32,7 +31,7 @@ public partial class Projects : ComponentBase {
         .ByAscending(p => p.Name);
 
     protected override async Task OnInitializedAsync() {
-        _projects = await _orderApi!
+        _projects = await _smartService!.GetClient()!
             .Project
             .GetProjectsAsQueryable();
         _deleteConfirmationInput = new ModalContentProps {
@@ -49,10 +48,13 @@ public partial class Projects : ComponentBase {
 
     private async Task OnDeleteConfirm(bool confirmed) {
        if (confirmed && _projectToDelete != null) {
-            await _orderApi!.Project.DeleteProject(_projectToDelete);
-            _projects = await _orderApi!
+            await _smartService!.GetClient()
                 .Project
-                .GetProjectsAsQueryable(true);
+                .DeleteProject(_projectToDelete);
+            // TODO: Checrk if this is necessary
+            // _projects = await _orderApi!
+            //     .Project
+            //     .GetProjectsAsQueryable(true);
             _projectToDelete = null;
             StateHasChanged();
         }
@@ -60,7 +62,9 @@ public partial class Projects : ComponentBase {
     }
 
     private async void OnStateChanged(object sender, EventArgs e) {
-        var projects = await _orderApi!.Project.GetProjects();
+        var projects = await _smartService!.GetClient()
+            .Project
+            .GetProjects();
         await InvokeAsync(StateHasChanged);
     }
 
@@ -78,7 +82,9 @@ public partial class Projects : ComponentBase {
     private async Task OnSearchInput(string input) {
         _searchQuery = input;
         if(string.IsNullOrEmpty(input)) {
-            var projects = await _orderApi!.Project.GetProjects();
+            var projects = await _smartService!.GetClient()
+                .Project
+                .GetProjects();
             _projects = projects.AsQueryable();
         } else {
             _projects = SearchProducts(input);

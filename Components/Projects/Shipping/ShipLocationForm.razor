@@ -1,6 +1,6 @@
 @inject IMapper Mapper
 @inject ILogger<ShipLocationForm> Logger
-@inject SmartOrderApi OrderApi
+@inject SmartService SmartService
 @namespace SO.Components.Projects
 @inherits InputBase<ShipLocationFormView>
 
@@ -104,7 +104,7 @@
     private async Task AddLocation() {
         _isSubmitting = true;
         Logger.LogInformation($"Creating new project: {Value.LocationName}");
-        var newLocation = await OrderApi
+        var newLocation = await SmartService!.GetClient()
             .ShipLocation
             .AddShipLocation(
                 Value.LocationName,

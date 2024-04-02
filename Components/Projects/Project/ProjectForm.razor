@@ -3,7 +3,7 @@
 @attribute [StreamRendering(true)]
 @namespace SO.Components.Projects
 @inject NavigationManager NavigationManager
-@inject SmartOrderApi OrderApi
+@inject SmartService SmartService
 @inject ILogger<ProjectForm> Logger
 
 <div class="flex flex-col bg-slate-100"
@@ -95,7 +95,7 @@
     private async Task AddQuote() {
         _isSubmitting = true;
         Logger.LogInformation($"Creating new project: {_newProject!.Name}");
-        Project newProject = await OrderApi!
+        Project newProject = await SmartService!.GetClient()
             .Project
             .AddProject(_newProject.Name);
         // Add ShippingLocation

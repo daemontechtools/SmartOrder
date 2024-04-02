@@ -2,8 +2,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using SMART.Common.LibraryManagement;
 using SMART.Common.ProjectManagement;
-using SMART.Web.OrderApi;
-using SO.Data;
 
 namespace SO.Components.Projects;
 
@@ -13,7 +11,7 @@ public partial class ProjectGroupForm : ComponentBase {
     private NavigationManager? _navigationManager { get; set; }
 
     [Inject]
-    private SmartOrderApi? _orderApi { get; set; }
+    private SmartService? _smartService { get; set; }
 
     [Inject]
     private ILogger<ProjectGroupForm>? _logger { get; set; }
@@ -39,17 +37,16 @@ public partial class ProjectGroupForm : ComponentBase {
     private List<RoomProfileProps> _roomProfileProps = new List<RoomProfileProps>();
 
     protected override async Task OnInitializedAsync() {
-        _project = await _orderApi!
+        _project = await _smartService!.GetClient()
             .Project
             .GetProjectById(ProjectLinkId!);
         if(ProjectGroupLinkId != null) {
-            _room = _orderApi!
+            _room = _smartService!.GetClient()
                 .ProjectGroup
                 .GetProjectGroupById(
-                    _project,
-                    ProjectGroupLinkId!
-                );
-            var products = await _orderApi!
+                    ProjectGroupLinkId!,
+                    _project!);
+            var products = await _smartService!.GetClient()
                 .Product
                 .GetProducts();
             _products = products.AsQueryable();
@@ -85,7 +82,7 @@ public partial class ProjectGroupForm : ComponentBase {
     private async Task AddRoom() {
         _isSubmitting = true;
         _logger!.LogInformation($"Creating new room: {_room!.Name}");
-        ProjectGroup newRoom = await _orderApi!
+        ProjectGroup newRoom = await _smartService!.GetClient()
             .ProjectGroup
             .AddProjectGroup(
                 _project!,
@@ -100,9 +97,9 @@ public partial class ProjectGroupForm : ComponentBase {
     private async Task UpdateRoom() {
         _isSubmitting = true;
         _logger!.LogInformation($"Updating room: {_room!.Name}");
-        await _orderApi!
+        await _smartService!.GetClient()
             .ProjectGroup
-            .UpdateRoom(_room);
+            .UpdateRoom(_project!);
         _logger!.LogInformation($"Updated room: {_room.Name}");
         _navigationManager!.NavigateTo($"/quotes/{ProjectLinkId}");
         _isSubmitting = false;

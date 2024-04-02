@@ -5,14 +5,13 @@
 @using SMART.Web.OrderApi
 @using SMART.Common.LibraryManagement
 @using SMART.Common.ProductionManagement
-@using SMART.Common.Functions.WebAppsSupport
 @using SMART.Common.Utility
 @using SMART.Common.CompanyManagement
 @using static Microsoft.AspNetCore.Components.Web.RenderMode
 @namespace SO.Components.Projects
 
 @inject IMapper Mapper
-@inject SmartOrderApi OrderApi
+@inject SmartService SmartService
 @inject ILogger<ProductForm> Logger
 
 <div class="flex flex-col h-full"
@@ -174,11 +173,15 @@
     private PersistingComponentStateSubscription? _stateSubscription;
 
     protected override async Task OnInitializedAsync() {
-        _project = await OrderApi.Project.GetProjectById(ProjectLinkId);
-        _projectGroup = OrderApi.ProjectGroup.GetProjectGroupById(
-            _project,
-            ProjectGroupLinkId
-        );
+        _project = await SmartService.GetClient()
+            .Project
+            .GetProjectById(ProjectLinkId);
+        _projectGroup = SmartService.GetClient()
+            .ProjectGroup
+            .GetProjectGroupById(
+                ProjectGroupLinkId!,
+                _project
+            );
         IList<Product> groupProducts = _projectGroup?.ProjectGroupProducts;
         var product = groupProducts?
             .First(p => p.LinkID == ProjectLinkId);
@@ -187,7 +190,9 @@
         } else {
             _productFormView = new();
         }
-        var products = await OrderApi.Product.GetCabinets();
+        var products = await SmartService.GetClient()
+            .Product
+            .GetCabinets();
         _allProducts = products.AsQueryable();
         @* _productTypeDictionary = await OrderApi
             .Product
@@ -206,9 +211,10 @@
         _selectedProduct = product;
 
         // Get StyleConfigurations for this product
-        _styleConfigurations = (await OrderApi
+        var client = SmartService!.GetClient();
+        _styleConfigurations = client
             .Product
-            .GetDoorStylesForProduct(product))
+            .GetDoorStylesForProduct(product)
             .AsQueryable();
 
         var filteredStyleConfigs = _styleConfigurations
@@ -238,7 +244,7 @@
         //Logger.LogInformation($"Style selected: {styleConfiguration?.Name}");
         _selectedStyleConfiguration = styleConfiguration;
 
-        _finishes = OrderApi
+        _finishes = SmartService.GetClient()
             .Product
             .GetAllowedFinishes(styleConfiguration!)
             .AsQueryable();
@@ -251,7 +257,7 @@
             _finishes.Append("None");
         } 
 
-        _doorHardwares = OrderApi
+        _doorHardwares = SmartService.GetClient()
             .Product
             .GetAllowedDrawerHardware(styleConfiguration!)
             .AsQueryable();
