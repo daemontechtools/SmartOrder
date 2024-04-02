@@ -1,13 +1,12 @@
 {
 	"folders": [
 		{
+			"name": "SmartOrder",
 			"path": "."
 		},
 		{
+			"name": "SmartOrderApi",
 			"path": "../SmartOrderApi"
-		},
-		{
-			"path": "../SmartOrderApiTests"
 		}
 	],
 	"settings": {
