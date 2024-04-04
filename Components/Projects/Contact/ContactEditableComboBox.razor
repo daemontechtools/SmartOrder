@@ -37,6 +37,7 @@
 </div>
 
 @code {
+
     private IQueryable<Contact> _contacts = default!;
     private Contact _currentContact = default!;
     private ContactFormView _currentFormView = default!;
@@ -48,9 +49,10 @@
     }
     
     protected override async Task OnInitializedAsync() {
-        _contacts = await SmartService.GetClient()
+        var contactList = await SmartService.GetClient()
             .Contact
-            .GetContactsAsQueryable();
+            .GetGlobalDealerShipLocationContacts();
+        _contacts = contactList.AsQueryable();
     }
 
     protected override bool TryParseValueFromString(
@@ -76,9 +78,10 @@
             _isEditing = false;
             return;
         }
-        _contacts = await SmartService.GetClient()
+        var contacts = await SmartService.GetClient()
             .Contact
-            .GetContactsAsQueryable();
+            .GetGlobalDealerShipLocationContacts();
+        _contacts = contacts.AsQueryable();
         _currentContact = _contacts
             .FirstOrDefault(c => c.LinkID == contact.LinkID)
             ?? throw new InvalidOperationException("Contact not found");
