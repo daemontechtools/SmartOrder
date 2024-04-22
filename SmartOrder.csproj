@@ -9,6 +9,7 @@
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
     <NoWarn>1591</NoWarn>
     <NoWarn>$(NoWarn);NETSDK1057</NoWarn>
+    <NoWarn>RZ10012</NoWarn>
   </PropertyGroup>
 
   <!-- Third Party Dependencies -->
