@@ -25,6 +25,9 @@ public partial class DmnComboBox<T> : InputBase<T> {
     public string? Label { get; set; }
 
     [Parameter]
+    public string? LabelClass { get; set; }
+
+    [Parameter]
     public string? Class { get; set; }
 
     private string _searchValue = "";
