@@ -40,6 +40,11 @@
                         Title="Sales Associate"
                         Property=@(p => p.LinkIDEmployeeSoldBy)
                     />
+                    <PropertyColumn 
+                        Title="Date Created"
+                        Property=@(p => p.DateOrderSubmit)
+                        Sortable=true
+                    />
                     <TemplateColumn 
                         Class="flex gap-x-2 justify-end"
                     >
