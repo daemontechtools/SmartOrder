@@ -20,7 +20,7 @@ public class ProjectFormView : SmartBaseClass {
         ErrorMessage = "Shipping Location is required when IsShipped is true."
     )]
     [ValidateComplexType]
-    public ShipLocationFormView ProjectShipLocation { get; set; } = new();
+    public ShipLocationFormView ProjectShipLocation { get; set; }
 
     public IList<ProjectGroup> ProjectGroups { get; set; } = new List<ProjectGroup>();
 }
