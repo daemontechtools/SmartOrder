@@ -71,6 +71,7 @@
     }
 
     private async Task OnContactChanged(ContactFormView contact) {
+        Console.WriteLine("Contact Changed");
         _currentFormView = contact;
         Value = contact;
         if(!Value.IsPersisted) {

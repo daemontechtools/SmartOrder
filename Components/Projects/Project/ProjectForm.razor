@@ -14,7 +14,11 @@
         }) 
     />
 
-    <div class="flex flex-1 flex-col container mt-12">
+    <div class="
+        container 
+        flex flex-1 flex-col 
+        my-12
+    ">
         <EditForm 
             @ref=@_editForm
             Model=@_newProject     
@@ -45,8 +49,14 @@
                 LabelClass="text-lg font-semibold" 
                 @bind-Value=@_newProject!.Name
             />
-            <div class="m-3"></div>
-            <h2 class="text-base font-semibold leading-7 text-gray-900 mb-1">Shipping Options</h2>
+            <ValidationSummary />
+            <h2 class="
+                text-lg font-semibold 
+                leading-7 text-gray-900 
+                mb-1
+            ">
+                Shipping Options
+            </h2>
 
             <InputRadioGroup @bind-Value=@_newProject!.IsShipped>
                 <div class="flex items-center">
@@ -55,15 +65,17 @@
                     <InputRadio Value=true class="dmn-input-radio" />Delivery
                 </div>
             </InputRadioGroup>
-             
              @if(_newProject.IsShipped) {
                 <div class="border-t border-gray-300 mb-8 mt-3"></div>
-                <ShipLocationEditableComboBox @bind-Value=@_newProject.ProjectShipLocation />
+                <ShipLocationEditableComboBox 
+                    @bind-Value=@_newProject.ProjectShipLocation
+                    Project=_newProject
+                />
              }
         </EditForm>
     </div>
 </div>
-
+    
 @code {
 
     [SupplyParameterFromForm]

@@ -105,12 +105,12 @@ public partial class DmnComboBox<T> : InputBase<T> {
         _isActive = false;
     }
 
-    private void OnOptionClick(T value) {
+    private async Task OnOptionClick(T value) {
         
         Value = value;
-        ValueChanged.InvokeAsync(value);
         _searchValue = GetTextValue(value);
         _isActive = false;
+        await ValueChanged.InvokeAsync(value);
     }
 
 }

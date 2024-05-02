@@ -26,7 +26,6 @@
 
 .validation-message {
     @apply
-        absolute
         bottom-0
         font-light
         text-red-500

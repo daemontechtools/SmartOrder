@@ -17,7 +17,7 @@ public class ProjectFormView : SmartBaseClass {
     [RequiredIf(
         "IsShipped", 
         true, 
-        ErrorMessage = "Shipping Location is required when IsShipped is true."
+        ErrorMessage = "Please select a Shipping Location"
     )]
     [ValidateComplexType]
     public ShipLocationFormView ProjectShipLocation { get; set; }

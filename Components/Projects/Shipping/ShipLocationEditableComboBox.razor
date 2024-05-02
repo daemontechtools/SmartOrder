@@ -18,23 +18,24 @@
           @bind-Value:get=@_currentShipLocation
           @bind-Value:set=OnShipLocationChanged
           TextFieldName=@nameof(ShipLocation.LocationName)
-          Label="Shipping Location"
+          Label="Select Shipping Location"
+          LabelClass="text-xl font-semibold"
           Class="pb-0"
         />
       } else {
         <span class="text-lg font-semibold">No available shipping addresses</span>
       }
-      @if(!_isAddingShipLocation) {
-        <a 
-          @onclick=@OnAddressClick
-          class="
-            dmn-link
-            text-left
-            my-2
-        ">
-          Add New Address
-        </a>
-      } else {
+      <ValidationMessage For=@(() => Project.ProjectShipLocation) />
+      <a 
+        @onclick=@OnAddressClick
+        class="
+          dmn-link
+          text-left
+          my-2
+      ">
+        Add New Address
+      </a>
+      @if(_currentShipLocation != null) {
         <div class="mt-6"></div>
         <ShipLocationForm @bind-Value=@Value />
       }
@@ -46,6 +47,9 @@
 
 @code {
 
+  [Parameter]
+  public ProjectFormView? Project { get; set; } = default!;
+
   private bool _isLoading = true;
 
   private IQueryable<ShipLocation> _shipLocations = default!;
@@ -53,8 +57,15 @@
 
   private bool _isAddingShipLocation = false;
     
-  protected override void OnParametersSet() {
+  @* protected override void OnParametersSet() {
     _currentShipLocation = Mapper.Map<ShipLocation>(Value);     
+  } *@
+
+  protected override void OnInitialized() {
+    if(Value == null) {
+      Value = new();
+    }
+    _currentShipLocation = Mapper.Map<ShipLocation>(Value);
   }
 
   protected override async Task OnInitializedAsync() {
@@ -98,10 +109,10 @@
     StateHasChanged();
   }      
 *@
- private void OnShipLocationChanged(ShipLocation shipLocation) {
-    Logger.LogInformation($"ShipLocationChanged??????????");
+ private async Task OnShipLocationChanged(ShipLocation shipLocation) {
     _currentShipLocation = shipLocation;
     Value = Mapper.Map<ShipLocationFormView>(shipLocation);
+    await ValueChanged.InvokeAsync(Value);
     //_currentShipLocationLinkId = e.Value?.ToString();
     
     //StateHasChanged();
