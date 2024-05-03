@@ -80,6 +80,11 @@
             ? "Update"
             : "Create";
 
+    protected override void OnParametersSet() {
+        if (Value == null) {
+            Value = new ContactFormView();
+        }
+    }
     protected override bool TryParseValueFromString(
         string? value, 
         out ContactFormView contactFormView,
@@ -107,6 +112,7 @@
                     Value.Email
                 );
         } else {
+            //update BOTH global and ship location contact
             contact = await SmartService.GetClient()
                 .Contact
                 .GetGlobalDealerShipLocationContactById(Value.LinkID)
@@ -119,7 +125,7 @@
         Logger.LogInformation($"Upserted contact: {contact.DisplayName}");
         var newView = Mapper.Map<ContactFormView>(contact);
         Value = newView;
-        ValueChanged.InvokeAsync(Value);
+        await ValueChanged.InvokeAsync(Value);
         _isSubmitting = false;
     }
 
