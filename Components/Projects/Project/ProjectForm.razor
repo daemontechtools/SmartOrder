@@ -84,13 +84,11 @@
     private EditForm _editForm = default!;
     private bool _isSubmitting = false;
 
-    protected override void OnInitialized()
-    {
+    protected override void OnInitialized() {
         _newProject ??= new();
     }
 
-    private async Task OnSubmitClick()
-    {
+    private async Task OnSubmitClick() {
         if (_editForm!.EditContext!.Validate()) {
             await AddQuote();
         } else {
@@ -98,8 +96,7 @@
         }
     }
 
-    private void OnCancelClick()
-    {
+    private void OnCancelClick() {
         _newProject = new();
         StateHasChanged();
     }

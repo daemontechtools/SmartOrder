@@ -63,10 +63,11 @@
         throw new NotImplementedException();
     }
 
-    private void OnContactSelected(Contact contact) {
+    private async Task OnContactSelected(Contact contact) {
         _currentContact = contact;
         Value = Mapper.Map<ContactFormView>(_currentContact);
         _currentFormView = Value;
+        await ValueChanged.InvokeAsync(Value);
         _isEditing = true;
     }
 

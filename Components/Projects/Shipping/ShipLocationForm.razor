@@ -27,6 +27,7 @@
         OnSubmitClick=@OnSubmitClick
         OnCancelClick=@OnCancelClick
     />
+    <ValidationSummary />
     <div class="
         mt-6 mb-8
     ">
@@ -82,7 +83,10 @@
             p-4
         ">
             <h3 class="text-2xl font-semibold mb-4">Shipping Contact</h3>
-            <ContactEditableComboBox @bind-Value=@_currentContact />
+            <ContactEditableComboBox 
+                @bind-Value:get=@_currentContact
+                @bind-Value:set=@OnContactSelected
+            />
             <ValidationMessage For=@(() => Value.Contact) /> 
         </div>
     </div>
@@ -154,7 +158,12 @@
         }
     }
 
-    private void OnCancelClick() {
+    private async Task OnCancelClick() {
+        if(!Value.IsPersisted) {
+            Value = new();
+        } else {
+            await DeleteLocation();
+        }
     }
 
     private async Task AddLocation() {
@@ -172,15 +181,14 @@
                 Value.Address.AddressNotes
             );
         Value = Mapper.Map<ShipLocationFormView>(newLocation);
-
         var newContact = await SmartService!.GetClient()
-            .ShipLocation
-            .AddContact(
-                newLocation,
-                _currentContact.DisplayName,
-                _currentContact.Phone,
-                _currentContact.Email
-            );
+                .ShipLocation
+                .AddContact(
+                    newLocation,
+                    _currentContact.DisplayName,
+                    _currentContact.Phone,
+                    _currentContact.Email
+                );
         _currentContact = Mapper.Map<ContactFormView>(newContact);
 
         await ValueChanged.InvokeAsync(Value);
@@ -191,11 +199,62 @@
     private async Task UpdateLocation() {
         _isSubmitting = true;
         Logger.LogInformation($"Updating project: {Value.LocationName}");
-        @* ShipLocationView updatedLocation = await OrderApi!
+        var location = await SmartService!.GetClient()
             .ShipLocation
-            .UpdateShipLocation(ShipLocation!);
-        Logger.LogInformation($"Updated project: {updatedLocation.LocationName}");
-        await OnChange.InvokeAsync(updatedLocation); *@
+            .GetShipLocationById(Value.LinkID);
+        Mapper.Map(Value, location);
+        await SmartService!.GetClient()
+            .ShipLocation
+            .UpdateShipLocation(
+                location
+            );
+
+        Contact contact = null;
+        if(location.Contacts != null || String.IsNullOrEmpty(location.Contacts[0].DisplayName)) {
+            contact = await SmartService!.GetClient()
+                .ShipLocation
+                .AddContact(
+                    location,
+                    _currentContact.DisplayName,
+                    _currentContact.Phone,
+                    _currentContact.Email
+                ); 
+            
+        } else {
+            contact = await SmartService!.GetClient()
+                .Contact
+                .GetShipLocationContactById(
+                    Value.Contact.LinkID,
+                    location
+                );        
+            Mapper.Map(_currentContact, contact);
+            await SmartService!.GetClient()
+                .Contact
+                .UpdateContact(
+                    contact
+                );
+        }
+        _currentContact = Mapper.Map<ContactFormView>(contact);
+
+        _isSubmitting = false;
+    }
+
+    private async Task OnContactSelected(ContactFormView contactView) {
+        _currentContact = contactView;
+        Value.Contact = _currentContact;
+        await ValueChanged.InvokeAsync(Value);
+    }
+
+    private async Task DeleteLocation() {
+        _isSubmitting = true;
+        Logger.LogInformation($"Deleting project: {Value.LocationName}");
+        await SmartService!.GetClient()
+            .ShipLocation
+            .DeleteShipLocationById(Value.LinkID);
+        Logger.LogInformation($"Deleted project: {Value.LocationName}");
+        Value = new ShipLocationFormView();
+        await ValueChanged.InvokeAsync(Value);
+        @* await OnChange.InvokeAsync(Value); *@
         _isSubmitting = false;
     }
 }
