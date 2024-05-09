@@ -41,7 +41,7 @@
             >
                 <ObjectGraphDataAnnotationsValidator />
                 <div class="grid grid-cols-6 gap-8 mt-8">
-                    <div class="col-span-6">
+                    <div class="col-span-3">
                         <DmnComboBox 
                             Data=@_allCabinets
                             @bind-Value:get=@_selectedCabinet
@@ -78,28 +78,39 @@
                                         Class="pb-4"
                                     />
                                 </div>
-                                <div class="col-span-3">
-                                    <div class="flex flex-col">
-                                        <label>
-                                            Width:
-                                            <InputNumber @bind-Value=@_productFormView.Width />
-                                        </label>
-                                        <div class="mt-3" />
-                                        <label>
-                                            Height:
-                                            <InputNumber @bind-Value=@_productFormView.Height />
-                                        </label>
-                                        <div class="mt-3" />
-                                        <label>
-                                            Depth:
-                                            <InputNumber @bind-Value=@_productFormView.Depth />
-                                        </label>
-                                    </div>
-                                </div>
                             </div>
                         }
                         </div>
                     </div> 
+                    <div class="col-span-3">
+                        @if(_selectedCabinet != null) {
+                            <div class="flex flex-col">
+                                <label>
+                                    Width:
+                                    <InputNumber @bind-Value=@_productFormView.Width />
+                                </label>
+                                <div class="mt-3" />
+                                <label>
+                                    Height:
+                                    <InputNumber @bind-Value=@_productFormView.Height />
+                                </label>
+                                <div class="mt-3" />
+                                <label>
+                                    Depth:
+                                    <InputNumber @bind-Value=@_productFormView.Depth />
+                                </label>
+                                <label>
+                                    Left End Finished:
+                                    <InputCheckbox @bind-Value=@_leftEndFinished/>
+                                </label>
+                                <label>
+                                    Right End Finished:
+                                    <InputCheckbox @bind-Value=@_rightEndFinished/>
+                                </label>
+                            </div>
+                        }
+
+                    </div>
                     @if(_productPrice != null 
                         || !string.IsNullOrEmpty(_priceError)
                     ) {
