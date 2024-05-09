@@ -223,6 +223,9 @@
     private async void OnProductSelected(LibraryProduct product) {
         Logger.LogInformation($"Product Code selected: {product?.Name}");
         _selectedCabinet = product;
+        _productFormView.Width = (float)product.Width;
+        _productFormView.Height = (float)product.Height;
+        _productFormView.Depth = (float)product.Depth;
 
         // Get StyleConfigurations for this product
         _doorStyles = SmartService.GetClient()
