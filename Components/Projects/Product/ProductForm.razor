@@ -31,7 +31,7 @@
                 SubmitButtonText="Get Price"
                 CancelButtonText="Clear"
                 OnSubmitClick=@OnSubmitClick
-                OnCancelClick=@OnCancelClick
+                OnCancelClick=@OnClearClick
             /> 
             <EditForm 
                 @ref=@_editForm
@@ -68,7 +68,7 @@
                                     <DmnComboBox 
                                         Data=@_finishes
                                         @bind-Value=@_selectedFinish
-                                        Label="Select a Finish"
+                                        Label="Select an Interior Finish"
                                         Class="pb-4"
                                     />
                                     <DmnComboBox 
@@ -268,8 +268,15 @@
         }
     }
 
-    private void OnCancelClick() {
-        Logger.LogInformation("On Cancel Click");
+    private void OnClearClick() {
+        _productFormView = new();
+        _selectedCabinet = null;
+        _finishes = null;
+        _selectedFinish = null;
+        _selectedDoorStyle = null;
+        _selectedDrawerHardware = null;
+        _drawerHardwares = null;
+        _productPrice = null;
     }
 
     private async Task GetProductPrice() {
