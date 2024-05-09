@@ -1,11 +1,11 @@
 @page "/quotes/{projectLinkId}/rooms/new"
-@page "/quotes/{projectLinkId}/rooms/{projectGroupLinkId}"
+@* @page "/quotes/{projectLinkId}/rooms/{projectGroupLinkId}" *@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @namespace SO.Components.Projects
 
 <div class="flex flex-col bg-slate-100">
     
-    <SEBreadcrumbNav 
+    <BreadcrumbNav 
         Options=@(new List<NavOptionProps> {
             new NavOptionProps { 
                 Path = "/quotes", Label = "Quotes" 
@@ -21,8 +21,7 @@
                     : _room!.Name 
             }
         }) 
-    />
-
+    />    
 
     <div class="flex flex-1 flex-col container mt-6">
         @if(_room == null) {
@@ -54,7 +53,7 @@
                     "
                 />
                 <DmnInputText 
-                    Label="Customer Name" 
+                    Label="Room Name" 
                     LabelClass="!text-base font-semibold" 
                     @bind-Value=@_room!.Name
                 />
