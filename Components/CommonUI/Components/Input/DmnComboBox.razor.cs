@@ -87,11 +87,28 @@ public partial class DmnComboBox<T> : InputBase<T> {
         _filteredData = Data
             .Where(x => 
                 GetTextValue(x)
-                    .Contains(
-                        _searchValue, 
-                        StringComparison.OrdinalIgnoreCase
-                    )
+                    .StartsWith(_searchValue, StringComparison.OrdinalIgnoreCase)
             );
+        // var newFilteredData = Data
+        //     .Where(x => 
+        //         GetTextValue(x)
+        //             .Contains(
+        //                 _searchValue, 
+        //                 StringComparison.OrdinalIgnoreCase
+        //             )
+        //     );
+        // newFilteredData
+        //     .ToList()
+        //     .Sort((a, b) => 
+        //         GetTextValue(a)
+        //             .ToLower()
+        //             .IndexOf(_searchValue.ToLower())
+        //             .CompareTo(
+        //                 GetTextValue(b)
+        //                     .ToLower()
+        //                     .IndexOf(_searchValue.ToLower())
+        //             )
+        //     );
     }
 
     private void HandleFocus(FocusEventArgs e) {
