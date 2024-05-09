@@ -19,7 +19,7 @@ public partial class ProjectGroupDetail : ComponentBase {
 
     private Project? _project;
     private ProjectGroup? _projectGroup;
-    private IList<LibraryProduct>? _products;
+    private IQueryable<Product>? _products;
     private bool IsLoading = true;
 
     private List<RoomProfileProps> _roomProfileProps = new List<RoomProfileProps>();
@@ -27,24 +27,33 @@ public partial class ProjectGroupDetail : ComponentBase {
     protected override async Task OnInitializedAsync() {
         _project = await _smartClient!.GetClient()
             .Project
-            .GetProjectById(ProjectLinkId!);
-        if(_project == null) {
-            throw new Exception("Project not found");
-        }
+            .GetProjectById(ProjectLinkId!)
+            ?? throw new Exception("Project not found");
         _projectGroup = _smartClient!.GetClient()
             .ProjectGroup
             .GetProjectGroupById(
                 ProjectGroupLinkId!,
                 _project
-            );
-        _products = await _smartClient!.GetClient()
-            .Product
-            .GetCabinets();
+            )
+            ?? throw new Exception("Project Group not found");
+        var productList = _project.ProjectGroupProducts as IList<Product>;
+        _products = productList != null ? productList?.AsQueryable() : new List<Product>().AsQueryable();
+
+        
+        // _products = await _smartClient!.GetClient()
+        //     .Product
+        //     .GetCabinetsAsQueryable();
         IsLoading = false;
 
-        _roomProfileProps.Add(new RoomProfileProps { Title = "Door Style" });
-        _roomProfileProps.Add(new RoomProfileProps { Title = "Finish" });
-        _roomProfileProps.Add(new RoomProfileProps { Title = "Interior Finish" });
-        _roomProfileProps.Add(new RoomProfileProps { Title = "Drawer Hardware" });
+        // _roomProfileProps.Add(new RoomProfileProps { Title = "Door Style" });
+        // _roomProfileProps.Add(new RoomProfileProps { Title = "Finish" });
+        // _roomProfileProps.Add(new RoomProfileProps { Title = "Interior Finish" });
+        // _roomProfileProps.Add(new RoomProfileProps { Title = "Drawer Hardware" });
+    }
+
+    private float GetRoomPrice() {
+        if(_products == null) return 0;
+        var roomTotal = _products?.Sum(p => p.PriceLibrary * p.Quantity) ?? 0;
+        return (float)roomTotal;
     }
 }
