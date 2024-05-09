@@ -21,5 +21,5 @@ public class ProductFormView : SmartBaseClass {
     public float Width { get; set; } = default!;
     public float Height { get; set; } = default!;
     public float Depth { get; set; } = default!;
-    public float Quantity { get; set; } = default!;
+    public float Quantity { get; set; } = 1;
 }
