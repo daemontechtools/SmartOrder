@@ -23,13 +23,6 @@
             } else {  
                 <QuickGrid Items=@_projects Pagination=@_pagination>
                     <TemplateColumn               
-                        Title="ID"
-                    >
-                        <NavLink href=@($"/quotes/{context.LinkID}") class="font-medium">
-                            @context.LinkID
-                        </NavLink>
-                    </TemplateColumn>
-                    <TemplateColumn               
                         Title="Name"
                     >
                         <NavLink href=@($"/quotes/{context.LinkID}") class="font-medium">
@@ -41,7 +34,7 @@
                         Property=@(p => p.LinkIDEmployeeSoldBy)
                     />
                     <PropertyColumn 
-                        Title="Date Created"
+                        Title="Last Updated"
                         Property=@(p => p.DateOrderSubmit)
                         Sortable=true
                     />
@@ -67,3 +60,5 @@
         <Paginator State=@_pagination />
    </div>
 </div>
+
+@* Property=@(p => p.RecordStatusDate) *@
