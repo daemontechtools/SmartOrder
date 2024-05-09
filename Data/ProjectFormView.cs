@@ -9,10 +9,11 @@ public class ProjectFormView : SmartBaseClass {
     [Required]
     [StringLength(50, ErrorMessage = "Id too long (50 character limit).")]
     public string Name { get; set; } = "";
+    
+    public string LinkIDEmployeeSoldBy { get; set; } = "";
    
     [Required]
     public bool IsShipped { get; set; } = false;
-    public string LinkIDEmployeeSoldBy { get; set; } = "";
     
     [RequiredIf(
         "IsShipped", 

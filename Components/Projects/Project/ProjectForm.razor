@@ -50,6 +50,11 @@
                 @bind-Value=@_newProject!.Name
             />
             <ValidationSummary />
+            <DmnInputText 
+                Label="Sales Associate" 
+                LabelClass="text-lg font-semibold" 
+                @bind-Value=@_newProject!.LinkIDEmployeeSoldBy
+            />
             <h2 class="
                 text-lg font-semibold 
                 leading-7 text-gray-900 
@@ -107,6 +112,12 @@
         Project newProject = await SmartService!.GetClient()
             .Project
             .AddProject(_newProject.Name);
+        if(!String.IsNullOrEmpty(_newProject.LinkIDEmployeeSoldBy)) {
+            newProject.LinkIDEmployeeSoldBy = _newProject.LinkIDEmployeeSoldBy;
+            await SmartService.GetClient()
+                .Project
+                .SaveProject(newProject);
+        }
         // Add ShippingLocation
         // Add Contact
 
