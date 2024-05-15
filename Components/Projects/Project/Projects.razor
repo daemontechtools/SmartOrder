@@ -35,7 +35,7 @@
                     />
                     <PropertyColumn 
                         Title="Last Updated"
-                        Property=@(p => p.DateOrderSubmit)
+                        Property=@(p => p.RecordStatusDate)
                         Sortable=true
                     />
                     <TemplateColumn 
@@ -60,5 +60,3 @@
         <Paginator State=@_pagination />
    </div>
 </div>
-
-@* Property=@(p => p.RecordStatusDate) *@
