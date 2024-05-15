@@ -9,18 +9,19 @@ public class ProjectFormView : SmartBaseClass {
     [Required]
     [StringLength(50, ErrorMessage = "Id too long (50 character limit).")]
     public string Name { get; set; } = "";
+    
+    public string LinkIDEmployeeSoldBy { get; set; } = "";
    
     [Required]
     public bool IsShipped { get; set; } = false;
-    public string LinkIDEmployeeSoldBy { get; set; } = "";
     
     [RequiredIf(
         "IsShipped", 
         true, 
-        ErrorMessage = "Shipping Location is required when IsShipped is true."
+        ErrorMessage = "Please select a Shipping Location"
     )]
     [ValidateComplexType]
-    public ShipLocationFormView ProjectShipLocation { get; set; } = new();
+    public ShipLocationFormView ProjectShipLocation { get; set; }
 
     public IList<ProjectGroup> ProjectGroups { get; set; } = new List<ProjectGroup>();
 }

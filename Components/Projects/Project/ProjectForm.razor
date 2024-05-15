@@ -14,7 +14,11 @@
         }) 
     />
 
-    <div class="flex flex-1 flex-col container mt-6">
+    <div class="
+        container 
+        flex flex-1 flex-col 
+        my-12
+    ">
         <EditForm 
             @ref=@_editForm
             Model=@_newProject     
@@ -24,7 +28,7 @@
             <ObjectGraphDataAnnotationsValidator />
             <DmnSectionHeader 
                 Title="Create Quote"
-                TitleClass="!text-3xl"
+                TitleClass="text-4xl"
                 Subtitle="Let's do some business"
                 SubmitButtonText="Save"
                 CancelButtonText="Clear"
@@ -41,12 +45,23 @@
                 "
             />
             <DmnInputText 
-                Label="Customer Name" 
-                LabelClass="!text-base font-semibold" 
+                Label="Quote Name" 
+                LabelClass="text-lg font-semibold" 
                 @bind-Value=@_newProject!.Name
             />
-            <div class="m-3"></div>
-            <h2 class="text-base font-semibold leading-7 text-gray-900 mb-1">Shipping Options</h2>
+            <ValidationSummary />
+            <DmnInputText 
+                Label="Sales Associate" 
+                LabelClass="text-lg font-semibold" 
+                @bind-Value=@_newProject!.LinkIDEmployeeSoldBy
+            />
+            <h2 class="
+                text-lg font-semibold 
+                leading-7 text-gray-900 
+                mb-1
+            ">
+                Shipping Options
+            </h2>
 
             <InputRadioGroup @bind-Value=@_newProject!.IsShipped>
                 <div class="flex items-center">
@@ -55,15 +70,17 @@
                     <InputRadio Value=true class="dmn-input-radio" />Delivery
                 </div>
             </InputRadioGroup>
-             
              @if(_newProject.IsShipped) {
-                <div class="border-t border-gray-300 mb-3 mt-3"></div>
-                <ShipLocationEditableComboBox @bind-Value=@_newProject.ProjectShipLocation />
+                <div class="border-t border-gray-300 mb-8 mt-3"></div>
+                <ShipLocationEditableComboBox 
+                    @bind-Value=@_newProject.ProjectShipLocation
+                    Project=_newProject
+                />
              }
         </EditForm>
     </div>
 </div>
-
+    
 @code {
 
     [SupplyParameterFromForm]
@@ -72,13 +89,11 @@
     private EditForm _editForm = default!;
     private bool _isSubmitting = false;
 
-    protected override void OnInitialized()
-    {
+    protected override void OnInitialized() {
         _newProject ??= new();
     }
 
-    private async Task OnSubmitClick()
-    {
+    private async Task OnSubmitClick() {
         if (_editForm!.EditContext!.Validate()) {
             await AddQuote();
         } else {
@@ -86,8 +101,7 @@
         }
     }
 
-    private void OnCancelClick()
-    {
+    private void OnCancelClick() {
         _newProject = new();
         StateHasChanged();
     }
@@ -98,6 +112,12 @@
         Project newProject = await SmartService!.GetClient()
             .Project
             .AddProject(_newProject.Name);
+        if(!String.IsNullOrEmpty(_newProject.LinkIDEmployeeSoldBy)) {
+            newProject.LinkIDEmployeeSoldBy = _newProject.LinkIDEmployeeSoldBy;
+            await SmartService.GetClient()
+                .Project
+                .SaveProject(newProject);
+        }
         // Add ShippingLocation
         // Add Contact
 

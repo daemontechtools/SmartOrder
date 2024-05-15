@@ -25,6 +25,9 @@ public partial class DmnComboBox<T> : InputBase<T> {
     public string? Label { get; set; }
 
     [Parameter]
+    public string? LabelClass { get; set; }
+
+    [Parameter]
     public string? Class { get; set; }
 
     private string _searchValue = "";
@@ -84,11 +87,28 @@ public partial class DmnComboBox<T> : InputBase<T> {
         _filteredData = Data
             .Where(x => 
                 GetTextValue(x)
-                    .Contains(
-                        _searchValue, 
-                        StringComparison.OrdinalIgnoreCase
-                    )
+                    .StartsWith(_searchValue, StringComparison.OrdinalIgnoreCase)
             );
+        // var newFilteredData = Data
+        //     .Where(x => 
+        //         GetTextValue(x)
+        //             .Contains(
+        //                 _searchValue, 
+        //                 StringComparison.OrdinalIgnoreCase
+        //             )
+        //     );
+        // newFilteredData
+        //     .ToList()
+        //     .Sort((a, b) => 
+        //         GetTextValue(a)
+        //             .ToLower()
+        //             .IndexOf(_searchValue.ToLower())
+        //             .CompareTo(
+        //                 GetTextValue(b)
+        //                     .ToLower()
+        //                     .IndexOf(_searchValue.ToLower())
+        //             )
+        //     );
     }
 
     private void HandleFocus(FocusEventArgs e) {
@@ -102,12 +122,12 @@ public partial class DmnComboBox<T> : InputBase<T> {
         _isActive = false;
     }
 
-    private void OnOptionClick(T value) {
+    private async Task OnOptionClick(T value) {
         
         Value = value;
-        ValueChanged.InvokeAsync(value);
         _searchValue = GetTextValue(value);
         _isActive = false;
+        await ValueChanged.InvokeAsync(value);
     }
 
 }

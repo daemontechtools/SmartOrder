@@ -1,11 +1,10 @@
 @using SMART.Common.ProjectManagement
 @using Microsoft.AspNetCore.Components.QuickGrid
-@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @namespace SO.Components.Projects
 @inject NavigationManager _navigationManager
 @inject ModalService _modalService
 @inject ILogger<ProjectDetailGroups> _logger 
-@inject SmartOrderApi OrderApi
+@inject SmartService SmartService
 
 <div class="container flex flex-col flex-1 bg-stone-100 pt-6 pb-3 justify-between">
     <div>

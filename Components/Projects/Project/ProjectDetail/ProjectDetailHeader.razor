@@ -1,7 +1,5 @@
 @using SMART.Common.ProjectManagement
-
 @namespace SO.Components.Projects
-
 
 <div class="
     container-wide 
@@ -21,7 +19,7 @@
                 <span class="font-semibold text-xl text-gray-200">@Project!.Name</span>
             </h1>
         </div>
-        <p class="mt-2 leading-6 text-gray-300">Sales Associate Name</p>
+        <p class="mt-2 leading-6 text-gray-300"><b>Sales Associate</b>: @Project!.LinkIDEmployeeSoldBy</p>
     </div>
     <div class="
         order-first flex-none 
@@ -43,33 +41,30 @@
     <div class="border-t border-stone-500 py-6 px-4 sm:px-6 lg:px-8">
         <p class="text-sm font-medium leading-6 text-gray-300">Total</p>
         <p class="mt-2 flex items-baseline gap-x-2">
-            <span class="text-4xl font-semibold tracking-tight text-white">$2000</span>
+            <span class="text-4xl font-semibold tracking-tight text-white">$@TotalTaxIn</span>
         </p>
     </div>
     <div class="border-t border-stone-500 py-6 px-4 sm:px-6 lg:px-8 sm:border-l">
         <p class="text-sm font-medium leading-6 text-gray-300">Subtotal</p>
         <p class="mt-2 flex items-baseline gap-x-2">
-            <span class="text-4xl font-semibold tracking-tight text-white">$1600</span>
+            <span class="text-4xl font-semibold tracking-tight text-white">$@SubTotal</span>
         </p>
     </div>
     <div class="border-t border-stone-500 py-6 px-4 sm:px-6 lg:px-8 lg:border-l">
-        <p class="text-sm font-medium leading-6 text-gray-300">Discount (%)</p>
+        <p class="text-sm font-medium leading-6 text-gray-300">Discount</p>
         <p class="mt-2 flex items-baseline gap-x-2">
-            <span class="text-4xl font-semibold tracking-tight text-white">$300</span>
+            <span class="text-4xl font-semibold tracking-tight text-white">@Discount%</span>
         </p>
     </div>
     <div class="border-t border-stone-500 py-6 px-4 sm:px-6 lg:px-8 sm:border-l">
         <p class="text-sm font-medium leading-6 text-gray-300">Shipping</p>
         <p class="mt-2 flex items-baseline gap-x-2">
-            <span class="text-4xl font-semibold tracking-tight text-white">$250</span>
+            <span class="text-4xl font-semibold tracking-tight text-white">$@Shipping</span>
         </p>
     </div>
 </div>
 
-<ProjectDetailNav Props=@(new ProjectDetailNavProps { 
-    ProjectId = Project!.LinkID,
-    ProjectDocumentCount = DocumentCount
-}) />
+<ProjectDetailNav Project=@Project />
 
 
 @code {
@@ -78,4 +73,18 @@
 
     [Parameter]
     public int DocumentCount { get; set; }
+
+    private float TotalTaxIn => Project!.PriceTotalTaxIn == null
+        ? (float)Project!.PriceTotalTaxIn
+        : 0;
+    private float TotalTaxOut => Project!.PriceTotalTaxOut == null
+        ? (float)Project!.PriceTotalTaxOut
+        : 0;
+    private float SubTotal => Project!.PriceSubTotal != null
+        ? (float)Project!.PriceSubTotal
+        : 0;
+    private float Discount => Project!.PriceClientDiscountAmount != null
+        ? (float)Project!.PriceClientDiscountAmount
+        : 0;
+    private float Shipping = 0;
 }

@@ -25,32 +25,34 @@
         </div>
         <div class="col-span-2"></div>
     </div>
-    @if(_isEditing) {
-        <div class="col-span-full pt-4 border-t-2 border-gray-300">
-            <ContactForm 
-                @bind-Value:get=@_currentFormView
-                @bind-Value:set=@OnContactChanged
-                OnCancelClicked=@(() => _isEditing = false)
-            />
-        </div>
-    }
+    <div class="col-span-full pt-4 border-t-2 border-gray-300">
+        <ContactForm 
+            @bind-Value:get=@Value
+            @bind-Value:set=@OnContactChanged
+            OnCancelClicked=@(() => _isEditing = false)
+        />
+    </div>
 </div>
 
 @code {
+
     private IQueryable<Contact> _contacts = default!;
     private Contact _currentContact = default!;
-    private ContactFormView _currentFormView = default!;
     private bool _isEditing = false;
 
     protected override void OnInitialized() {
+        if(Value == null) {
+            Value = new();
+        }
         //_currentFormView = Value;
         _currentContact = Mapper.Map<Contact>(Value);
     }
     
     protected override async Task OnInitializedAsync() {
-        _contacts = await SmartService.GetClient()
+        var contactList = await SmartService.GetClient()
             .Contact
-            .GetContactsAsQueryable();
+            .GetGlobalDealerShipLocationContacts();
+        _contacts = contactList.AsQueryable();
     }
 
     protected override bool TryParseValueFromString(
@@ -61,34 +63,34 @@
         throw new NotImplementedException();
     }
 
-    private void OnContactSelected(Contact contact) {
+    private async Task OnContactSelected(Contact contact) {
         _currentContact = contact;
         Value = Mapper.Map<ContactFormView>(_currentContact);
-        _currentFormView = Value;
+        await ValueChanged.InvokeAsync(Value);
         _isEditing = true;
     }
 
-    private async Task OnContactChanged(ContactFormView contact) {
-        _currentFormView = contact;
-        Value = contact;
-        if(!Value.IsPersisted) {
-            _currentContact = new Contact();
-            _isEditing = false;
-            return;
-        }
-        _contacts = await SmartService.GetClient()
-            .Contact
-            .GetContactsAsQueryable();
-        _currentContact = _contacts
-            .FirstOrDefault(c => c.LinkID == contact.LinkID)
+    private async Task OnContactChanged(ContactFormView contactView) {
+        Console.WriteLine("Contact Changed");
+        Contact contact = default!;
+        if(!contactView.IsPersisted) {
+            contact = Mapper.Map<Contact>(contactView);
+        } else {
+            var contacts = await SmartService.GetClient()
+                .Contact
+                .GetGlobalDealerShipLocationContacts();
+            _contacts = contacts.AsQueryable();
+            contact = _contacts
+            .FirstOrDefault(c => c.LinkID == contactView.LinkID)
             ?? throw new InvalidOperationException("Contact not found");
+        }
+        _currentContact = contact;
+        Value = contactView;
+        await ValueChanged.InvokeAsync(Value);
     }
 
-    private void OnCreateNewContactClicked() {
-        _isEditing = true;
-        if(_currentFormView != null && !_currentFormView.IsPersisted) {
-            return;
-        }
-        _currentFormView = new ContactFormView();
+    private async Task OnCreateNewContactClicked() {
+        Value = new ContactFormView();
+        await ValueChanged.InvokeAsync(Value); 
     }
 }

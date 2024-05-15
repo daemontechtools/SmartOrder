@@ -63,6 +63,9 @@
     [Parameter]
     public EventCallback OnCancelClicked { get; set; }
 
+    [Parameter]
+    public ShipLocation ShipLocation { get; set; }
+
     private EditForm _editForm = default!;
     private bool _isSubmitting = false;
     private bool _isDeleting = false;
@@ -77,6 +80,11 @@
             ? "Update"
             : "Create";
 
+    protected override void OnParametersSet() {
+        if (Value == null) {
+            Value = new ContactFormView();
+        }
+    }
     protected override bool TryParseValueFromString(
         string? value, 
         out ContactFormView contactFormView,
@@ -98,15 +106,16 @@
         if(!Value.IsPersisted) {
             contact = await SmartService.GetClient()!
                 .Contact
-                .AddContact(
+                .AddGlobalDealerShipLocationContact(
                     Value.DisplayName,
                     Value.Phone,
                     Value.Email
                 );
         } else {
+            //update BOTH global and ship location contact
             contact = await SmartService.GetClient()
                 .Contact
-                .GetContactById(Value.LinkID)
+                .GetGlobalDealerShipLocationContactById(Value.LinkID)
                 ?? throw new InvalidOperationException("Contact not found");
             Mapper.Map(Value, contact);
             await SmartService.GetClient()
@@ -116,19 +125,17 @@
         Logger.LogInformation($"Upserted contact: {contact.DisplayName}");
         var newView = Mapper.Map<ContactFormView>(contact);
         Value = newView;
-        ValueChanged.InvokeAsync(Value);
+        await ValueChanged.InvokeAsync(Value);
         _isSubmitting = false;
     }
 
     private async Task OnDeleteClick() {
         _isDeleting = true;
-        var contact = await SmartService.GetClient()
-            .Contact
-            .GetContactById(Value.LinkID)
-            ?? throw new InvalidOperationException("Unable to find contact");
         await SmartService.GetClient()
             .Contact
-            .DeleteContact(contact);
+            .DeleteGlobalDealerShipLocationContactById(
+                Value.LinkID
+            );
         Value = new ContactFormView();
         ValueChanged.InvokeAsync(Value);
         OnCancelClicked.InvokeAsync();

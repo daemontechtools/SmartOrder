@@ -1,5 +1,7 @@
 ﻿@using SMART.Common.ProjectManagement
 @page "/quotes/{projectLinkId}"
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@attribute [StreamRendering(true)]
 @namespace SO.Components.Projects
 
 @inject ILogger<ProjectDetail> _logger
@@ -7,7 +9,7 @@
 
 <div class="flex flex-col h-full">
     @if(_isLoading) {
-    <span>Loading</span>
+        <span>Loading...</span>
     } else if(_project is null) {
         <span>Project not found</span>
     } else {
@@ -25,9 +27,6 @@
 
     private Project? _project;
     private bool _isLoading = true;
-
-    @* protected override void OnInitialized()
-    { *@
 
     protected override async Task OnInitializedAsync() {
         //_logger.LogInformation("Load Project: {ProjectLinkId}", ProjectLinkId ?? "NULL");

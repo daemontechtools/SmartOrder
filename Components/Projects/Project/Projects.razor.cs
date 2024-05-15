@@ -34,6 +34,8 @@ public partial class Projects : ComponentBase {
         _projects = await _smartService!.GetClient()!
             .Project
             .GetProjectsAsQueryable();
+        _projects = _projects
+            .OrderByDescending(p => p.DateOrderSubmit);
         _deleteConfirmationInput = new ModalContentProps {
             Title = "Delete Quote",
             Description = "Are you sure you want to delete this quote?",
@@ -77,7 +79,6 @@ public partial class Projects : ComponentBase {
         _modalService!.Show(_deleteConfirmationInput);
     }
 
-
     // TODO: Abstract this out?
     private async Task OnSearchInput(string input) {
         _searchQuery = input;
@@ -102,6 +103,3 @@ public partial class Projects : ComponentBase {
             .AsQueryable();
     }
 }
-
-
-

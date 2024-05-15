@@ -5,18 +5,18 @@ public class ShipLocationFormView : SmartBaseClass {
 
     public ShipLocationFormView() : this("") { }
     public ShipLocationFormView(string LinkID) : base(LinkID) {
-        Contacts = new List<ContactFormView>();
-        Contacts.Add(new ContactFormView());
-        Addresses = new List<AddressFormView>();
-        Addresses.Add(new AddressFormView());
+        Contact = new ContactFormView();
+        Address = new AddressFormView();
     }
 
     [Required]
     public string LocationName { get; set; } = "";
 
-    public IList<ContactFormView> Contacts { get; set; }
+    [Required]
+    [ValidateComplexType]
+    public ContactFormView Contact { get; set; }
     
     [Required]
     [ValidateComplexType]
-    public IList<AddressFormView> Addresses { get; set; }
+    public AddressFormView Address { get; set; }
 }

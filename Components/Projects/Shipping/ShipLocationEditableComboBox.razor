@@ -18,25 +18,29 @@
           @bind-Value:get=@_currentShipLocation
           @bind-Value:set=OnShipLocationChanged
           TextFieldName=@nameof(ShipLocation.LocationName)
-          Label="Shipping Location"
+          Label="Select Shipping Location"
+          LabelClass="text-xl font-semibold"
           Class="pb-0"
         />
       } else {
         <span class="text-lg font-semibold">No available shipping addresses</span>
       }
-      @if(!_isAddingShipLocation) {
-        <a 
-          @onclick=@OnAddressClick
-          class="
-            dmn-link
-            text-left
-            my-2
-        ">
-          Add New Address
-        </a>
-      } else {
+      <ValidationMessage For=@(() => Project.ProjectShipLocation) />
+      <a 
+        @onclick=@OnAddressClick
+        class="
+          dmn-link
+          text-left
+          my-2
+      ">
+        Add New Address
+      </a>
+      @if(_currentShipLocation != null) {
         <div class="mt-6"></div>
-        <ShipLocationForm @bind-Value=@Value />
+        <ShipLocationForm 
+          @bind-Value:get=@Value
+          @bind-Value:set=OnShipLocationViewChanged
+        />
       }
     </div>
     <div class="mb-4"></div>
@@ -46,6 +50,9 @@
 
 @code {
 
+  [Parameter]
+  public ProjectFormView? Project { get; set; } = default!;
+
   private bool _isLoading = true;
 
   private IQueryable<ShipLocation> _shipLocations = default!;
@@ -53,8 +60,15 @@
 
   private bool _isAddingShipLocation = false;
     
-  protected override void OnParametersSet() {
+  @* protected override void OnParametersSet() {
     _currentShipLocation = Mapper.Map<ShipLocation>(Value);     
+  } *@
+
+  protected override void OnInitialized() {
+    if(Value == null) {
+      Value = new();
+    }
+    _currentShipLocation = Mapper.Map<ShipLocation>(Value);
   }
 
   protected override async Task OnInitializedAsync() {
@@ -82,8 +96,13 @@
     StateHasChanged();
   } *@
 
-  private void OnAddressClick(MouseEventArgs e) {
-    _isAddingShipLocation = true;
+  private async Task OnAddressClick(MouseEventArgs e) {
+    var location = new ShipLocation();
+    _currentShipLocation = location;
+    var locationView = Mapper.Map<ShipLocationFormView>(location);
+    Value = locationView;
+    await ValueChanged.InvokeAsync(Value);
+    //_isAddingShipLocation = true;
     //StateHasChanged();
   }
   
@@ -98,12 +117,27 @@
     StateHasChanged();
   }      
 *@
- private void OnShipLocationChanged(ShipLocation shipLocation) {
-    Logger.LogInformation($"ShipLocationChanged??????????");
+  private async Task OnShipLocationChanged(ShipLocation shipLocation) {
     _currentShipLocation = shipLocation;
     Value = Mapper.Map<ShipLocationFormView>(shipLocation);
-    //_currentShipLocationLinkId = e.Value?.ToString();
-    
-    //StateHasChanged();
+    await ValueChanged.InvokeAsync(Value);
+  }
+
+  private async Task OnShipLocationViewChanged(ShipLocationFormView shipLocationView) {
+    ShipLocation? shipLocation = null;
+    if(!String.IsNullOrEmpty(shipLocationView.LocationName))  {
+      shipLocation = await SmartService!.GetClient()
+        .ShipLocation
+        .GetShipLocationById(shipLocationView.LinkID);
+    } else {
+      shipLocation = Mapper.Map<ShipLocation>(shipLocationView);
+    }
+    _currentShipLocation = shipLocation;
+    Value = shipLocationView;
+    await ValueChanged.InvokeAsync(Value);
+    _shipLocations = await SmartService.GetClient()
+      .ShipLocation
+      .GetShipLocationsAsQueryable();
+    StateHasChanged();
   }
 }

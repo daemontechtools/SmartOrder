@@ -1,5 +1,5 @@
 @namespace SO.Components.Projects
-
+@inject SmartService SmartService
 
 <nav class="
     container-wide
@@ -26,3 +26,38 @@
         </NavLink>
     }
 </nav>
+
+@code {
+
+    [Parameter] 
+    public Project Project { get; set; } = default!;
+
+    private (string, string)[] MenuOptions { get; set; } = new (string, string)[]{};
+    private IList<ProjectFileStorageRecord>? _documents;
+    private int? _documentCount;
+    private string DocumentCount => _documentCount == null
+        ? "..."
+        : _documentCount.ToString();
+
+    protected override void OnInitialized() {
+        MenuOptions = new (string, string)[] {
+            ("Rooms", $"/quotes/{Project.LinkID}"),
+            ("Shipping", $"/quotes/{Project.LinkID}/shipping"),
+            ($"Documents ({DocumentCount})", $"/quotes/{Project.LinkID}/documents"),
+        };
+    }
+
+    protected override async Task OnInitializedAsync() {
+        _documents = await SmartService.GetClient()
+            .File
+            .GetFilesFromProject(Project);
+        _documentCount = _documents.Count;
+
+        // TODO: This is dumb
+        MenuOptions = new (string, string)[] {
+            ("Rooms", $"/quotes/{Project.LinkID}"),
+            ("Shipping", $"/quotes/{Project.LinkID}/shipping"),
+            ($"Documents ({DocumentCount})", $"/quotes/{Project.LinkID}/documents"),
+        };
+    }
+}

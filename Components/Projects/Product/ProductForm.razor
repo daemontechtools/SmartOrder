@@ -1,29 +1,21 @@
-@page "/quotes/{projectLinkId}/rooms/{projectGroupLinkId}/products/{productLinkId}"
 @page "/quotes/{projectLinkId}/rooms/{projectGroupLinkId}/products/new"
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
-@using AutoMapper
-@using SMART.Web.OrderApi
-@using SMART.Common.LibraryManagement
-@using SMART.Common.ProductionManagement
-@using SMART.Common.Utility
-@using SMART.Common.CompanyManagement
-@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@attribute [StreamRendering(true)]
 @namespace SO.Components.Projects
-
 @inject IMapper Mapper
 @inject SmartService SmartService
-@inject ILogger<ProductForm> Logger
+@inject NavigationManager NavigationManager
+@inject ILogger<ProductPricingTest> Logger
 
-<div class="flex flex-col h-full"
+<div class="flex flex-col h-full">    
     <BreadcrumbNav
         Options=@(new List<NavOptionProps> {
             new NavOptionProps { Path = "/quotes" },
-            new NavOptionProps { Path = $"/quotes/{ProjectLinkId}", Label = _project?.Name },
-            new NavOptionProps { Path = $"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}", Label = _projectGroup?.Name },
+            new NavOptionProps { Path = $"/quotes/{ProjectLinkId}", Label = _project.Name },
+            new NavOptionProps { Path = $"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}", Label = _projectGroup.Name },
             new NavOptionProps { Path = $"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}/products/new", Label = "New Product" },
         }) 
     />
-
     <div class="flex flex-1 flex-col container mt-6">
         @if(_isLoading) {
             <div class="flex flex-col items-center justify-center h-full">
@@ -32,249 +24,317 @@
                 </div>
             </div>
         } else {
+            <DmnSectionHeader 
+                Title="Test Product Pricing"
+                TitleClass="!text-3xl"
+                Subtitle="Test Product Search, Category Sorting, Finish and Drawer Hardware Selection and getting the Price of the product"
+                SubmitButtonText="Get Price"
+                CancelButtonText="Clear"
+                OnSubmitClick=@OnSubmitClick
+                OnCancelClick=@OnClearClick
+            /> 
             <EditForm 
                 @ref=@_editForm
                 Model=@_productFormView    
-                FormName="add-room"
-                OnValidSubmit=@AddProductToProjectGroup
+                FormName="test-product-pricing"
+                OnValidSubmit=@GetProductPrice
             >
                 <ObjectGraphDataAnnotationsValidator />
-                <DmnSectionHeader 
-                    Title="Create Product"
-                    TitleClass="!text-3xl"
-                    Subtitle="So many products, so little time"
-                    SubmitButtonText="Save"
-                    CancelButtonText="Clear"
-                /> 
-                <div class="grid grid-cols-5 gap-8">
+                <div class="grid grid-cols-6 gap-8 mt-8">
                     <div class="col-span-3">
-                        <div class="h-full flex items-center w-2/3">
-                            <div class="center-self w-full">
-                                @* <ProductDetailTypeSelect 
-                                    SelectedProductType=@SelectedProductType
-                                    OnProductTypeChanged="OnProductTypeChanged"
-                                /> *@
-                                <DmnComboBox 
-                                    Data=@_allProducts
-                                    bind-Value=@_selectedProduct 
-                                    TextFieldName=@nameof(ProductFormView.Name)
-                                    Label="Select a Product"
-                                    Class="pb-0"
-                                />
+                        <DmnComboBox 
+                            Data=@_allCabinets
+                            @bind-Value:get=@_selectedCabinet
+                            @bind-Value:set=@(c => OnProductSelected(c))
+                            TextFieldName=@nameof(LibraryProduct.Name)
+                            Label="Select a Product"
+                            Class="pb-4"
+                        />
 
-                                @if(_selectedProduct is not null) {
-                                    <DmnComboBox
-                                        Data=@_styleConfigurations
-                                        bind-Value=@_selectedStyleConfiguration
-                                        TextFieldName=@nameof(LibraryStyleConfiguration.Name)
-                                        Label="Select a Door Style"
-                                    />
-                                }
+                        @if(_selectedCabinet != null) {
+                            <DmnComboBox 
+                                Data=@_doorStyles
+                                @bind-Value:get=@_selectedDoorStyle
+                                @bind-Value:set=@(s => OnStyleSelected(s))
+                                TextFieldName=@nameof(LibraryStyleConfiguration.Name)
+                                Label="Select a Door Style"
+                                Class="pb-4"
+                            />
+                        }
 
-                                @if(_selectedStyleConfiguration is not null) {
-                                    <DmnComboBox
+                        @if(_selectedDoorStyle != null) {
+                            <div class="col-span-6">
+                                <div class="col-span-3">
+                                    <DmnComboBox 
                                         Data=@_finishes
-                                        bind-Value=@_selectedFinish
-                                        Label="Select a Finish"
+                                        @bind-Value=@_selectedFinish
+                                        Label="Select an Interior Finish"
+                                        Class="pb-4"
                                     />
-                                }
-                                
-                                @if(_selectedStyleConfiguration is not null) {
-                                    <DmnComboBox
-                                        Data=@_doorHardwares
-                                        bind-Value=@_selectedDoorHardware
-                                        ValueExpression=@(() => _selectedDoorHardware)
-                                        Label="Select a Door Hardware"
+                                    <DmnComboBox 
+                                        Data=@_drawerHardwares
+                                        @bind-Value=@_selectedDrawerHardware
+                                        Label="Select a Drawer Hardware"
+                                        Class="pb-4"
                                     />
+                                </div>
+                            </div>
+                        }
+                        </div>
+                    </div> 
+                    <div class="col-span-3">
+                        @if(_selectedCabinet != null) {
+                            <div class="flex flex-col">
+                                <label>
+                                    Width:
+                                    <InputNumber @bind-Value=@_productFormView.Width />
+                                </label>
+                                <div class="mt-3" />
+                                <label>
+                                    Height:
+                                    <InputNumber @bind-Value=@_productFormView.Height />
+                                </label>
+                                <div class="mt-3" />
+                                <label>
+                                    Depth:
+                                    <InputNumber @bind-Value=@_productFormView.Depth />
+                                </label>
+                                <label>
+                                    Left End Finished:
+                                    <InputCheckbox @bind-Value=@_leftEndFinished/>
+                                </label>
+                                <label>
+                                    Right End Finished:
+                                    <InputCheckbox @bind-Value=@_rightEndFinished/>
+                                </label>
+                            </div>
+                        }
+
+                    </div>
+                    @if(_productPrice != null 
+                        || !string.IsNullOrEmpty(_priceError)
+                    ) {
+                        <div class="col-span-6 mt-6">
+                            <div class="flex flex-col">
+                                <label>
+                                    Quatity:
+                                    <InputNumber @bind-Value=@_productFormView.Quantity />
+                                </label>
+                                <label>
+                                    Product Price:
+                                    $@(_productPrice * _productFormView.Quantity)
+                                </label>
+                                @if(!string.IsNullOrEmpty(_priceError)) {
+                                    <div class="mt-3" />
+                                    <label>
+                                        Product Error:
+                                        @_priceError
+                                    </label>
                                 }
-
-                                
-
-                                @* <InputSelect 
-                                    @bind-Value=_selectedProductType
-                                    class="mt-4"
+                                <button 
+                                    class="dmn-btn mt-4"
+                                    onclick=@AddProductToProjectGroup
                                 >
-                                    <option value="">Select a Product Type</option>
-                                    @foreach(ProductCategoryType type in Enum.GetValues<ProductCategoryType>()) {
-                                            <option value=@type>@type</option>
-                                    }
-                                </InputSelect> *@
-
+                                    Add Product
+                                </button>
                             </div>
                         </div>
-                    </div>
-                    @* <div class="col-span-2">
-                    <ProductDetailPriceSummary />
-                    </div>
-
-                    @if(SelectedProductType is not null) {
-                        <div class="col-span-3">
-                            <ProductDetailDimensions />
-                            <div class="mt-6" />
-                            //<ProductDetailAddOns ProductType=@SelectedProductType />
-                        </div>
-
-                        <div class="col-span-2">
-                            <DmnFileDropzone 
-                                Class="w-full"
-                                IconClass="w-24 stroke-sky-500" 
-                            />
-                        </div>
-
-                        <div class="col-span-5">
-                            <ProductDetailComments />
-                        </div>
-                    } *@
-                </div>
+                    }
             </EditForm>
         }
     </div>
 </div>
 
 
-@code {
-    [Parameter]
-    public string? ProjectLinkId { get; set; }
-
-    [Parameter]
-    public string? ProjectGroupLinkId { get; set; }
-
-    [Parameter]
-    public string? ProductLinkId { get; set; }
-
-    private EditForm? _editForm = default!;
-    private bool _isSubmitting = false;
-
-    private bool _isLoading = true;
-
-    private Project? _project;
-    private ProjectGroup? _projectGroup;
-    private Product? _product;
-    private ProductFormView? _productFormView;
-
-    private IQueryable<LibraryProduct>? _allProducts;
+@code {    
     
-    private LibraryProduct? _selectedProduct;
+    [Parameter]
+    public string ProjectLinkId { get; set; }
+
+    [Parameter]
+    public string ProjectGroupLinkId { get; set; }
+    
+    private bool _isLoading = true;
+    private EditForm _editForm = default!;
+    private bool _isSubmitting = false;
+    
+    private Project _project = default!;
+    private ProjectGroup _projectGroup = default!;
+
+    private ProductFormView _productFormView = new();
+
+    private IQueryable<LibraryProduct>? _allCabinets;
+    //private IDictionary<ProductCategoryType, List<LibraryProduct>> _sortedCabinets;
+    private LibraryProduct? _selectedCabinet;
 
     private ProductCategoryType? _selectedProductType { get; set; }
+    private IQueryable<ProductCategoryType>? _productTypes;
 
-    private IQueryable<LibraryStyleConfiguration>? _styleConfigurations;
-    private LibraryStyleConfiguration? _selectedStyleConfiguration;
+    private IQueryable<LibraryStyleConfiguration>? _doorStyles;
+    private LibraryStyleConfiguration? _selectedDoorStyle;
 
     private IQueryable<string>? _finishes;
     private string? _selectedFinish;
 
-    private IQueryable<string>? _doorHardwares;
-    private string? _selectedDoorHardware;
+    private IQueryable<string>? _drawerHardwares;
+    private string? _selectedDrawerHardware;
+
+    private bool _leftEndFinished = false;
+    private bool _rightEndFinished = false;
+
+    private float? _productPrice;
+    private string _priceError = "";
+
     
 
-    private IDictionary<ProductCategoryType, List<ProductFormView>>? _productTypeDictionary;
+    private Dictionary<ProductCategoryType, List<ProductFormView>> _productTypeDictionary;
 
-    private PersistingComponentStateSubscription? _stateSubscription;
 
     protected override async Task OnInitializedAsync() {
         _project = await SmartService.GetClient()
             .Project
-            .GetProjectById(ProjectLinkId);
+            .GetProjectById(ProjectLinkId)
+            ?? throw new InvalidOperationException("Project not found");
         _projectGroup = SmartService.GetClient()
             .ProjectGroup
             .GetProjectGroupById(
-                ProjectGroupLinkId!,
+                ProjectGroupLinkId,
                 _project
-            );
-        IList<Product> groupProducts = _projectGroup?.ProjectGroupProducts;
-        var product = groupProducts?
-            .First(p => p.LinkID == ProjectLinkId);
-        if(_product != null) {
-            _productFormView = Mapper.Map<ProductFormView>(product);
-        } else {
-            _productFormView = new();
-        }
-        var products = await SmartService.GetClient()
+            )
+            ?? throw new InvalidOperationException("Project Group not found");
+        //_productTypes test = Enum.GetValues<ProductCategoryType>().AsQueryable();
+        _allCabinets = await SmartService.GetClient()
             .Product
-            .GetCabinets();
-        _allProducts = products.AsQueryable();
-        @* _productTypeDictionary = await OrderApi
+            .GetCabinetsAsQueryable();
+        @* _sortedCabinets = await SmartService.GetClient()
             .Product
-            .GetSortedProducts(products); *@
+            .GetSortedProducts(cabinets); *@
         _isLoading = false;
     }
+
+    @* protected override void OnAfterRender(bool firstRender) {       
+        if(_selectedProductType is not null) {
+            ProductCategoryType productType = (ProductCategoryType)_selectedProductType;
+            _allProducts = _productTypeDictionary[productType].AsQueryable();
+        }
+    } *@
+    
+    @* private Task PersistFormState() {
+        ApplicationState?.PersistAsJson("products", _allProducts);
+        //ApplicationState?.PersistAsJson("project", _project);
+        return Task.CompletedTask;
+    } *@
 
     @* private void OnProductTypeChanged(ChangeEventArgs e) {
         ProductCategoryType productType = (ProductCategoryType)Enum.Parse(typeof(ProductCategoryType), e.Value.ToString());
         _selectedProductType = productType;
-    } *@
-    
-    private async void OnProductSelected(object obj) {
-        var product = obj as LibraryProduct;
+    }
+    *@
+
+    private async void OnProductSelected(LibraryProduct product) {
         Logger.LogInformation($"Product Code selected: {product?.Name}");
-        _selectedProduct = product;
+        _selectedCabinet = product;
+        _productFormView.Width = (float)product.Width;
+        _productFormView.Height = (float)product.Height;
+        _productFormView.Depth = (float)product.Depth;
 
         // Get StyleConfigurations for this product
-        var client = SmartService!.GetClient();
-        _styleConfigurations = client
+        _doorStyles = SmartService.GetClient()
             .Product
             .GetDoorStylesForProduct(product)
             .AsQueryable();
+        _selectedDoorStyle = null;
 
-        var filteredStyleConfigs = _styleConfigurations
-            .Where(c => c.Finish != null && c.Finish.Length > 10);
-        _styleConfigurations = filteredStyleConfigs;
-        @* foreach(LibraryStyleConfiguration style in styleConfiguration) {
-            Logger.LogInformation($"Style: {style}");
-        } *@
-        
-        @* IList<Category> rootCategories = OrderApi.GetRootProductCategories();
-        foreach(Category category in rootCategories) {
-            Logger.LogInformation($"Root Category: {category.CategoryName}");
-        }
-        
-        IList<Category> childCategories = OrderApi.GetChildCategories();
-        foreach(Category category in childCategories) {
-            Logger.LogInformation($"Children Category: {category.CategoryName}");
-        } *@
-        // Get Categories for this product
-        //IList<Category> categories = OrderApi.GetProductCategories(libraryProduct);
+        _finishes = null;
+        _selectedFinish = null;
+        _drawerHardwares = null;
+        _selectedDrawerHardware = null;
+    }
 
-        StateHasChanged();
+    private void OnProductTypeChanged(ProductCategoryType e) {
+        Logger.LogInformation($"Product Type selected: {e}");
+        _selectedProductType = e;
     }
     
-    private void OnStyleSelected(object obj) {
-        LibraryStyleConfiguration? styleConfiguration = obj as LibraryStyleConfiguration;
-        //Logger.LogInformation($"Style selected: {styleConfiguration?.Name}");
-        _selectedStyleConfiguration = styleConfiguration;
+    private void OnStyleSelected(LibraryStyleConfiguration doorStyle) {
+        _selectedDoorStyle = doorStyle;
 
         _finishes = SmartService.GetClient()
             .Product
-            .GetAllowedFinishes(styleConfiguration!)
+            .GetAllowedFinishes(doorStyle!)
             .AsQueryable();
         Logger.LogInformation($"Finishes: {_finishes.Count()}");
-        foreach(string finish in _finishes) {
-            Logger.LogInformation(finish);
-        }
+        _selectedFinish = null;
 
-        if(_finishes.Count() < 1) {
-            _finishes.Append("None");
-        } 
-
-        _doorHardwares = SmartService.GetClient()
+        _drawerHardwares = SmartService.GetClient()
             .Product
-            .GetAllowedDrawerHardware(styleConfiguration!)
+            .GetAllowedDrawerHardware(doorStyle!)
             .AsQueryable();
+        Logger.LogInformation($"Drawer Hardwares: {_drawerHardwares.Count()}");
+        _selectedDrawerHardware = null;
     }
 
-    private Task AddProductToProjectGroup() {
-        return Task.CompletedTask;
-        @* _isSubmitting = true;
-        _logger!.LogInformation($"Creating new room: {_room!.Name}");
-        ProjectGroupView newRoom = await _projectStore!
-            .AddRoom(
-                ProjectLinkId!,
-                _room!
-                
+    private async Task OnSubmitClick(){
+        if (_editForm!.EditContext!.Validate()) {
+            await GetProductPrice();
+        } else {
+            Logger.LogInformation("Validation failed!!!!");
+        }
+    }
+
+    private void OnClearClick() {
+        _productFormView = new();
+        _selectedCabinet = null;
+        _finishes = null;
+        _selectedFinish = null;
+        _selectedDoorStyle = null;
+        _selectedDrawerHardware = null;
+        _drawerHardwares = null;
+        _productPrice = null;
+    }
+
+    private async Task GetProductPrice() {
+        Logger.LogInformation("Get Product Price");
+        _isSubmitting = true;
+        _selectedCabinet.ProductFinishInterior = _selectedFinish;
+        _selectedCabinet.ProductLeftSide = _leftEndFinished ? "Finished" : "Unfinished";
+        _selectedCabinet.ProductRightSide = _rightEndFinished ? "Finished" : "Unfinished";
+        _selectedCabinet.ProductSlide = _selectedDrawerHardware;
+        _selectedCabinet.ProductDoorSwing = "Left";
+        _selectedCabinet.ProductDoorStyle = _selectedDoorStyle.Name;
+        _selectedCabinet.Width = _productFormView.Width;
+        _selectedCabinet.Height = _productFormView.Height;
+        _selectedCabinet.Depth = _productFormView.Depth;
+        _selectedCabinet.Quantity = _productFormView.Quantity;
+        Logger.LogInformation("Product Finish: "+_selectedFinish);
+        Logger.LogInformation("Product Drawer Hardware: "+_selectedDrawerHardware);
+        var priceRes = await SmartService.GetClient()
+            .Product
+            .GetProductPrice(
+                _selectedCabinet!,
+                _productFormView.Width,
+                _productFormView.Height,
+                _productFormView.Depth,
+                _selectedDoorStyle!.Name
             );
-        _logger!.LogInformation($"Created new room: {newRoom.Name}");
-        _navigationManager!.NavigateTo($"/quotes/{ProjectLinkId}");
-        _isSubmitting = false;*@
+        _productPrice = priceRes.Item1;
+        _priceError = priceRes.Item2;
+        _isSubmitting = false;
+        Logger.LogInformation("Product Price: "+_productPrice);
+        Logger.LogInformation("Product Resporse: "+priceRes.Item2);
     } 
+
+    private async Task AddProductToProjectGroup() {
+        _selectedCabinet.Quantity = _productFormView.Quantity;
+        var product = await SmartService.GetClient()
+            .ProjectGroup
+            .AddProductToProjectGroup(
+                _project,
+                _projectGroup,
+                _selectedCabinet
+            )
+            ?? throw new InvalidOperationException("Product not added to Project Group"); 
+        NavigationManager
+            .NavigateTo($"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}");
+    }
 }

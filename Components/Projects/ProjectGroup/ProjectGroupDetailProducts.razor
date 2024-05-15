@@ -2,6 +2,7 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @namespace SO.Components.Projects
 
+@inject SmartService SmartService
 @inject NavigationManager NavigationManager
 @inject ModalService ModalService
 @inject ILogger<ProjectGroupDetailProducts> Logger
@@ -11,89 +12,89 @@
     Title="Products"
     Subtitle="What's a room without some products?"
     SubmitButtonText="Add Product"
-    OnSubmitClick=@OnClick
+    OnSubmitClick=@AddProduct
     Class="mb-6"
 />
-<QuickGrid Items=Products>
-    <TemplateColumn               
-        Title="ID"
-        SortBy=@_sortByName
-        Sortable=true 
-    >
-        <NavLink href=@($"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}/products/{context.LinkID}")>
-            @context.LinkID
-        </NavLink>
-    </TemplateColumn>
-    <TemplateColumn               
-        Title="Code"
-        SortBy=@_sortByName
-        Sortable=true 
-    >
-        <NavLink href=@($"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}/products/{context.LinkID}")>
-            @context.Name
-        </NavLink>
-    </TemplateColumn>
-    <PropertyColumn 
-        Title="Qty"
-        Property=@(p => p.Quantity)
-    />
-    <PropertyColumn 
-        Title="Width"
-        Property=@(p => p.Width) 
-    />
-    <PropertyColumn 
-        Title="Height"
-        Property=@(p => p.Height)
-    />
-    <PropertyColumn 
-        Title="Depth"
-        Property=@(p => p.Depth)
-    />
-    <PropertyColumn 
-        Title="Left"
-        Property=@(p => p.ProductLeftSide)
-    />
-    <PropertyColumn 
-        Title="Right"
-        Property=@(p => p.ProductRightSide)
-    />
-    <PropertyColumn 
-        Title="Price"
-        Property=@(p => p.PriceLibrary)
-    />
-    @* <PropertyColumn 
-        Title="EXT"
-        Property=@(p => p.EXT)
-    /> *@
-    <PropertyColumn 
-        Title="Comments"
-        Property=@(p => p.Comments)
-    />
-    <TemplateColumn 
-        Class="flex gap-x-2 justify-end"
-    >
-        <button @onclick=@(() => DeleteProduct(context.LinkID))>
-            <TrashIcon Props=@(new IconProps() {
-                Class=@"
-                    w-[22px]
-                    cursor-pointer 
-                    stroke-gray-400
-                    hover:stroke-rose-500 
-                    duration-300 
-                    ease-in-out
-                " 
-            }) />
-        </button>         
-    </TemplateColumn>
-</QuickGrid>
 @if(!Products.Any()) {
     <div class="flex justify-center">
         <div class="text-gray-400 text-2xl">
             No products found
         </div>
     </div>
+} else {
+    <QuickGrid Items=Products>
+        <TemplateColumn               
+            Title="Code"
+            SortBy=@_sortByName
+            Sortable=true 
+        >
+            <NavLink href=@($"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}/products/{context.LinkID}")>
+                @context.Name
+            </NavLink>
+        </TemplateColumn>
+        <PropertyColumn 
+            Title="Qty"
+            Property=@(p => p.Quantity)
+        />
+       
+        <PropertyColumn 
+            Title="W"
+            Property=@(p => p.Width) 
+        />
+        <PropertyColumn 
+            Title="H"
+            Property=@(p => p.Height)
+        />
+        <PropertyColumn 
+            Title="D"
+            Property=@(p => p.Depth)
+        />
+        <PropertyColumn 
+            Title="Door Style"
+            Property=@(p => p.ProductDoorStyle)
+        />
+        <PropertyColumn 
+            Title="Drawer"
+            Property=@(p => p.ProductSlide)
+        />
+        <PropertyColumn 
+            Title="Left"
+            Property=@(p => GetProductSideFinish(p.ProductLeftSide))
+        />
+        <PropertyColumn 
+            Title="Right"
+            Property=@(p => GetProductSideFinish(p.ProductRightSide))
+        />
+        <PropertyColumn 
+            Title="Price"
+            Property=@(p => Math.Round(p.PriceLibrary * p.Quantity, 2))
+        />
+        @* <PropertyColumn 
+            Title="EXT"
+            Property=@(p => p.EXT)
+        /> *@
+        @* <PropertyColumn 
+            Title="Comments"
+            Property=@(p => p.Comments)
+        /> *@
+        <TemplateColumn 
+            Class="flex gap-x-2 justify-end"
+        >
+            <button @onclick=@(() => DeleteProduct(context.LinkID))>
+                <TrashIcon Props=@(new IconProps() {
+                    Class=@"
+                        w-[22px]
+                        cursor-pointer 
+                        stroke-gray-400
+                        hover:stroke-rose-500 
+                        duration-300 
+                        ease-in-out
+                    " 
+                }) />
+            </button>         
+        </TemplateColumn>
+    </QuickGrid>
 }
-    
 
 
 @code {
@@ -104,9 +105,9 @@
     public string ProjectGroupLinkId { get; set; }
 
     [Parameter]
-    public IQueryable<LibraryProduct>? Products { get; set; } 
+    public IQueryable<Product>? Products { get; set; } 
 
-    private GridSort<LibraryProduct> _sortByName = GridSort<LibraryProduct>
+    private GridSort<Product> _sortByName = GridSort<Product>
         .ByAscending(p => p.Name);
 
     private ModalContentProps _deleteConfirmationInput;
@@ -123,13 +124,19 @@
             OnConfirm = OnDeleteConfirm 
         };
     }
-
-
-    private void OnClick() {
+    private void AddProduct() {
         NavigationManager
             .NavigateTo(
-                $"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}/products"
+                $"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}/products/new"
             );
+    }
+
+    private string GetProductSideFinish(string sideFinish) {
+        return sideFinish switch {
+            "Finished" => "FE",
+            "Unfinished" => "UF",
+            _ => "N/A"
+        };
     }
 
     private void DeleteProduct(string productLinkId) {
@@ -138,6 +145,19 @@
     }
 
     private async Task OnDeleteConfirm(bool confirmed) {
+        if(confirmed) {
+            var product = Products.FirstOrDefault(p => p.LinkID == _itemIdToDelete);
+            var project = await SmartService.GetClient()
+                .Project
+                .GetProjectById(ProjectLinkId);
+            await SmartService.GetClient()
+                .Product
+                .DeleteProduct(
+                    product,
+                    project
+                );
+            StateHasChanged();
+        }
         ModalService!.Hide();
     }
 }

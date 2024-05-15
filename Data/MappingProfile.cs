@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Data;
+using AutoMapper;
 using SMART.Common.CompanyManagement;
 using SMART.Common.LibraryManagement;
 using SMART.Common.ProjectManagement;
@@ -10,7 +11,16 @@ public class SmartOrderMappingProfile : Profile {
         CreateMap<ProjectGroup, ProjectGroupFormView>().ReverseMap();
         CreateMap<Product, ProductFormView>().ReverseMap();
         CreateMap<LibraryProduct, ProductFormView>().ReverseMap();
-        CreateMap<ShipLocation, ShipLocationFormView>().ReverseMap();
+        CreateMap<ShipLocation, ShipLocationFormView>()
+            .ForMember(
+                dest => dest.Contact,
+                opt => opt.MapFrom(src => (src.Contacts as IList<Contact>).FirstOrDefault() ?? new Contact())
+            )
+            .ForMember(
+                dest => dest.Address,
+                opt => opt.MapFrom(src => src.Addresses != null ? (src.Addresses as IList<Address>).FirstOrDefault() ?? new Address() : new Address())
+            )
+            .ReverseMap();
         CreateMap<Address, AddressFormView>().ReverseMap();
         CreateMap<Contact, ContactFormView>()
             .ForMember(

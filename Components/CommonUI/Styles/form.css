@@ -1,51 +1,47 @@
+.dmn-input-label {
+    @apply 
+        flex flex-col
+        relative
+        font-medium 
+        text-gray-900
+}   
 
-@layer components {    
-    
-    .dmn-input-label {
-        @apply 
-            flex flex-col
-            relative
-            font-medium 
-            text-gray-900
-    }   
+.dmn-input-text {
+    @apply
+        block w-full 
+        cursor-text
+        rounded-md border-0 
+        text-base sm:text-sm
+        font-thin
+        mt-2
+        pl-2
+        py-1.5 
+        text-gray-900 
+        shadow-sm 
+        ring-1 ring-inset ring-gray-300 
+        focus:ring-sky-500 focus:shadow focus:shadow-sky-500/50
+        placeholder:text-gray-400 
+        outline-none
+}
 
-    .dmn-input-text {
-        @apply
-            block w-full 
-            cursor-text
-            rounded-md border-0 
-            mt-2
-            pl-2
-            py-1.5 
-            text-gray-900 
-            shadow-sm 
-            ring-1 ring-inset ring-gray-300 
-            focus:ring-sky-500 focus:shadow focus:shadow-sky-500/50
-            placeholder:text-gray-400 
-            outline-none
-            sm:text-sm
-    }
+.validation-message {
+    @apply
+        bottom-0
+        font-light
+        text-red-500
+        text-base
+        text-left
+}
 
-    .validation-message {
-        @apply
-            absolute
-            bottom-0
-            font-light
-            text-red-500
-            text-left
-    }
+[aria-invalid="true"] {
+    @apply
+        border-red-500
+        ring-red-500
+}
 
-    [aria-invalid="true"] {
-        @apply
-            border-red-500
-            ring-red-500
-    }
-
-
-    .dmn-input-radio {
-        @apply 
-            h-4 w-4
-            mr-1
-            border-gray-300
-    }
+.dmn-input-radio {
+    @apply 
+        h-4 w-4
+        mr-1
+        border-gray-300
 }
