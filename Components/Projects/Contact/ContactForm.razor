@@ -106,16 +106,16 @@
         if(!Value.IsPersisted) {
             contact = await SmartService.GetClient()!
                 .Contact
-                .AddGlobalDealerShipLocationContact(
+                .AddShipLocationContact(
+                    ShipLocation,
                     Value.DisplayName,
                     Value.Phone,
                     Value.Email
                 );
         } else {
-            //update BOTH global and ship location contact
             contact = await SmartService.GetClient()
                 .Contact
-                .GetGlobalDealerShipLocationContactById(Value.LinkID)
+                .GetShipLocationContactById(Value.LinkID, ShipLocation)
                 ?? throw new InvalidOperationException("Contact not found");
             Mapper.Map(Value, contact);
             await SmartService.GetClient()
@@ -131,10 +131,19 @@
 
     private async Task OnDeleteClick() {
         _isDeleting = true;
+        if(!Value.IsPersisted) {
+            _isDeleting = false;
+            return;
+        }
+        Contact contact = await SmartService.GetClient()
+            .Contact
+            .GetShipLocationContactById(Value.LinkID, ShipLocation)
+            ?? throw new InvalidOperationException("Contact not found");
         await SmartService.GetClient()
             .Contact
-            .DeleteGlobalDealerShipLocationContactById(
-                Value.LinkID
+            .DeleteShipLocationContact(
+                contact,
+                ShipLocation
             );
         Value = new ContactFormView();
         ValueChanged.InvokeAsync(Value);

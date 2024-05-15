@@ -18,7 +18,7 @@
     <ObjectGraphDataAnnotationsValidator />
     
     <DmnSectionHeader 
-        Title="Edit Shipping Location"
+        Title="Current Shipping Location"
         TitleClass="!text-xl3"
         SubmitButtonText=@_submitButtonText
         CancelButtonText=@_cancelButtonText
@@ -27,7 +27,6 @@
         OnSubmitClick=@OnSubmitClick
         OnCancelClick=@OnCancelClick
     />
-    <ValidationSummary />
     <div class="
         mt-6 mb-8
     ">
@@ -77,18 +76,21 @@
             </div>
         </div>
         <div class="sm:col-span-3"></div>
-        <div class="
-            col-span-full 
-            border-2 rounded-lg border-solid border-gray-300
-            p-4
-        ">
-            <h3 class="text-2xl font-semibold mb-4">Shipping Contact</h3>
-            <ContactEditableComboBox 
-                @bind-Value:get=@_currentContact
-                @bind-Value:set=@OnContactSelected
-            />
-            <ValidationMessage For=@(() => Value.Contact) /> 
-        </div>
+        @if(_currentShipLocation != null) {
+            <div class="
+                col-span-full 
+                border-2 rounded-lg border-solid border-gray-300
+                p-4
+            ">
+                <h3 class="text-2xl font-semibold mb-4">Current Shipping Contact</h3>
+                <ContactEditableComboBox 
+                    ShipLocation=_currentShipLocation
+                    @bind-Value:get=@_currentContact
+                    @bind-Value:set=@OnContactSelected
+                />
+                <ValidationMessage For=@(() => Value.Contact) /> 
+            </div>
+        }
     </div>
 </EditForm>
 
@@ -101,6 +103,7 @@
     private bool _isSubmitting = false;
     private string _submitButtonText => !Value.IsPersisted ? "Create" : "Update";
     private string _cancelButtonText => !Value.IsPersisted ? "Cancel" : "Delete";
+    private ShipLocation? _currentShipLocation = null;
     private ContactFormView _currentContact = default!;
     
     protected override void OnParametersSet() {
@@ -128,12 +131,15 @@
         //_editForm.EditContext.Validate();
     }
 
-    @* protected override async Task OnParametersSetAsync() {
-        if(_editForm != null) {
-            bool isValid = _editForm.EditContext.Validate();
+    protected override async Task OnParametersSetAsync() {
+        if(Value.IsPersisted) {
+            _currentShipLocation = await SmartService!.GetClient()
+                .ShipLocation
+                .GetShipLocationById(Value.LinkID);
+        } else {
+            _currentShipLocation = null;
         }
-
-    } *@
+    }
 
     @* protected override void OnInitialized() {
         _editForm.EditContext.Validate();
@@ -180,8 +186,10 @@
                 Value.Address.PostalCode,
                 Value.Address.AddressNotes
             );
+        _currentShipLocation = newLocation;
         Value = Mapper.Map<ShipLocationFormView>(newLocation);
-        var newContact = await SmartService!.GetClient()
+
+        @* var newContact = await SmartService!.GetClient()
                 .ShipLocation
                 .AddContact(
                     newLocation,
@@ -189,7 +197,7 @@
                     _currentContact.Phone,
                     _currentContact.Email
                 );
-        _currentContact = Mapper.Map<ContactFormView>(newContact);
+        _currentContact = Mapper.Map<ContactFormView>(newContact); *@
 
         await ValueChanged.InvokeAsync(Value);
         Logger.LogInformation($"Created new Ship Location: {Value.LocationName}");
@@ -209,7 +217,7 @@
                 location
             );
 
-        Contact contact = null;
+        @* Contact contact = null;
         if(location.Contacts != null || String.IsNullOrEmpty(location.Contacts[0].DisplayName)) {
             contact = await SmartService!.GetClient()
                 .ShipLocation
@@ -234,7 +242,7 @@
                     contact
                 );
         }
-        _currentContact = Mapper.Map<ContactFormView>(contact);
+        _currentContact = Mapper.Map<ContactFormView>(contact); *@
 
         _isSubmitting = false;
     }

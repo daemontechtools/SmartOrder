@@ -12,8 +12,6 @@ public class ShipLocationFormView : SmartBaseClass {
     [Required]
     public string LocationName { get; set; } = "";
 
-    [Required]
-    [ValidateComplexType]
     public ContactFormView Contact { get; set; }
     
     [Required]
