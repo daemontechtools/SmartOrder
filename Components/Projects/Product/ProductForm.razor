@@ -74,7 +74,7 @@
                                     <DmnComboBox 
                                         Data=@_drawerHardwares
                                         @bind-Value=@_selectedDrawerHardware
-                                        Label="Select a Drawer Hardware"
+                                        Label="Select a Drawer"
                                         Class="pb-4"
                                     />
                                 </div>
@@ -264,14 +264,27 @@
             .GetAllowedFinishes(doorStyle!)
             .AsQueryable();
         Logger.LogInformation($"Finishes: {_finishes.Count()}");
-        _selectedFinish = null;
+        if(!String.IsNullOrEmpty(_projectGroup.ProductFinishInterior)
+            && _finishes.Contains(_projectGroup.ProductFinishInterior)
+        ) {
+            _selectedFinish = _projectGroup.ProductFinishInterior;
+        } else {
+            _selectedFinish = null;
+        }
+                
 
         _drawerHardwares = SmartService.GetClient()
             .Product
             .GetAllowedDrawerHardware(doorStyle!)
             .AsQueryable();
         Logger.LogInformation($"Drawer Hardwares: {_drawerHardwares.Count()}");
-        _selectedDrawerHardware = null;
+        if(!String.IsNullOrEmpty(_projectGroup.ProductSlide)
+            && _drawerHardwares.Contains(_projectGroup.ProductSlide)
+        ) {
+            _selectedDrawerHardware = _projectGroup.ProductSlide;
+        } else {
+            _selectedDrawerHardware = null;
+        }
     }
 
     private async Task OnSubmitClick(){
