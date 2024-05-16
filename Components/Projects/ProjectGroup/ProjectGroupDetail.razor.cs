@@ -54,6 +54,24 @@ public partial class ProjectGroupDetail : ComponentBase {
     private float GetRoomPrice() {
         if(_products == null) return 0;
         var roomTotal = _products?.Sum(p => p.PriceLibrary * p.Quantity) ?? 0;
-        return (float)roomTotal;
+        return (float)Math.Round(roomTotal, 2);
+    }
+
+    private string GetRoomInteriorFinish() {
+        return (
+            _projectGroup is null
+            || String.IsNullOrEmpty(_projectGroup.ProductFinishInterior)
+        )
+        ? "N/A"
+        : _projectGroup.ProductFinishInterior;
+    }
+
+    private string GetRoomDrawer() {
+        return (
+            _projectGroup is null
+            || String.IsNullOrEmpty(_projectGroup.ProductSlide)
+        )
+        ? "N/A"
+        : _projectGroup.ProductSlide;
     }
 }

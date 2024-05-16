@@ -37,9 +37,13 @@
                     ">
                         @_projectGroup.Name
                     </h2>
-                    <p class="mt-1 text-sm text-gray-500">
-                        Room Price: @GetRoomPrice()
+                    <p class="mt-1 text-lg text-gray-500">
+                        Room Price: $@GetRoomPrice()
                     </p>
+                    <div class="flex flex-col mt-2">
+                        <span><b>Default Interior Finish</b>: @GetRoomInteriorFinish()</span>
+                        <span><b>Default Drawer</b>: @GetRoomDrawer()</span>
+                    </div>
                 </div>
                 @* <div class="mt-4 flex md:ml-4 md:mt-0">
                     <button type="button" class="ml-3 inline-flex items-center rounded-md bg-sky-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-sky-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500">Save</button>
