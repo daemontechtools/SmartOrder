@@ -5,7 +5,6 @@
     <div class="flex flex-col pr-10">
         @if(Title != null) {
             <h1 class=@($@"
-                {TitleSize}
                 {TitleClass}
                 font-semibold 
                 leading-6 text-gray-900 
@@ -91,6 +90,5 @@
     [Parameter]
     public string Size { get; set; } = "md";
     
-    private string TitleSize => Size == "md" ? "text-2xl" : "text-xl";
     private string ButtonSize => Size == "md" ? "dmn-btn" : "dmn-btn-sm";
 }
