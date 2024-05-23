@@ -18,7 +18,11 @@ public class RequiredIfAttribute : ValidationAttribute {
         var type = instance.GetType();
         var propertyValue = type?.GetProperty(_propertyName)?.GetValue(instance, null);
 
-        if (propertyValue?.ToString() == _expectedValue.ToString() && value == null) {
+        if (propertyValue?.ToString() != _expectedValue.ToString()) {
+            return ValidationResult.Success;
+        }
+
+        if(value == null || String.IsNullOrEmpty(value.ToString())) {
             var memberNames = new List<string>();
             if (validationContext.MemberName != null) {
                 memberNames.Add(validationContext.MemberName);
