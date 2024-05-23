@@ -15,13 +15,12 @@ public class ProjectFormView : SmartBaseClass {
     [Required]
     public bool IsShipped { get; set; } = false;
     
-    [RequiredIf(
+   [RequiredIf(
         "IsShipped", 
         true, 
         ErrorMessage = "Please select a Shipping Location"
     )]
-    [ValidateComplexType]
-    public ShipLocationFormView ProjectShipLocation { get; set; }
+    public string LinkIDShipLocation { get; set; } = "";
 
     public IList<ProjectGroup> ProjectGroups { get; set; } = new List<ProjectGroup>();
 }

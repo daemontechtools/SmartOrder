@@ -6,7 +6,7 @@
 @inject SmartService SmartService
 @inject ILogger<ProjectForm> Logger
 
-<div class="flex flex-col bg-slate-100"
+<div class="flex flex-col bg-slate-100">
     <BreadcrumbNav
         Options=@(new List<NavOptionProps> {
             new NavOptionProps { Path = "/quotes" },
@@ -69,10 +69,12 @@
                     <InputRadio Value=true class="dmn-input-radio" />Delivery
                 </div>
             </InputRadioGroup>
+            <ValidationMessage For=@(() => _newProject!.LinkIDShipLocation) />
              @if(_newProject.IsShipped) {
                 <div class="border-t border-gray-300 mb-8 mt-3"></div>
                 <ShipLocationEditableComboBox 
-                    @bind-Value=@_newProject.ProjectShipLocation
+                    @bind-Value:get=@_newProject.LinkIDShipLocation
+                    @bind-Value:set=@OnShipLocationViewChanged
                     Project=_newProject
                 />
              }
@@ -111,17 +113,24 @@
         Project newProject = await SmartService!.GetClient()
             .Project
             .AddProject(_newProject.Name);
-        if(!String.IsNullOrEmpty(_newProject.LinkIDEmployeeSoldBy)) {
-            newProject.LinkIDEmployeeSoldBy = _newProject.LinkIDEmployeeSoldBy;
-            await SmartService.GetClient()
-                .Project
-                .SaveProject(newProject);
+        
+        newProject.LinkIDEmployeeSoldBy = _newProject.LinkIDEmployeeSoldBy;
+        newProject.LinkIDShipLocation = _newProject.LinkIDShipLocation;
+        if (_newProject.IsShipped) {
+            newProject.LinkIDShipLocation = _newProject.LinkIDShipLocation;
         }
+        await SmartService.GetClient()
+            .Project
+            .SaveProject(newProject);
         // Add ShippingLocation
         // Add Contact
 
         Logger.LogInformation($"Created new project: {newProject.Name}");
         NavigationManager.NavigateTo("/quotes");
         _isSubmitting = false;
+    }
+
+    private void OnShipLocationViewChanged(string shipLocationLinkId) {
+        _newProject.LinkIDShipLocation = shipLocationLinkId is not null ? shipLocationLinkId : "";
     }
 }

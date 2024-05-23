@@ -1,63 +1,71 @@
-@inherits InputBase<ContactFormView>
+@inherits InputBase<string>
 @inject ILogger<ContactForm> Logger
 @inject IMapper Mapper
 @inject SmartService SmartService
 @namespace SO.Components.Projects
 
-<EditForm 
-    @ref=@_editForm
-    Model=@Value
-    FormName="contact-form"
-    class="flex flex-col"
->
-    <ObjectGraphDataAnnotationsValidator />
-    <DmnSectionHeader 
-        Title=@_title
-        TitleClass="!text-xl"
-        SubmitButtonText=@_submitButtonText
-        CancelButtonText="Cancel"
-        Size="sm"
-        IsLoading=@_isSubmitting
-        OnSubmitClick=@OnSubmitClick
-        OnCancelClick=@(() => OnCancelClicked.InvokeAsync())
-    />
-    <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
-        <div class="sm:col-span-3">
-            <DmnInputText 
-                Label="Contact Name"
-                @bind-Value=@Value.DisplayName
-            />
-        </div>
-        <div class="sm:col-span-3"></div>
-        <div class="sm:col-span-3">
-            <DmnInputText 
-                Label="Email Address" 
-                @bind-Value=@Value.Email
-            />
-        </div>
-        <div class="sm:col-span-3">
-            <DmnInputText 
-                Label="Phone Number" 
-                @bind-Value=@Value.Phone
-            />
-        </div>
-        @if(Value.IsPersisted) {
-            <div class="col-span-1">
-                <button 
-                    type="button" 
-                    class="dmn-btn text-white bg-red-300 hover:bg-red-600"
-                    @onclick=@OnDeleteClick
-                >
-                    @if(_isDeleting) {
-                        <Spinner Class="text-stone-400 dark:text-stone-400 fill-orange-600" />
-                    } else {
-                        <span>Delete</span>
-                    }
-                </button>
-            </div>
-        }
+
+@if(_isLoading) {
+    <div class="flex justify-center">
+        <Spinner Class="w-4 h-4" />
+        <span>Loading Contact...</span>
     </div>
-</EditForm>
+} else {
+    <EditForm 
+        @ref=@_editForm
+        Model=@_contactForm
+        FormName="contact-form"
+        class="flex flex-col"
+    >
+        <ObjectGraphDataAnnotationsValidator />
+        <DmnSectionHeader 
+            Title=@_title
+            TitleClass="!text-xl"
+            SubmitButtonText=@_submitButtonText
+            CancelButtonText="Cancel"
+            Size="sm"
+            IsLoading=@_isSubmitting
+            OnSubmitClick=@OnSubmitClick
+            OnCancelClick=@(() => OnCancelClicked.InvokeAsync())
+        />
+        <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
+            <div class="sm:col-span-3">
+                <DmnInputText 
+                    Label="Contact Name"
+                    @bind-Value=@_contactForm.DisplayName
+                />
+            </div>
+            <div class="sm:col-span-3"></div>
+            <div class="sm:col-span-3">
+                <DmnInputText 
+                    Label="Email Address" 
+                    @bind-Value=@_contactForm.Email
+                />
+            </div>
+            <div class="sm:col-span-3">
+                <DmnInputText 
+                    Label="Phone Number" 
+                    @bind-Value=@_contactForm.Phone
+                />
+            </div>
+            @if(!String.IsNullOrEmpty(Value)) {
+                <div class="col-span-1">
+                    <button 
+                        type="button" 
+                        class="dmn-btn text-white bg-red-300 hover:bg-red-600"
+                        @onclick=@OnDeleteClick
+                    >
+                        @if(_isDeleting) {
+                            <Spinner Class="text-stone-400 dark:text-stone-400 fill-orange-600" />
+                        } else {
+                            <span>Delete</span>
+                        }
+                    </button>
+                </div>
+            }
+        </div>
+    </EditForm>
+}
 
 @code {
     [Parameter]
@@ -66,28 +74,42 @@
     [Parameter]
     public ShipLocation ShipLocation { get; set; }
 
+    private ContactFormView _contactForm { get; set; }
+
     private EditForm _editForm = default!;
     private bool _isSubmitting = false;
+    private bool _isLoading = true;
     private bool _isDeleting = false;
 
     private string _title =>
-        Value.IsPersisted
+        _contactForm.IsPersisted
             ? "Edit Contact"
             : "New Contact";
 
     private string _submitButtonText =>
-        Value.IsPersisted
+        _contactForm.IsPersisted
             ? "Update"
             : "Create";
 
     protected override void OnParametersSet() {
-        if (Value == null) {
-            Value = new ContactFormView();
+        if (String.IsNullOrEmpty(Value)) {
+            _contactForm = new ContactFormView();
+            _isLoading = false;
         }
+    }
+
+    protected async override Task OnParametersSetAsync() {
+        if (!String.IsNullOrEmpty(Value)) {
+            var contact = await SmartService.GetClient()
+                .Contact
+                .GetShipLocationContactById(Value, ShipLocation);
+            _contactForm = Mapper.Map<ContactFormView>(contact);
+        }
+        _isLoading = false;
     }
     protected override bool TryParseValueFromString(
         string? value, 
-        out ContactFormView contactFormView,
+        out string contactFormView,
         out string validationErrorMessage) {
         throw new NotImplementedException();
     }
@@ -101,43 +123,43 @@
 
     private async Task UpsertContact() {
         _isSubmitting = true;
-        Logger.LogInformation($"Upserting new contact: {Value.DisplayName}");
+        Logger.LogInformation($"Upserting new contact: {_contactForm.DisplayName}");
         Contact contact = default!;
-        if(!Value.IsPersisted) {
+        if(!_contactForm.IsPersisted) {
             contact = await SmartService.GetClient()!
                 .Contact
                 .AddShipLocationContact(
                     ShipLocation,
-                    Value.DisplayName,
-                    Value.Phone,
-                    Value.Email
+                    _contactForm.DisplayName,
+                    _contactForm.Phone,
+                    _contactForm.Email
                 );
         } else {
             contact = await SmartService.GetClient()
                 .Contact
-                .GetShipLocationContactById(Value.LinkID, ShipLocation)
+                .GetShipLocationContactById(_contactForm.LinkID, ShipLocation)
                 ?? throw new InvalidOperationException("Contact not found");
-            Mapper.Map(Value, contact);
+            Mapper.Map(_contactForm, contact);
             await SmartService.GetClient()
                 .Contact
                 .UpdateContact(contact);
         }
         Logger.LogInformation($"Upserted contact: {contact.DisplayName}");
-        var newView = Mapper.Map<ContactFormView>(contact);
-        Value = newView;
+        _contactForm = Mapper.Map<ContactFormView>(contact);
+        Value = _contactForm.LinkID;
         await ValueChanged.InvokeAsync(Value);
         _isSubmitting = false;
     }
 
     private async Task OnDeleteClick() {
         _isDeleting = true;
-        if(!Value.IsPersisted) {
+        if(!_contactForm.IsPersisted) {
             _isDeleting = false;
             return;
         }
         Contact contact = await SmartService.GetClient()
             .Contact
-            .GetShipLocationContactById(Value.LinkID, ShipLocation)
+            .GetShipLocationContactById(_contactForm.LinkID, ShipLocation)
             ?? throw new InvalidOperationException("Contact not found");
         await SmartService.GetClient()
             .Contact
@@ -145,7 +167,8 @@
                 contact,
                 ShipLocation
             );
-        Value = new ContactFormView();
+        _contactForm = new ContactFormView();
+        Value = null;
         ValueChanged.InvokeAsync(Value);
         OnCancelClicked.InvokeAsync();
         _isDeleting = false;
