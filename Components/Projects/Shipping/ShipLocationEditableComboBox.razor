@@ -34,13 +34,11 @@
       ">
         Add New Address
       </a>
-      @if(_currentShipLocation != null) {
-        <div class="mt-6"></div>
-        <ShipLocationForm 
-          @bind-Value:get=@Value
-          @bind-Value:set=OnShipLocationViewChanged
-        />
-      }
+      <div class="mt-6"></div>
+      <ShipLocationForm 
+        @bind-Value:get=@Value
+        @bind-Value:set=OnShipLocationViewChanged
+      />
     </div>
     <div class="mb-4"></div>
   }
