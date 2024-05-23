@@ -8,9 +8,9 @@
 
 
 @if(_isLoading) {
-    <div class="flex justify-center">
-        <Spinner Class="w-4 h-4" />
-        <span>Loading current Ship Location...</span>
+    <div class="flex flex-col justify-center"> 
+        <span class="mb-8">Loading current Ship Location...</span>
+        <Spinner Class="w-8 h-8" />
     </div>
 } else {
     <EditForm 
@@ -25,8 +25,8 @@
         <ObjectGraphDataAnnotationsValidator />
         
         <DmnSectionHeader 
-            Title="Current Shipping Location"
-            TitleClass="!text-xl3"
+            Title=@_title
+            TitleClass="text-2xl"
             SubmitButtonText=@_submitButtonText
             CancelButtonText=@_cancelButtonText
             Size="sm"
@@ -83,22 +83,22 @@
                 </div>
             </div>
             <div class="sm:col-span-3"></div>
-            @if(_currentShipLocation != null) {
-                <div class="
-                    col-span-full 
-                    border-2 rounded-lg border-solid border-gray-300
-                    p-4
-                ">
-                    <h3 class="text-2xl font-semibold mb-4">Current Shipping Contact</h3>
-                    <ContactEditableComboBox 
-                        ShipLocation=_currentShipLocation
-                        @bind-Value:get=@_shipLocationForm.ContactLinkID
-                        @bind-Value:set=@OnContactSelected
-                    />
-                    <ValidationMessage For=@(() => _shipLocationForm.ContactLinkID) /> 
-                </div>
-            }
         </div>
+        @if(_currentShipLocation != null) {
+            <div class="
+                col-span-full 
+                border-2 rounded-lg border-solid border-gray-300
+                p-4
+            ">
+                <h3 class="text-2xl font-semibold mb-4">Current Shipping Contact</h3>
+                <ContactEditableComboBox 
+                    ShipLocation=_currentShipLocation
+                    @bind-Value:get=@_shipLocationForm.ContactLinkID
+                    @bind-Value:set=@OnContactSelected
+                />
+                <ValidationMessage For=@(() => _shipLocationForm.ContactLinkID) /> 
+            </div>
+        }
     </EditForm>
 }
 
@@ -112,6 +112,7 @@
     private EditForm _editForm = default!;
     private bool _isLoading = true;
     private bool _isSubmitting = false;
+    private string _title => _shipLocationForm.IsPersisted ? "Current Shipping Location" : "New Shipping Location";
     private string _submitButtonText => String.IsNullOrEmpty(Value) ? "Create" : "Update";
     private string _cancelButtonText => String.IsNullOrEmpty(Value) ? "Cancel" : "Delete";
     private ShipLocation? _currentShipLocation = null;
