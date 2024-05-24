@@ -7,14 +7,19 @@ namespace SO.Data;
 
 public class SmartOrderMappingProfile : Profile {
     public SmartOrderMappingProfile() {
-        CreateMap<Project, ProjectFormView>().ReverseMap();
+        CreateMap<Project, ProjectFormView>()
+            .ForMember(
+                dest => dest.IsShipped,
+                opt => opt.MapFrom(src => src.LinkIDShipLocation != null)
+            )
+            .ReverseMap();
         CreateMap<ProjectGroup, ProjectGroupFormView>().ReverseMap();
         CreateMap<Product, ProductFormView>().ReverseMap();
         CreateMap<LibraryProduct, ProductFormView>().ReverseMap();
         CreateMap<ShipLocation, ShipLocationFormView>()
             .ForMember(
-                dest => dest.Contact,
-                opt => opt.MapFrom(src => (src.Contacts as IList<Contact>).FirstOrDefault() ?? new Contact())
+                dest => dest.ContactLinkID,
+                opt => opt.MapFrom(src => (src.Contacts != null && src.Contacts.Count > 0) ? (src.Contacts as IList<Contact>).FirstOrDefault()!.LinkID ?? "" : "")
             )
             .ForMember(
                 dest => dest.Address,

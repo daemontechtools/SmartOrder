@@ -4,78 +4,86 @@
 @inject ILogger<ShipLocationForm> Logger
 @inject SmartService SmartService
 @namespace SO.Components.Projects
-@inherits InputBase<ShipLocationFormView>
+@inherits InputBase<string>
 
-<EditForm 
-    @ref=@_editForm
-    Model=@Value
-    FormName="ship-location-form"
-    class="
-        flex flex-col
-        p-4 border-2 rounded-lg border-gray-300
-    "
->
-    <ObjectGraphDataAnnotationsValidator />
-    
-    <DmnSectionHeader 
-        Title="Current Shipping Location"
-        TitleClass="!text-xl3"
-        SubmitButtonText=@_submitButtonText
-        CancelButtonText=@_cancelButtonText
-        Size="sm"
-        IsLoading=@_isSubmitting
-        OnSubmitClick=@OnSubmitClick
-        OnCancelClick=@OnCancelClick
-    />
-    <div class="
-        mt-6 mb-8
-    ">
-        <div class="sm:col-span-3">
-            <DmnInputText 
-                Label="Location Name"
-                @bind-Value=@Value.LocationName
-            />
-        </div>
 
-        <div class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
-            <h2 class="
-                col-span-full
-                text-lg font-semibold
-            ">
-                Shipping Address
-            </h2>
-            <div class="col-span-full">
+@if(_isLoading) {
+    <div class="flex flex-col justify-center"> 
+        <span class="mb-8">Loading current Ship Location...</span>
+        <Spinner Class="w-8 h-8" />
+    </div>
+} else {
+    <EditForm 
+        @ref=@_editForm
+        Model=@_shipLocationForm
+        FormName="ship-location-form"
+        class="
+            flex flex-col
+            p-4 border-2 rounded-lg border-gray-300
+        "
+    >
+        <ObjectGraphDataAnnotationsValidator />
+        
+        <DmnSectionHeader 
+            Title=@_title
+            TitleClass="text-2xl"
+            SubmitButtonText=@_submitButtonText
+            CancelButtonText=@_cancelButtonText
+            Size="sm"
+            IsLoading=@_isSubmitting
+            OnSubmitClick=@OnSubmitClick
+            OnCancelClick=@OnCancelClick
+        />
+        <div class="
+            mt-6 mb-8
+        ">
+            <div class="sm:col-span-3">
                 <DmnInputText 
-                    Label="Street Address" 
-                    @bind-Value=@Value.Address.Street
+                    Label="Location Name"
+                    @bind-Value=@_shipLocationForm.LocationName
                 />
             </div>
+
+            <div class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
+                <h2 class="
+                    col-span-full
+                    text-lg font-semibold
+                ">
+                    Shipping Address
+                </h2>
                 <div class="col-span-full">
-                <DmnInputText 
-                    Label="Address Line 2" 
-                    @bind-Value=@Value.Address.StreetLine2
-                />
+                    <DmnInputText 
+                        Label="Street Address" 
+                        @bind-Value=@_shipLocationForm.Address.Street
+                    />
+                </div>
+                    <div class="col-span-full">
+                    <DmnInputText 
+                        Label="Address Line 2" 
+                        @bind-Value=@_shipLocationForm.Address.StreetLine2
+                    />
+                </div>
+                <div class="sm:col-span-2 sm:col-start-1">
+                    <DmnInputText 
+                        Label="City" 
+                        @bind-Value=@_shipLocationForm.Address.City
+                    />
+                </div>
+                <div class="sm:col-span-2">
+                    <DmnInputText 
+                        Label="Province" 
+                        @bind-Value=@_shipLocationForm.Address.StateProvince
+                    />
+                </div>
+                <div class="sm:col-span-2">
+                    <DmnInputText 
+                        Label="Postal Code" 
+                        @bind-Value=@_shipLocationForm.Address.PostalCode
+                    />
+                </div>
             </div>
-            <div class="sm:col-span-2 sm:col-start-1">
-                <DmnInputText 
-                    Label="City" 
-                    @bind-Value=@Value.Address.City
-                />
-            </div>
-            <div class="sm:col-span-2">
-                <DmnInputText 
-                    Label="Province" 
-                    @bind-Value=@Value.Address.StateProvince
-                />
-            </div>
-            <div class="sm:col-span-2">
-                <DmnInputText 
-                    Label="Postal Code" 
-                    @bind-Value=@Value.Address.PostalCode
-                />
-            </div>
+            <div class="sm:col-span-3"></div>
         </div>
-        <div class="sm:col-span-3"></div>
         @if(_currentShipLocation != null) {
             <div class="
                 col-span-full 
@@ -85,30 +93,34 @@
                 <h3 class="text-2xl font-semibold mb-4">Current Shipping Contact</h3>
                 <ContactEditableComboBox 
                     ShipLocation=_currentShipLocation
-                    @bind-Value:get=@_currentContact
+                    @bind-Value:get=@_shipLocationForm.ContactLinkID
                     @bind-Value:set=@OnContactSelected
                 />
-                <ValidationMessage For=@(() => Value.Contact) /> 
+                <ValidationMessage For=@(() => _shipLocationForm.ContactLinkID) /> 
             </div>
         }
-    </div>
-</EditForm>
+    </EditForm>
+}
 
 
 @code {
     @* [Parameter]
     public EventCallback<ShipLocation> ShipLocationSelected { get; set; } *@
 
+    private ShipLocationFormView _shipLocationForm = default!;
+
     private EditForm _editForm = default!;
+    private bool _isLoading = true;
     private bool _isSubmitting = false;
-    private string _submitButtonText => !Value.IsPersisted ? "Create" : "Update";
-    private string _cancelButtonText => !Value.IsPersisted ? "Cancel" : "Delete";
+    private string _title => _shipLocationForm.IsPersisted ? "Current Shipping Location" : "New Shipping Location";
+    private string _contactTitle => _shipLocationForm.ContactLinkID is not null ? "Current Shipping Contact" : "New Shipping Contact";
+    private string _submitButtonText => String.IsNullOrEmpty(Value) ? "Create" : "Update";
+    private string _cancelButtonText => String.IsNullOrEmpty(Value) ? "Cancel" : "Delete";
     private ShipLocation? _currentShipLocation = null;
-    private ContactFormView _currentContact = default!;
-    
+
     protected override void OnParametersSet() {
-        if(Value == null) {
-            Value = new();
+        if(String.IsNullOrEmpty(Value)) {
+            _shipLocationForm = new();
         }
         @* if(Value.Contacts == null) {
             Value.Contacts = new List<ContactFormView>();
@@ -116,7 +128,7 @@
         if(!Value.Contacts.Any()) {
             Value.Contacts.Add(new ContactFormView());
         } *@
-        _currentContact = Value.Contact;
+        @* _currentContact = Value.Contact; *@
 
         @* if(Value.Addresses == null) {
             Value.Addresses = new List<AddressFormView>();
@@ -132,13 +144,15 @@
     }
 
     protected override async Task OnParametersSetAsync() {
-        if(Value.IsPersisted) {
+        if(!String.IsNullOrEmpty(Value)) {
             _currentShipLocation = await SmartService!.GetClient()
                 .ShipLocation
-                .GetShipLocationById(Value.LinkID);
+                .GetShipLocationById(Value);
+            _shipLocationForm = Mapper.Map<ShipLocationFormView>(_currentShipLocation);
         } else {
             _currentShipLocation = null;
         }
+        _isLoading = false;
     }
 
     @* protected override void OnInitialized() {
@@ -147,7 +161,7 @@
     
     protected override bool TryParseValueFromString(
         string? value, 
-        out ShipLocationFormView shipLocation,
+        out string shipLocationLinkId,
         out string validationErrorMessage) {
         throw new NotImplementedException();
     }
@@ -157,7 +171,7 @@
             return;
         }
 
-        if(!Value.IsPersisted) {
+        if(String.IsNullOrEmpty(Value)) {
             await AddLocation();
         } else {
             await UpdateLocation();
@@ -165,29 +179,26 @@
     }
 
     private async Task OnCancelClick() {
-        if(!Value.IsPersisted) {
-            Value = new();
-        } else {
+        if(!String.IsNullOrEmpty(Value)) {
             await DeleteLocation();
         }
     }
 
     private async Task AddLocation() {
         _isSubmitting = true;
-        Logger.LogInformation($"Creating new Ship Location: {Value.LocationName}");
         var newLocation = await SmartService!.GetClient()
             .ShipLocation
             .AddShipLocation(
-                Value.LocationName,
-                Value.Address.Street,
-                Value.Address.StreetLine2,
-                Value.Address.City,
-                Value.Address.StateProvince,
-                Value.Address.PostalCode,
-                Value.Address.AddressNotes
+                _shipLocationForm.LocationName,
+                _shipLocationForm.Address.Street,
+                _shipLocationForm.Address.StreetLine2,
+                _shipLocationForm.Address.City,
+                _shipLocationForm.Address.StateProvince,
+                _shipLocationForm.Address.PostalCode,
+                _shipLocationForm.Address.AddressNotes
             );
         _currentShipLocation = newLocation;
-        Value = Mapper.Map<ShipLocationFormView>(newLocation);
+        Value = newLocation.LinkID;
 
         @* var newContact = await SmartService!.GetClient()
                 .ShipLocation
@@ -200,17 +211,16 @@
         _currentContact = Mapper.Map<ContactFormView>(newContact); *@
 
         await ValueChanged.InvokeAsync(Value);
-        Logger.LogInformation($"Created new Ship Location: {Value.LocationName}");
         _isSubmitting = false;
     }
     
     private async Task UpdateLocation() {
         _isSubmitting = true;
-        Logger.LogInformation($"Updating project: {Value.LocationName}");
         var location = await SmartService!.GetClient()
             .ShipLocation
-            .GetShipLocationById(Value.LinkID);
-        Mapper.Map(Value, location);
+            .GetShipLocationById(Value);
+        Logger.LogInformation($"Updating project: {location.LocationName}");
+        Mapper.Map(_shipLocationForm, location);
         await SmartService!.GetClient()
             .ShipLocation
             .UpdateShipLocation(
@@ -247,20 +257,24 @@
         _isSubmitting = false;
     }
 
-    private async Task OnContactSelected(ContactFormView contactView) {
-        _currentContact = contactView;
-        Value.Contact = _currentContact;
-        await ValueChanged.InvokeAsync(Value);
+    private async Task OnContactSelected(string contactViewLinkId) {
+        if(!String.IsNullOrEmpty(contactViewLinkId)) {
+            var contact = await SmartService!.GetClient()
+                .Contact
+                .GetShipLocationContactById(contactViewLinkId, _currentShipLocation)
+                ?? throw new InvalidOperationException("Contact not found");
+            _shipLocationForm.ContactLinkID = contact.LinkID;
+        } else {
+            _shipLocationForm.ContactLinkID = "";
+        }
     }
 
     private async Task DeleteLocation() {
         _isSubmitting = true;
-        Logger.LogInformation($"Deleting project: {Value.LocationName}");
         await SmartService!.GetClient()
             .ShipLocation
-            .DeleteShipLocationById(Value.LinkID);
-        Logger.LogInformation($"Deleted project: {Value.LocationName}");
-        Value = new ShipLocationFormView();
+            .DeleteShipLocationById(Value);
+        Value = "";
         await ValueChanged.InvokeAsync(Value);
         @* await OnChange.InvokeAsync(Value); *@
         _isSubmitting = false;

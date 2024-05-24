@@ -1,35 +1,119 @@
 @page "/quotes/{projectLinkId}/shipping"
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@attribute [StreamRendering(true)]
 @using SMART.Common.ProjectManagement
 @namespace SO.Components.Projects
 @inject SmartService SmartService
+@inject IMapper Mapper
+@inject ILogger<ProjectDetailShipping> Logger
 
-<ProjectDetailHeader Project=@_project/>
+@if(_isLoading) {
+    <div class="flex justify-center">
+        <Spinner Class="w-4 h-4" />
+        <span>Loading project...</span>
+    </div>
+} else {
 
-<div class="
-  container
-  mt-5 
-  flex flex-col flex-1
-  justify-between
-">
-  <div class="flex items-center justify-end gap-x-6">
-    <button type="button" class="text-sm font-semibold leading-6 text-gray-900">Cancel</button>
-    <button type="submit" class="rounded-md bg-sky-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500">Save</button>
+  <div class="flex flex-col bg-slate-100">
+      <ProjectDetailHeader Project=@_project />
+
+      <div class="
+          container 
+          flex flex-1 flex-col 
+          my-12
+      ">
+          <EditForm 
+              @ref=@_editForm
+              Model=@_projectView     
+              FormName="save-quote"
+              OnValidSubmit=@SaveQuote
+          >
+              <ObjectGraphDataAnnotationsValidator />
+              <DmnSectionHeader 
+                  SubmitButtonText="Save"
+                  CancelButtonText="Clear"
+                  IsLoading=@_isSubmitting
+                  OnSubmitClick=@OnSubmitClick
+                  OnCancelClick=@OnCancelClick
+              />
+              <h2 class="
+                  text-lg font-semibold 
+                  leading-7 text-gray-900 
+                  mb-1
+              ">
+                  Shipping Options
+              </h2>
+
+              <InputRadioGroup @bind-Value=@_projectView!.IsShipped>
+                  <div class="flex items-center">
+                      <InputRadio Value=false class="dmn-input-radio" />Pickup
+                      <div class="w-4" />
+                      <InputRadio Value=true class="dmn-input-radio" />Delivery
+                  </div>
+              </InputRadioGroup>
+              @if(!String.IsNullOrEmpty(_projectView.LinkIDShipLocation)) {
+                  <div class="border-t border-gray-300 mb-8 mt-3"></div>
+                  <ShipLocationEditableComboBox 
+                      @bind-Value=@_projectView.LinkIDShipLocation
+                      Project=@_projectView
+                  />
+              }
+          </EditForm>
+      </div>
   </div>  
-
-  <SEShippingInput />
-</div>  
+}
 
 
-@code {
+@code {    
+  @* [SupplyParameterFromForm]
+  private ProjectFormView? _projectView { get; set; } *@
 
-    [Parameter]
-    public string? ProjectLinkId { get; set; }
+  private EditForm _editForm = default!;
+  private bool _isLoading = true;
+  private bool _isSubmitting = false;
 
-    private Project? _project;
+  [Parameter]
+  public string? ProjectLinkId { get; set; }
 
-    protected override async Task OnInitializedAsync() {
-      _project = await SmartService.GetClient()
-        .Project
-        .GetProjectById(ProjectLinkId!);
-    }
+  private Project? _project;
+  private ProjectFormView? _projectView;
+
+  protected override async Task OnInitializedAsync() {
+    _project = await SmartService.GetClient()
+      .Project
+      .GetProjectById(ProjectLinkId!);
+    _projectView = Mapper.Map<ProjectFormView>(_project);
+    _isLoading = false;
+  }    
+  
+  private async Task OnSubmitClick() {
+      if (_editForm!.EditContext!.Validate()) {
+          await SaveQuote();
+      } else {
+          Logger.LogInformation("Validation failed!!!!");
+      }
+  }
+
+  private void OnCancelClick() {
+      _projectView = new();
+      StateHasChanged();
+  }
+
+  private async Task SaveQuote() {
+      _isSubmitting = true;
+      Logger.LogInformation($"Creating new project: {_projectView!.Name}");
+      @* Project newProject = await SmartService!.GetClient()
+          .Project
+          .AddProject(_projectView.Name); *@
+      Mapper.Map(_projectView, _project);
+      await SmartService.GetClient()
+          .Project
+          .SaveProject(_project);
+      // Add ShippingLocation
+      // Add Contact
+
+      Logger.LogInformation($"Created new project: {_project.Name}");
+      //NavigationManager.NavigateTo("/quotes");
+      _isSubmitting = false;
+  }
 }

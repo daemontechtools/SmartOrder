@@ -5,14 +5,13 @@ public class ShipLocationFormView : SmartBaseClass {
 
     public ShipLocationFormView() : this("") { }
     public ShipLocationFormView(string LinkID) : base(LinkID) {
-        Contact = new ContactFormView();
         Address = new AddressFormView();
     }
 
     [Required]
     public string LocationName { get; set; } = "";
 
-    public ContactFormView Contact { get; set; }
+    public string ContactLinkID { get; set; } = "";
     
     [Required]
     [ValidateComplexType]
