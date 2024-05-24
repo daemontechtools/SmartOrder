@@ -20,7 +20,7 @@ public partial class ProjectGroupDetail : ComponentBase {
     private Project? _project;
     private ProjectGroup? _projectGroup;
     private IQueryable<Product>? _products;
-    private bool IsLoading = true;
+    private bool _isLoading = true;
 
     private List<RoomProfileProps> _roomProfileProps = new List<RoomProfileProps>();
 
@@ -43,7 +43,7 @@ public partial class ProjectGroupDetail : ComponentBase {
         // _products = await _smartClient!.GetClient()
         //     .Product
         //     .GetCabinetsAsQueryable();
-        IsLoading = false;
+        _isLoading = false;
 
         // _roomProfileProps.Add(new RoomProfileProps { Title = "Door Style" });
         // _roomProfileProps.Add(new RoomProfileProps { Title = "Finish" });
