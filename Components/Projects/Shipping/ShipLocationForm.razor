@@ -113,6 +113,7 @@
     private bool _isLoading = true;
     private bool _isSubmitting = false;
     private string _title => _shipLocationForm.IsPersisted ? "Current Shipping Location" : "New Shipping Location";
+    private string _contactTitle => _shipLocationForm.ContactLinkID is not null ? "Current Shipping Contact" : "New Shipping Contact";
     private string _submitButtonText => String.IsNullOrEmpty(Value) ? "Create" : "Update";
     private string _cancelButtonText => String.IsNullOrEmpty(Value) ? "Cancel" : "Delete";
     private ShipLocation? _currentShipLocation = null;
