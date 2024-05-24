@@ -9,16 +9,16 @@
 
 
 <DmnSectionHeader 
-    Title="Products"
-    Subtitle="What's a room without some products?"
+    Title="Manage Products"
     SubmitButtonText="Add Product"
     OnSubmitClick=@AddProduct
     Class="mb-6"
+    TitleClass="text-2xl"
 />
 @if(!Products.Any()) {
     <div class="flex justify-center">
         <div class="text-gray-400 text-2xl">
-            No products found
+            No Products
         </div>
     </div>
 } else {

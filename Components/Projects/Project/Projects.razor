@@ -9,15 +9,17 @@
     <div class="container flex flex-col flex-1 justify-between bg-gray-100 h-full pt-8 pb-3">
         <div class="flex flex-col">
             <DmnSectionHeader 
-                Title="Quotes"
-                Subtitle="A list of all your quotes including their name, sales associate and created and last updated dates"
+                Title="Manage Quotes"
                 SubmitButtonText="Add Quote"
                 OnSubmitClick=AddQuote
                 Class="mb-6"
+                TitleClass="text-2xl"
             />
 
             @if(IsLoading) {
-                <Spinner Class="text-stone-400 dark:text-stone-400 fill-orange-600" />
+                <div class="flex justify-center">
+                    <Spinner Class="text-stone-400 dark:text-stone-400 fill-orange-600" />
+                </div>
             } else if(!_projects.Any()) {
                 <span>No Quotes Available</span>
             } else {  

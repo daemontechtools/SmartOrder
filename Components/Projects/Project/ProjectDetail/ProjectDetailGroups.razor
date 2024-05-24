@@ -9,11 +9,11 @@
 <div class="container flex flex-col flex-1 bg-stone-100 pt-6 pb-3 justify-between">
     <div>
         <DmnSectionHeader 
-            Title="Rooms"
-            Subtitle="We heard you like rooms"
+            Title="Manage Rooms"
             SubmitButtonText="Add Room"
             OnSubmitClick=AddRoom
             Class="mb-6"
+            TitleClass="text-2xl"
         />
 
         @if(_projectGroups is null || !_projectGroups.Any()) {
