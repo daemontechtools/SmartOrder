@@ -7,19 +7,20 @@ namespace SO.Components.Projects;
 
 public partial class Projects : ComponentBase {
     [Inject]
-    private ModalService? _modalService { get; set; }
+    private ModalService _modalService { get; set; } = default!;
 
     [Inject]
-    private SmartService? _smartService { get; set; }
+    private SmartService _smartService { get; set; } = default!;
 
     [Inject]
-    private ILogger<Projects>? _logger { get; set; }
+    private ILogger<Projects> _logger { get; set; } = default!;
 
     [Inject]
-    private NavigationManager? _navigationManager { get; set; }
+    private NavigationManager _navigationManager { get; set; } = default!;
 
-    private IQueryable<Project>? _projects;
-    private bool IsLoading { get; set; } = true;
+    private IQueryable<Project> _allProjects = default!;
+    private IQueryable<Project> _filteredProjects = default!;
+    private bool _isLoading { get; set; } = true;
 
     private ModalContentProps _deleteConfirmationInput;
     
@@ -31,11 +32,13 @@ public partial class Projects : ComponentBase {
         .ByAscending(p => p.Name);
 
     protected override async Task OnInitializedAsync() {
-        _projects = await _smartService!.GetClient()!
+        _allProjects = await _smartService.GetClient()!
             .Project
             .GetProjectsAsQueryable();
-        _projects = _projects
+        _allProjects = _allProjects
             .OrderByDescending(p => p.DateOrderSubmit);
+        _filteredProjects = _allProjects;
+        
         _deleteConfirmationInput = new ModalContentProps {
             Title = "Delete Quote",
             Description = "Are you sure you want to delete this quote?",
@@ -45,7 +48,7 @@ public partial class Projects : ComponentBase {
             ButtonClass = "bg-red-500 hover:bg-red-400",
             OnConfirm = OnDeleteConfirm 
         };
-        IsLoading = false;
+        _isLoading = false;
     }
 
     private async Task OnDeleteConfirm(bool confirmed) {
@@ -54,7 +57,7 @@ public partial class Projects : ComponentBase {
                 .Project
                 .DeleteProject(_projectToDelete);
             // TODO: Checrk if this is necessary
-            // _projects = await _orderApi!
+            // _allProjects = await _orderApi!
             //     .Project
             //     .GetProjectsAsQueryable(true);
             _projectToDelete = null;
@@ -63,12 +66,12 @@ public partial class Projects : ComponentBase {
         _modalService!.Hide();
     }
 
-    private async void OnStateChanged(object sender, EventArgs e) {
-        var projects = await _smartService!.GetClient()
-            .Project
-            .GetProjects();
-        await InvokeAsync(StateHasChanged);
-    }
+    // private async void OnStateChanged(object sender, EventArgs e) {
+    //     var projects = await _smartService!.GetClient()
+    //         .Project
+    //         .GetProjects();
+    //     await InvokeAsync(StateHasChanged);
+    // }
 
     private async Task AddQuote() {
         _navigationManager?.NavigateTo("/quotes/new");
@@ -80,26 +83,13 @@ public partial class Projects : ComponentBase {
     }
 
     // TODO: Abstract this out?
-    private async Task OnSearchInput(string input) {
-        _searchQuery = input;
-        if(string.IsNullOrWhiteSpace(input)) {
-            var projects = await _smartService!.GetClient()
-                .Project
-                .GetProjects();
-            _projects = projects.AsQueryable();
-        } else {
-            _projects = SearchProducts(input);
-        }   
-    }
-
-    private IQueryable<Project> SearchProducts(string? query) {
-        if(string.IsNullOrWhiteSpace(query)) {
-            return _projects!;
-        }
-        return _projects!
-            .Where(q => 
-                q.Name.Contains(query, StringComparison.OrdinalIgnoreCase)
-            )
-            .AsQueryable();
+    private void OnSearchInput(string input) {
+        _filteredProjects = String.IsNullOrWhiteSpace(input)
+            ? _allProjects
+            : _allProjects
+                .Where(q => 
+                    q.Name.Contains(input, StringComparison.OrdinalIgnoreCase)
+                )
+                .AsQueryable();
     }
 }
