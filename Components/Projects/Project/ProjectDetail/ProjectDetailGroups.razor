@@ -9,11 +9,11 @@
 <div class="container flex flex-col flex-1 bg-stone-100 pt-6 pb-3 justify-between">
     <div>
         <DmnSectionHeader 
-            Title="Rooms"
-            Subtitle="We heard you like rooms"
+            Title="Manage Rooms"
             SubmitButtonText="Add Room"
             OnSubmitClick=AddRoom
             Class="mb-6"
+            TitleClass="text-2xl"
         />
 
         @if(_projectGroups is null || !_projectGroups.Any()) {
@@ -42,16 +42,16 @@
                     Title="Interior"
                     Property=@(r => r.ProductFinishInterior)
                 /> *@
-                @* <PropertyColumn 
-                    Title="Drawer Hardware"
-                    Property=@(r => r.ProductSlide)
-                /> *@
-                @* <PropertyColumn 
-                    Title="Drawer Hardware"
+                <PropertyColumn 
+                    Title="Defaut Door Style"
+                    Property=@(r => String.IsNullOrWhiteSpace(r.ProductDoorStyle) ? "N/A" : r.ProductDoorStyle)
+                />
+                <PropertyColumn 
+                    Title="Subtotal"
                     Property=@(r => r.PriceSubTotal)
                     Format="C"
                     Sortable=true 
-                /> *@
+                />
                 <TemplateColumn 
                     Class="flex gap-x-2 justify-end"
                 >

@@ -20,7 +20,7 @@ public partial class ProjectGroupDetail : ComponentBase {
     private Project? _project;
     private ProjectGroup? _projectGroup;
     private IQueryable<Product>? _products;
-    private bool IsLoading = true;
+    private bool _isLoading = true;
 
     private List<RoomProfileProps> _roomProfileProps = new List<RoomProfileProps>();
 
@@ -36,14 +36,17 @@ public partial class ProjectGroupDetail : ComponentBase {
                 _project
             )
             ?? throw new Exception("Project Group not found");
-        var productList = _project.ProjectGroupProducts as IList<Product>;
-        _products = productList != null ? productList?.AsQueryable() : new List<Product>().AsQueryable();
-
+        _products =  _smartClient!.GetClient()
+            .ProjectGroup
+            .GetProjectGroupProductsAsQueryable(
+                _projectGroup.LinkID,
+                _project
+            );
         
         // _products = await _smartClient!.GetClient()
         //     .Product
         //     .GetCabinetsAsQueryable();
-        IsLoading = false;
+        _isLoading = false;
 
         // _roomProfileProps.Add(new RoomProfileProps { Title = "Door Style" });
         // _roomProfileProps.Add(new RoomProfileProps { Title = "Finish" });
@@ -60,7 +63,7 @@ public partial class ProjectGroupDetail : ComponentBase {
     private string GetRoomInteriorFinish() {
         return (
             _projectGroup is null
-            || String.IsNullOrEmpty(_projectGroup.ProductFinishInterior)
+            || String.IsNullOrWhiteSpace(_projectGroup.ProductFinishInterior)
         )
         ? "N/A"
         : _projectGroup.ProductFinishInterior;
@@ -69,7 +72,7 @@ public partial class ProjectGroupDetail : ComponentBase {
     private string GetRoomDrawer() {
         return (
             _projectGroup is null
-            || String.IsNullOrEmpty(_projectGroup.ProductSlide)
+            || String.IsNullOrWhiteSpace(_projectGroup.ProductSlide)
         )
         ? "N/A"
         : _projectGroup.ProductSlide;

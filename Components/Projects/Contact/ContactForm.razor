@@ -48,7 +48,7 @@
                     @bind-Value=@_contactForm.Phone
                 />
             </div>
-            @if(!String.IsNullOrEmpty(Value)) {
+            @if(!String.IsNullOrWhiteSpace(Value)) {
                 <div class="col-span-1">
                     <button 
                         type="button" 
@@ -92,14 +92,14 @@
             : "Create";
 
     protected override void OnParametersSet() {
-        if (String.IsNullOrEmpty(Value)) {
+        if (String.IsNullOrWhiteSpace(Value)) {
             _contactForm = new ContactFormView();
             _isLoading = false;
         }
     }
 
     protected async override Task OnParametersSetAsync() {
-        if (!String.IsNullOrEmpty(Value)) {
+        if (!String.IsNullOrWhiteSpace(Value)) {
             var contact = await SmartService.GetClient()
                 .Contact
                 .GetShipLocationContactById(Value, ShipLocation);

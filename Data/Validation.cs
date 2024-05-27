@@ -22,7 +22,7 @@ public class RequiredIfAttribute : ValidationAttribute {
             return ValidationResult.Success;
         }
 
-        if(value == null || String.IsNullOrEmpty(value.ToString())) {
+        if(value == null || String.IsNullOrWhiteSpace(value.ToString())) {
             var memberNames = new List<string>();
             if (validationContext.MemberName != null) {
                 memberNames.Add(validationContext.MemberName);

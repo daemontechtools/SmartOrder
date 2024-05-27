@@ -16,16 +16,11 @@
                 <div class="h-2 w-2 rounded-full bg-current"></div>
             </div>
             <h1 class="flex gap-x-3 text-base leading-7">
-                <span class="font-semibold text-2xl text-gray-200">@Project.Name</span>
+                <span class="font-semibold text-2xl text-gray-200">@ProjectGroup!.Name</span>
             </h1>
         </div>
-        <p class="mt-2 leading-6 text-gray-300">
-            <b>Sales Associate</b>: @(String.IsNullOrWhiteSpace(Project.LinkIDEmployeeSoldBy) 
-                ? "N/A" 
-                : Project.LinkIDEmployeeSoldBy)
-        </p>
     </div>
-    <div class="
+    @* <div class="
         order-first flex-none 
         rounded-full bg-green-200 
         px-2 py-1 text-sm 
@@ -34,7 +29,7 @@
         sm:order-none
     ">
         Approved
-    </div>
+    </div> *@
 </div>
 
     <!-- Stats -->
@@ -68,24 +63,19 @@
     </div>
 </div>
 
-<ProjectDetailNav Project=@Project />
-
 
 @code {
     [Parameter]
-    public Project Project { get; set; } = default!;
+    public ProjectGroup ProjectGroup { get; set; } = default!;
 
-    [Parameter]
-    public int DocumentCount { get; set; }
-
-    private float TotalTaxOut => Project.PriceTotalTaxOut != null
-        ? (float)Math.Round(Project.PriceTotalTaxOut, 2)
+    private float TotalTaxOut => ProjectGroup.PriceTotalTaxOut != null
+        ? (float)Math.Round(ProjectGroup.PriceTotalTaxOut, 2)
         : 0;
-    private float SubTotal => Project.PriceSubTotal != null
-        ? (float)Math.Round(Project.PriceSubTotal, 2)
+    private float SubTotal => ProjectGroup.PriceSubTotal != null
+        ? (float)Math.Round(ProjectGroup.PriceSubTotal, 2)
         : 0;
-    private float Discount => Project.PriceClientDiscountAmount != null
-        ? (float)Project!.PriceClientDiscountAmount
+    private float Discount => ProjectGroup.PriceClientDiscountAmount != null
+        ? (float)ProjectGroup!.PriceClientDiscountAmount
         : 0;
     private float Shipping = 0;
 }

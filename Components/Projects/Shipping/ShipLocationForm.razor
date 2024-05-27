@@ -114,12 +114,12 @@
     private bool _isSubmitting = false;
     private string _title => _shipLocationForm.IsPersisted ? "Current Shipping Location" : "New Shipping Location";
     private string _contactTitle => _shipLocationForm.ContactLinkID is not null ? "Current Shipping Contact" : "New Shipping Contact";
-    private string _submitButtonText => String.IsNullOrEmpty(Value) ? "Create" : "Update";
-    private string _cancelButtonText => String.IsNullOrEmpty(Value) ? "Cancel" : "Delete";
+    private string _submitButtonText => String.IsNullOrWhiteSpace(Value) ? "Create" : "Update";
+    private string _cancelButtonText => String.IsNullOrWhiteSpace(Value) ? "Cancel" : "Delete";
     private ShipLocation? _currentShipLocation = null;
 
     protected override void OnParametersSet() {
-        if(String.IsNullOrEmpty(Value)) {
+        if(String.IsNullOrWhiteSpace(Value)) {
             _shipLocationForm = new();
         }
         @* if(Value.Contacts == null) {
@@ -144,7 +144,7 @@
     }
 
     protected override async Task OnParametersSetAsync() {
-        if(!String.IsNullOrEmpty(Value)) {
+        if(!String.IsNullOrWhiteSpace(Value)) {
             _currentShipLocation = await SmartService!.GetClient()
                 .ShipLocation
                 .GetShipLocationById(Value);
@@ -171,7 +171,7 @@
             return;
         }
 
-        if(String.IsNullOrEmpty(Value)) {
+        if(String.IsNullOrWhiteSpace(Value)) {
             await AddLocation();
         } else {
             await UpdateLocation();
@@ -179,7 +179,7 @@
     }
 
     private async Task OnCancelClick() {
-        if(!String.IsNullOrEmpty(Value)) {
+        if(!String.IsNullOrWhiteSpace(Value)) {
             await DeleteLocation();
         }
     }
@@ -228,7 +228,7 @@
             );
 
         @* Contact contact = null;
-        if(location.Contacts != null || String.IsNullOrEmpty(location.Contacts[0].DisplayName)) {
+        if(location.Contacts != null || String.IsNullOrWhiteSpace(location.Contacts[0].DisplayName)) {
             contact = await SmartService!.GetClient()
                 .ShipLocation
                 .AddContact(
@@ -258,7 +258,7 @@
     }
 
     private async Task OnContactSelected(string contactViewLinkId) {
-        if(!String.IsNullOrEmpty(contactViewLinkId)) {
+        if(!String.IsNullOrWhiteSpace(contactViewLinkId)) {
             var contact = await SmartService!.GetClient()
                 .Contact
                 .GetShipLocationContactById(contactViewLinkId, _currentShipLocation)

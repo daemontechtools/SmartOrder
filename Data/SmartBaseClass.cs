@@ -10,7 +10,7 @@ public class SmartBaseClass : SMARTBaseClass {
 
     public bool IsPersisted { 
         get { 
-            return !string.IsNullOrEmpty(LinkIDFactory); 
+            return !string.IsNullOrWhiteSpace(LinkIDFactory); 
         }
     }
 

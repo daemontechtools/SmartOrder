@@ -19,9 +19,7 @@
     <div class="flex flex-1 flex-col container mt-6">
         @if(_isLoading) {
             <div class="flex flex-col items-center justify-center h-full">
-                <div class="text-3xl font-bold text-gray-500">
-                    <span class="ml-4">Loading...</span>
-                </div>
+                <Spinner Class="w-24 h-24 text-white dark:text-stone-400 fill-orange-600"/>
             </div>
         } else {
             <DmnSectionHeader 
@@ -112,7 +110,7 @@
 
                     </div>
                     @if(_productPrice != null 
-                        || !string.IsNullOrEmpty(_priceError)
+                        || !string.IsNullOrWhiteSpace(_priceError)
                     ) {
                         <div class="col-span-6 mt-6">
                             <div class="flex flex-col">
@@ -124,7 +122,7 @@
                                     Product Price:
                                     $@(_productPrice * _productFormView.Quantity)
                                 </label>
-                                @if(!string.IsNullOrEmpty(_priceError)) {
+                                @if(!string.IsNullOrWhiteSpace(_priceError)) {
                                     <div class="mt-3" />
                                     <label>
                                         Product Error:
@@ -264,7 +262,7 @@
             .GetAllowedFinishes(doorStyle!)
             .AsQueryable();
         Logger.LogInformation($"Finishes: {_finishes.Count()}");
-        if(!String.IsNullOrEmpty(_projectGroup.ProductFinishInterior)
+        if(!String.IsNullOrWhiteSpace(_projectGroup.ProductFinishInterior)
             && _finishes.Contains(_projectGroup.ProductFinishInterior)
         ) {
             _selectedFinish = _projectGroup.ProductFinishInterior;
@@ -278,7 +276,7 @@
             .GetAllowedDrawerHardware(doorStyle!)
             .AsQueryable();
         Logger.LogInformation($"Drawer Hardwares: {_drawerHardwares.Count()}");
-        if(!String.IsNullOrEmpty(_projectGroup.ProductSlide)
+        if(!String.IsNullOrWhiteSpace(_projectGroup.ProductSlide)
             && _drawerHardwares.Contains(_projectGroup.ProductSlide)
         ) {
             _selectedDrawerHardware = _projectGroup.ProductSlide;
@@ -347,6 +345,28 @@
                 _selectedCabinet
             )
             ?? throw new InvalidOperationException("Product not added to Project Group"); 
+
+
+        product.PriceSubTotal = product.PriceLibrary * product.Quantity;
+        product.PriceTotalTaxOut = product.PriceSubTotal;
+
+        var projectGroupProducts = SmartService.GetClient()
+            .ProjectGroup
+            .GetProjectGroupProducts(
+                _projectGroup.LinkID,
+                _project
+            );
+        _projectGroup.PriceSubTotal = projectGroupProducts.Sum(p => p.PriceSubTotal);
+        _projectGroup.PriceTotalTaxOut = projectGroupProducts.Sum(p => p.PriceTotalTaxOut); 
+
+        IList<ProjectGroup> projectGroupList = _project.ProjectGroups;
+        _project.PriceSubTotal = projectGroupList.Sum(pg => pg.PriceSubTotal);
+        _project.PriceTotalTaxOut = projectGroupList.Sum(pg => pg.PriceTotalTaxOut);
+
+        
+        await SmartService.GetClient()
+            .Project
+            .SaveProject(_project);
         NavigationManager
             .NavigateTo($"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}");
     }

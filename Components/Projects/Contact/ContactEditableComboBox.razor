@@ -57,7 +57,7 @@
             .GetShipLocationContactsAsQueryable(
                 ShipLocation
             );
-        if(!String.IsNullOrEmpty(Value)) {
+        if(!String.IsNullOrWhiteSpace(Value)) {
             _currentContact = await SmartService.GetClient()
                 .Contact
                 .GetShipLocationContactById(
@@ -86,7 +86,7 @@
     private async Task OnContactChanged(string contactLinkId) {
         Console.WriteLine("Contact Changed");
         Contact contact = default!;
-        _currentContact = String.IsNullOrEmpty(contactLinkId)
+        _currentContact = String.IsNullOrWhiteSpace(contactLinkId)
             ? null
             : await SmartService.GetClient()
                 .Contact
