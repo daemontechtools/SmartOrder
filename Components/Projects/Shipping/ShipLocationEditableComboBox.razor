@@ -74,7 +74,7 @@
     _shipLocations = await SmartService.GetClient()
       .ShipLocation
       .GetShipLocationsAsQueryable();
-    if(!String.IsNullOrEmpty(Value)) {
+    if(!String.IsNullOrWhiteSpace(Value)) {
       _currentShipLocation = await SmartService.GetClient()
         .ShipLocation
         .GetShipLocationById(Value);
@@ -132,7 +132,7 @@
   }
 
   private async Task OnShipLocationViewChanged(string shipLocationLinkId) {
-    if(String.IsNullOrEmpty(shipLocationLinkId)) {
+    if(String.IsNullOrWhiteSpace(shipLocationLinkId)) {
       _currentShipLocation = null;
       Value = null;
     } else {

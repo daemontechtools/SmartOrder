@@ -22,18 +22,18 @@ public class RequiredIfNoContact : ValidationAttribute {
     ) {
         var contactForm = validationContext.ObjectInstance as ContactFormView;
         if(
-            !string.IsNullOrEmpty(contactForm?.Email)
-            && !string.IsNullOrEmpty(contactForm?.Phone)
+            !string.IsNullOrWhiteSpace(contactForm?.Email)
+            && !string.IsNullOrWhiteSpace(contactForm?.Phone)
         ) {
             return ValidationResult.Success;
         }
 
         var memberNames = new List<string>();
         if(validationContext.MemberName == nameof(ContactFormView.Email)
-            && string.IsNullOrEmpty(contactForm?.Email)) {
+            && string.IsNullOrWhiteSpace(contactForm?.Email)) {
             memberNames.Add(nameof(ContactFormView.Email));
         } else if(validationContext.MemberName == nameof(ContactFormView.Phone)
-            && string.IsNullOrEmpty(contactForm?.Phone)) {
+            && string.IsNullOrWhiteSpace(contactForm?.Phone)) {
             memberNames.Add(nameof(ContactFormView.Phone));
         }
         return new ValidationResult(ErrorMessage, memberNames);

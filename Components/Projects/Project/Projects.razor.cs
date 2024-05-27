@@ -82,7 +82,7 @@ public partial class Projects : ComponentBase {
     // TODO: Abstract this out?
     private async Task OnSearchInput(string input) {
         _searchQuery = input;
-        if(string.IsNullOrEmpty(input)) {
+        if(string.IsNullOrWhiteSpace(input)) {
             var projects = await _smartService!.GetClient()
                 .Project
                 .GetProjects();

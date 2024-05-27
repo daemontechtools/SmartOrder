@@ -51,7 +51,7 @@
                       <InputRadio Value=true class="dmn-input-radio" />Delivery
                   </div>
               </InputRadioGroup>
-              @if(!String.IsNullOrEmpty(_projectView.LinkIDShipLocation)) {
+              @if(!String.IsNullOrWhiteSpace(_projectView.LinkIDShipLocation)) {
                   <div class="border-t border-gray-300 mb-8 mt-3"></div>
                   <ShipLocationEditableComboBox 
                       @bind-Value=@_projectView.LinkIDShipLocation

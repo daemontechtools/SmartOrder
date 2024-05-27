@@ -80,7 +80,7 @@ public partial class DmnComboBox<T> : InputBase<T> {
 
     private void HandleInput(ChangeEventArgs e) {
         _searchValue = e.Value?.ToString() ?? "";
-        if(String.IsNullOrEmpty(_searchValue)) {
+        if(String.IsNullOrWhiteSpace(_searchValue)) {
             _filteredData = Data;
             return;
         }
