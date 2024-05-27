@@ -58,7 +58,7 @@
     <div class="border-t border-stone-500 py-6 px-4 sm:px-6 lg:px-8 sm:border-l">
         <p class="text-xl font-bold leading-6 text-gray-100">Total</p>
         <p class="mt-2 flex items-baseline gap-x-2">
-            <span class="text-4xl font-semibold tracking-tight text-white">$@TotalTaxIn</span>
+            <span class="text-4xl font-semibold tracking-tight text-white">$@TotalTaxOut</span>
         </p>
     </div>
 </div>
@@ -68,17 +68,14 @@
     [Parameter]
     public ProjectGroup ProjectGroup { get; set; } = default!;
 
-    private float TotalTaxIn => ProjectGroup.PriceTotalTaxIn == null
-        ? (float)ProjectGroup!.PriceTotalTaxIn
-        : 0;
-    private float TotalTaxOut => ProjectGroup.PriceTotalTaxOut == null
-        ? (float)ProjectGroup.PriceTotalTaxOut
+    private float TotalTaxOut => ProjectGroup.PriceTotalTaxOut != null
+        ? (float)Math.Round(ProjectGroup.PriceTotalTaxOut, 2)
         : 0;
     private float SubTotal => ProjectGroup.PriceSubTotal != null
-        ? (float)ProjectGroup.PriceSubTotal
+        ? (float)Math.Round(ProjectGroup.PriceSubTotal, 2)
         : 0;
     private float Discount => ProjectGroup.PriceClientDiscountAmount != null
-        ? (float)ProjectGroup.PriceClientDiscountAmount
+        ? (float)ProjectGroup!.PriceClientDiscountAmount
         : 0;
     private float Shipping = 0;
 }
