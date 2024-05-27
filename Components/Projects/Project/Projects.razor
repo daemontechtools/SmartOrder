@@ -7,7 +7,7 @@
 <div class="flex flex-col h-full">
     <Search OnInput=OnSearchInput />
     <div class="container flex flex-col flex-1 justify-between bg-gray-100 h-full pt-8 pb-3">
-        <div class="flex flex-col">
+        <div class="flex flex-col grow">
             <DmnSectionHeader 
                 Title="Manage Quotes"
                 SubmitButtonText="Add Quote"
@@ -16,14 +16,14 @@
                 TitleClass="text-2xl"
             />
 
-            @if(IsLoading) {
-                <div class="flex justify-center">
-                    <Spinner Class="text-stone-400 dark:text-stone-400 fill-orange-600" />
+            @if(_isLoading) {
+                <div class="flex justify-center items-center grow">
+                    <Spinner Class="w-12 h-12" />
                 </div>
-            } else if(!_projects.Any()) {
-                <span>No Quotes Available</span>
+            } else if(!_filteredProjects.Any()) {
+                <span>No Quotes Found</span>
             } else {  
-                <QuickGrid Items=@_projects Pagination=@_pagination>
+                <QuickGrid Items=@_filteredProjects Pagination=@_pagination>
                     <TemplateColumn               
                         Title="Name"
                     >
