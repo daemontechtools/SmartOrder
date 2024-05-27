@@ -42,16 +42,16 @@
                     Title="Interior"
                     Property=@(r => r.ProductFinishInterior)
                 /> *@
-                @* <PropertyColumn 
-                    Title="Drawer Hardware"
-                    Property=@(r => r.ProductSlide)
-                /> *@
-                @* <PropertyColumn 
-                    Title="Drawer Hardware"
+                <PropertyColumn 
+                    Title="Defaut Door Style"
+                    Property=@(r => String.IsNullOrWhiteSpace(r.ProductDoorStyle) ? "N/A" : r.ProductDoorStyle)
+                />
+                <PropertyColumn 
+                    Title="Subtotal"
                     Property=@(r => r.PriceSubTotal)
                     Format="C"
                     Sortable=true 
-                /> *@
+                />
                 <TemplateColumn 
                     Class="flex gap-x-2 justify-end"
                 >
