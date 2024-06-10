@@ -1,0 +1,64 @@
+@inject SmartService SmartService
+@namespace SO.Components.Projects
+
+<div class="md:flex md:items-center md:justify-between my-6">
+    <div class="flex flex-col">
+        <h1 class="text-xl font-semibold">Default Door Style</h1>
+        @if(_isLoading) {
+            <div class="flex items-center justify-center h-full">
+                <Spinner Class="w-12 h-12" />
+            </div>
+        } else {
+            <div class="grid grid-cols-2 gap-4">
+                <div class="col-span-1">
+                    <DmnComboBox 
+                        Data=@_doorStyles
+                        @bind-Value=@_selectedDoorStyle
+                        TextFieldName=@nameof(LibraryStyleConfiguration.Name)
+                        Label="Select a Door Style"
+                        Class="pb-4"
+                    />
+                </div>
+                <div class="col-span-1 flex flex-col">
+                    <span><b>Interior Finish</b>: @GetRoomInteriorFinish()</span>
+                    <span><b>Drawer Hardware</b>: @GetRoomDrawer()</span>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code { 
+    [Parameter]
+    public ProjectGroup ProjectGroup { get; set; } = default!;
+
+    private IQueryable<LibraryStyleConfiguration> _doorStyles = default!;
+    
+    private LibraryStyleConfiguration? _selectedDoorStyle;
+    private bool _isLoading = true;
+
+    protected override async Task OnInitializedAsync() {
+        var doorStyles = await SmartService.GetClient()
+            .DoorStyle
+            .GetDoorStyles();
+        _doorStyles = doorStyles.AsQueryable();
+        if(!String.IsNullOrWhiteSpace(ProjectGroup.ProductDoorStyle)) {
+            _selectedDoorStyle = await SmartService.GetClient()
+                .DoorStyle
+                .GetDoorStyleByName(ProjectGroup.ProductDoorStyle);
+        }
+        _isLoading = false;
+    }
+    
+    private string GetRoomInteriorFinish() {
+        return String.IsNullOrWhiteSpace(ProjectGroup.ProductFinishInterior)
+            ? "N/A"
+            : ProjectGroup.ProductFinishInterior;
+    }
+
+    private string GetRoomDrawer() {
+        return String.IsNullOrWhiteSpace(ProjectGroup.ProductSlide)
+            ? "N/A"
+            : ProjectGroup.ProductSlide;
+    }
+}
