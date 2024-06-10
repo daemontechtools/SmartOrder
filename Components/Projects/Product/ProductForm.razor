@@ -19,7 +19,7 @@
     <div class="flex flex-1 flex-col container mt-6">
         @if(_isLoading) {
             <div class="flex flex-col items-center justify-center h-full">
-                <Spinner Class="w-24 h-24 text-white dark:text-stone-400 fill-orange-600"/>
+                <Spinner Class="w-12 h-12"/>
             </div>
         } else {
             <DmnSectionHeader 
@@ -82,6 +82,11 @@
                     </div> 
                     <div class="col-span-3">
                         @if(_selectedCabinet != null) {
+                            @* <img 
+                                class="w-64 h-64"
+                                src=@GetImageSource()
+                                alt="Description of image"
+                            /> *@
                             <div class="flex flex-col">
                                 <label>
                                     Width:
@@ -238,7 +243,7 @@
 
         // Get StyleConfigurations for this product
         _doorStyles = SmartService.GetClient()
-            .Product
+            .DoorStyle
             .GetDoorStylesForProduct(product)
             .AsQueryable();
         _selectedDoorStyle = null;
@@ -258,7 +263,7 @@
         _selectedDoorStyle = doorStyle;
 
         _finishes = SmartService.GetClient()
-            .Product
+            .DoorStyle
             .GetAllowedFinishes(doorStyle!)
             .AsQueryable();
         Logger.LogInformation($"Finishes: {_finishes.Count()}");
@@ -272,7 +277,7 @@
                 
 
         _drawerHardwares = SmartService.GetClient()
-            .Product
+            .DoorStyle
             .GetAllowedDrawerHardware(doorStyle!)
             .AsQueryable();
         Logger.LogInformation($"Drawer Hardwares: {_drawerHardwares.Count()}");
@@ -369,5 +374,12 @@
             .SaveProject(_project);
         NavigationManager
             .NavigateTo($"/quotes/{ProjectLinkId}/rooms/{ProjectGroupLinkId}");
+    }
+
+    private async Task<string> GetImageSource() {
+        var b64 = await SmartService.GetClient()
+            .Product
+            .GetProductGraphic(_selectedCabinet);
+        return $"data:image/png;base64,{b64}";
     }
 }

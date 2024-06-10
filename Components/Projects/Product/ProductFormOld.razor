@@ -213,7 +213,7 @@
         // Get StyleConfigurations for this product
         var client = SmartService!.GetClient();
         _styleConfigurations = client
-            .Product
+            .DoorStyle
             .GetDoorStylesForProduct(product)
             .AsQueryable();
 
@@ -245,7 +245,7 @@
         _selectedStyleConfiguration = styleConfiguration;
 
         _finishes = SmartService.GetClient()
-            .Product
+            .DoorStyle
             .GetAllowedFinishes(styleConfiguration!)
             .AsQueryable();
         Logger.LogInformation($"Finishes: {_finishes.Count()}");
@@ -258,7 +258,7 @@
         } 
 
         _doorHardwares = SmartService.GetClient()
-            .Product
+            .DoorStyle
             .GetAllowedDrawerHardware(styleConfiguration!)
             .AsQueryable();
     }

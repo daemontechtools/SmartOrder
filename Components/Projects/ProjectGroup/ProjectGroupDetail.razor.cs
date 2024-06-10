@@ -59,22 +59,4 @@ public partial class ProjectGroupDetail : ComponentBase {
         var roomTotal = _products?.Sum(p => p.PriceLibrary * p.Quantity) ?? 0;
         return (float)Math.Round(roomTotal, 2);
     }
-
-    private string GetRoomInteriorFinish() {
-        return (
-            _projectGroup is null
-            || String.IsNullOrWhiteSpace(_projectGroup.ProductFinishInterior)
-        )
-        ? "N/A"
-        : _projectGroup.ProductFinishInterior;
-    }
-
-    private string GetRoomDrawer() {
-        return (
-            _projectGroup is null
-            || String.IsNullOrWhiteSpace(_projectGroup.ProductSlide)
-        )
-        ? "N/A"
-        : _projectGroup.ProductSlide;
-    }
 }
