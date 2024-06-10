@@ -9,27 +9,21 @@
                 <Spinner Class="w-12 h-12" />
             </div>
         } else {
-            <EditForm 
-                @ref=@_editForm
-                Model=@ProjectGroup    
-                FormName="defaultDoorStyleForm"
-            >
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="col-span-1">
-                        <DmnComboBox 
-                            Data=@_doorStyles
-                            @bind-Value=@_selectedDoorStyle
-                            TextFieldName=@nameof(LibraryStyleConfiguration.Name)
-                            Label="Select a Door Style"
-                            Class="pb-4"
-                        />
-                    </div>
-                    <div class="col-span-1 flex flex-col">
-                        <span><b>Interior Finish</b>: @GetRoomInteriorFinish()</span>
-                        <span><b>Drawer Hardware</b>: @GetRoomDrawer()</span>
-                    </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="col-span-1">
+                    <DmnComboBox 
+                        Data=@_doorStyles
+                        @bind-Value=@_selectedDoorStyle
+                        TextFieldName=@nameof(LibraryStyleConfiguration.Name)
+                        Label="Select a Door Style"
+                        Class="pb-4"
+                    />
                 </div>
-            </EditForm>
+                <div class="col-span-1 flex flex-col">
+                    <span><b>Interior Finish</b>: @GetRoomInteriorFinish()</span>
+                    <span><b>Drawer Hardware</b>: @GetRoomDrawer()</span>
+                </div>
+            </div>
         }
     </div>
 </div>
@@ -37,8 +31,6 @@
 @code { 
     [Parameter]
     public ProjectGroup ProjectGroup { get; set; } = default!;
-
-    private EditForm? _editForm;
 
     private IQueryable<LibraryStyleConfiguration> _doorStyles = default!;
     
