@@ -26,7 +26,11 @@
     />
     <ProjectGroupHeader ProjectGroup=@_projectGroup />
     <div class="container flex flex-col pt-6">
-        <ProjectGroupDetailDefaults ProjectGroup=@_projectGroup />
+        <ProjectGroupDetailDefaults 
+            Project=@_project
+            ProjectGroup=@_projectGroup 
+        />
+        <div class="my-3" />
 
         @* <RoomProperties 
             Props=@_roomProfileProps

@@ -1,64 +1,205 @@
 @inject SmartService SmartService
 @namespace SO.Components.Projects
 
-<div class="md:flex md:items-center md:justify-between my-6">
-    <div class="flex flex-col">
-        <h1 class="text-xl font-semibold">Default Door Style</h1>
-        @if(_isLoading) {
-            <div class="flex items-center justify-center h-full">
-                <Spinner Class="w-12 h-12" />
-            </div>
-        } else {
-            <div class="grid grid-cols-2 gap-4">
-                <div class="col-span-1">
+<div class="flex flex-col">
+    <h1 class="
+        text-xl font-semibold
+        mb-2    
+    ">
+        Room Default Settings
+    </h1>
+    @if(_isLoading) {
+        <div class="
+            flex 
+            justify-center items-center 
+            min-h-20
+        ">
+            <Spinner Class="w-6 h-6" />
+        </div>
+    } else {
+        <div class="
+            grid grid-cols-2 gap-x-12 
+            min-h-20
+        ">
+            <div class="col-span-1">
+                <div class="flex grow items-center justify-between">
+                    <span class="w-1/4 text-sm text-gray-500">Door Style: </span>
                     <DmnComboBox 
                         Data=@_doorStyles
-                        @bind-Value=@_selectedDoorStyle
+                        @bind-Value:get=@_selectedDoorStyle
+                        @bind-Value:set=@SetDefaultDoorStyle
                         TextFieldName=@nameof(LibraryStyleConfiguration.Name)
-                        Label="Select a Door Style"
-                        Class="pb-4"
+                        Placeholder="Select a Door Style"
+                        Class="w-3/4"
                     />
-                </div>
-                <div class="col-span-1 flex flex-col">
-                    <span><b>Interior Finish</b>: @GetRoomInteriorFinish()</span>
-                    <span><b>Drawer Hardware</b>: @GetRoomDrawer()</span>
+
                 </div>
             </div>
-        }
-    </div>
+            <div class="col-span-1 flex flex-col">
+                @if(_selectedDoorStyle is null) {
+                    <span class="
+                        flex flex-1
+                        text-sm text-gray-500
+                        items-center justify-center
+                    ">
+                        Must like select a door style
+                    </span>
+                } else if(_isSaving == true) {
+                    <div class="flex flex-col flex-1">
+                        <span class="mb-2">Saving Room Defaults</span>
+                        <Spinner Class="w-8 h-8" />
+                    </div>
+                } else {
+                    <div class="flex grow items-center justify-between">
+                        <span class="w-1/4 text-sm text-gray-500">Int. Finish: </span>
+                        <DmnComboBox
+                            Data=@_finishes
+                            Placeholder="Select a Finish"
+                            @bind-Value:get=@_selectedFinish
+                            @bind-Value:set=@(f => SetDefaultFinish(f))
+                            Class="w-3/4"
+                        />
+                    </div>
+                    <div class="flex grow items-center justify-between">
+                        <span class="w-1/4 text-sm text-gray-500">Hardware: </span>
+                        <DmnComboBox
+                            Data=@_drawerHardwares
+                            Placeholder="Select a Door Hardware"
+                            @bind-Value:get=@_selectedDrawerHardware
+                            @bind-Value:set=@(h => SetDefaultHardware(h))
+                            Class="w-3/4"
+                        />
+                    </div>
+                }
+            </div>
+        </div>
+    }
 </div>
 
 @code { 
     [Parameter]
+    public Project Project { get; set; } = default!;
+
+    [Parameter]
     public ProjectGroup ProjectGroup { get; set; } = default!;
 
     private IQueryable<LibraryStyleConfiguration> _doorStyles = default!;
-    
     private LibraryStyleConfiguration? _selectedDoorStyle;
+    private IQueryable<string>? _finishes;
+    private string _selectedFinish = "";
+    private IQueryable<string>? _drawerHardwares;
+    private string _selectedDrawerHardware = "";
+    private bool _isSaving = false;
+    
     private bool _isLoading = true;
 
-    protected override async Task OnInitializedAsync() {
+    protected override async Task OnInitializedAsync() { 
+        _selectedFinish = ProjectGroup.ProductFinishInterior;
+        _selectedDrawerHardware = ProjectGroup.ProductSlide;
         var doorStyles = await SmartService.GetClient()
             .DoorStyle
             .GetDoorStyles();
         _doorStyles = doorStyles.AsQueryable();
         if(!String.IsNullOrWhiteSpace(ProjectGroup.ProductDoorStyle)) {
-            _selectedDoorStyle = await SmartService.GetClient()
+            var doorStyle = await SmartService.GetClient()
                 .DoorStyle
                 .GetDoorStyleByName(ProjectGroup.ProductDoorStyle);
+            if(doorStyle is null) {
+                throw new Exception("Door Style not found");
+            }
+            await SetDefaultDoorStyle(doorStyle);
         }
+
         _isLoading = false;
     }
-    
-    private string GetRoomInteriorFinish() {
-        return String.IsNullOrWhiteSpace(ProjectGroup.ProductFinishInterior)
-            ? "N/A"
-            : ProjectGroup.ProductFinishInterior;
+
+    private async Task SetDefaultDoorStyle(LibraryStyleConfiguration doorStyle) {
+        _isSaving = true;
+        var shouldSave = false;
+        _selectedDoorStyle = doorStyle;
+        if(_selectedDoorStyle.Name != ProjectGroup.ProductDoorStyle) {
+            ProjectGroup.ProductDoorStyle = _selectedDoorStyle.Name;
+            shouldSave = true;
+        }
+
+        _finishes = SmartService.GetClient()
+            .DoorStyle
+            .GetAllowedFinishes(doorStyle)
+            .AsQueryable();
+        if(!_finishes.Contains(_selectedFinish)) {
+            _selectedFinish = "";
+        }
+        if(_finishes.Count() < 2) {
+            _selectedFinish = _finishes.First();
+        }
+        if(_selectedFinish != ProjectGroup.ProductFinishInterior
+        ) {
+            await SetDefaultFinish(_selectedFinish, false);
+            shouldSave = true;
+        }
+
+        _drawerHardwares = SmartService.GetClient()
+            .DoorStyle
+            .GetAllowedDrawerHardware(doorStyle)
+            .AsQueryable();
+        if(!_drawerHardwares.Contains(ProjectGroup.ProductSlide)) {
+            _selectedDrawerHardware = "";
+        }
+        if(_drawerHardwares.Count() < 2) {
+            _selectedDrawerHardware = _drawerHardwares.First();
+        }
+        if(_selectedDrawerHardware != ProjectGroup.ProductSlide) {
+            await SetDefaultHardware(_selectedDrawerHardware, false);
+            shouldSave = true;
+        }
+
+        if(shouldSave) {
+            await SmartService.GetClient()
+                .Project
+                .SaveProject(Project);
+        }
+        _isSaving = false;
+    } 
+
+    private async Task SetDefaultFinish(
+        string finish,
+        bool saveRemote = true
+    ) {
+        if(finish == ProjectGroup.ProductFinishInterior) {
+            return;
+        }
+
+        if(saveRemote == true) {
+            _isSaving = true;
+        }
+        ProjectGroup.ProductFinishInterior = finish;
+        _selectedFinish = finish;
+        if(saveRemote == true) {
+            await SmartService.GetClient()
+                .Project
+                .SaveProject(Project);
+            _isSaving = false;
+        }
     }
 
-    private string GetRoomDrawer() {
-        return String.IsNullOrWhiteSpace(ProjectGroup.ProductSlide)
-            ? "N/A"
-            : ProjectGroup.ProductSlide;
+    private async Task SetDefaultHardware(
+        string hardware,
+        bool saveRemote = true
+    ) {
+        if(ProjectGroup.ProductSlide == hardware) {
+            return;
+        }
+
+        if(saveRemote == true) {
+            _isSaving = true;
+        }
+        ProjectGroup.ProductSlide = hardware;
+        _selectedDrawerHardware = hardware;
+        if(saveRemote == true) {
+            await SmartService.GetClient()
+                .Project
+                .SaveProject(Project);
+            _isSaving = false;
+        }
     }
 }
